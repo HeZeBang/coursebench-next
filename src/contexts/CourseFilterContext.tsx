@@ -15,6 +15,7 @@ interface CourseFilterState {
   selected: string[]; // selected institute names
   sortKey: SortKey;
   order: SortOrder;
+  includeDataInsufficient: boolean;
 }
 
 // ── Actions ──
@@ -23,6 +24,7 @@ type CourseFilterAction =
   | { type: "SET_SELECTED"; payload: string[] }
   | { type: "SET_SORT_KEY"; payload: SortKey }
   | { type: "SET_ORDER"; payload: SortOrder }
+  | { type: "SET_INCLUDE_DATA_INSUFFICIENT"; payload: boolean }
   | { type: "RESET" };
 
 function courseFilterReducer(
@@ -38,8 +40,10 @@ function courseFilterReducer(
       return { ...state, sortKey: action.payload, page: 1 };
     case "SET_ORDER":
       return { ...state, order: action.payload, page: 1 };
+    case "SET_INCLUDE_DATA_INSUFFICIENT":
+      return { ...state, includeDataInsufficient: action.payload, page: 1 };
     case "RESET":
-      return { page: 1, selected: [], sortKey: "score", order: "desc" };
+      return { page: 1, selected: [], sortKey: "score", order: "desc", includeDataInsufficient: false };
     default:
       return state;
   }
@@ -51,6 +55,7 @@ const CourseFilterContext = createContext<CourseFilterState>({
   selected: [],
   sortKey: "score",
   order: "desc",
+  includeDataInsufficient: false,
 });
 
 const CourseFilterDispatchContext = createContext<Dispatch<CourseFilterAction>>(
@@ -64,6 +69,7 @@ export function CourseFilterProvider({ children }: { children: ReactNode }) {
     selected: [],
     sortKey: "score",
     order: "desc",
+    includeDataInsufficient: false,
   });
 
   return (

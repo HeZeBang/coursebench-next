@@ -19,6 +19,7 @@ import { EmptyState } from "@/components/layout";
 import { sortCmp } from "@/utils";
 import { averageScore } from "@/utils/parseScore";
 import type { Course, SortKey, SortOrder } from "@/types";
+import { ENOUGH_DATA_THRESHOLD } from "@/constants/scores";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -49,7 +50,7 @@ function courseComparator(key: SortKey, order: SortOrder) {
 export default function HomePage() {
   const { data, isLoading } = useCourses();
   const { keys, isRegexp } = useSearch();
-  const { page, selected, sortKey, order } = useCourseFilter();
+  const { page, selected, sortKey, order, includeDataInsufficient } = useCourseFilter();
   const dispatch = useCourseFilterDispatch();
 
   const courses = data?.data ?? [];
@@ -87,8 +88,20 @@ export default function HomePage() {
     // Sort
     result.sort(courseComparator(sortKey, order));
 
+    // Data insufficiency filter
+    if (!includeDataInsufficient) {
+      // Move insufficient data to the end and mark them
+      result.sort((a, b) => {
+        const aInsufficient = a.comment_num < ENOUGH_DATA_THRESHOLD;
+        const bInsufficient = b.comment_num < ENOUGH_DATA_THRESHOLD;
+        if (aInsufficient && !bInsufficient) return 1;
+        if (!aInsufficient && bInsufficient) return -1;
+        return 0;
+      });
+    }
+
     return result;
-  }, [courses, selected, keys, isRegexp, sortKey, order]);
+  }, [courses, selected, keys, isRegexp, sortKey, order, includeDataInsufficient]);
 
   const totalPages = Math.ceil(filteredCourses.length / ITEMS_PER_PAGE);
   const pagedCourses = filteredCourses.slice(
@@ -124,6 +137,10 @@ export default function HomePage() {
             }
             onOrderChange={(o) =>
               dispatch({ type: "SET_ORDER", payload: o })
+            }
+            includeDataInsufficient={includeDataInsufficient}
+            onIncludeDataInsufficientChange={(v) =>
+              dispatch({ type: "SET_INCLUDE_DATA_INSUFFICIENT", payload: v })
             }
           />
 

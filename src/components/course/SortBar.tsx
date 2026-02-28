@@ -7,6 +7,8 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
@@ -17,6 +19,8 @@ interface SortBarProps {
   order: SortOrder;
   onSortKeyChange: (key: SortKey) => void;
   onOrderChange: (order: SortOrder) => void;
+  includeDataInsufficient: boolean;
+  onIncludeDataInsufficientChange: (value: boolean) => void;
 }
 
 const sortOptions: { label: string; value: SortKey }[] = [
@@ -30,9 +34,11 @@ export default function SortBar({
   order,
   onSortKeyChange,
   onOrderChange,
+  includeDataInsufficient,
+  onIncludeDataInsufficientChange,
 }: SortBarProps) {
   return (
-    <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
+    <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2, flexWrap: "wrap" }}>
       <FormControl size="small" sx={{ minWidth: 120 }}>
         <InputLabel>排序方式</InputLabel>
         <Select
@@ -61,6 +67,17 @@ export default function SortBar({
           <ArrowUpwardIcon fontSize="small" />
         </ToggleButton>
       </ToggleButtonGroup>
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={!includeDataInsufficient}
+            onChange={(e) => onIncludeDataInsufficientChange(!e.target.checked)}
+            size="small"
+          />
+        }
+        label="延后数据不足"
+      />
     </Box>
   );
 }
