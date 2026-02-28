@@ -145,10 +145,10 @@ export default function LoginDialog({
   }, [handleReset, onClose]);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-      <DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="xs">
+      <DialogTitle sx={{ display: "flex", flexDirection: "column"}}>
+        <Logo width={100}/>
         登录
-        <Logo />
       </DialogTitle>
       <DialogContent>
         {error && (
@@ -203,18 +203,20 @@ export default function LoginDialog({
                 helperText={captchaError || "点击图片刷新验证码"}
               />
             </Grid>
-            <Grid size={4}>
+            <Grid size={4} alignContent="center" overflow="hidden">
               {captchaLoading ? (
-                <CircularProgress size={20} />
+                <Box sx={{ width: 150, alignContent: "center", alignItems: "center" }}>
+                  <CircularProgress size={20} />
+                </Box>
               ) : captchaImage ? (
                 <img
                   src={captchaImage}
                   alt="captcha"
-                  style={{ height: 50, borderRadius: 4, cursor: "pointer" }}
+                  style={{ width: 150, borderRadius: 4, cursor: "pointer" }}
                   onClick={fetchCaptcha}
                 />
               ) : (
-                <Button variant="outlined">加载验证码</Button>
+                <Button variant="text" sx={{ width: 150 }}>加载验证码</Button>
               )}
             </Grid>
           </Grid>
