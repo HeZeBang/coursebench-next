@@ -161,7 +161,7 @@ export default function HomePage() {
               </Typography>
               <Grid container spacing={2}>
                 {pagedCourses.map((course) => (
-                  <Grid key={course.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                  <Grid key={course.id} size={{ xs: 12, sm: 6 }}>
                     <CourseCard course={course} />
                   </Grid>
                 ))}
