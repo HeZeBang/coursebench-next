@@ -1,0 +1,253 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import Tooltip from "@mui/material/Tooltip";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import RegexIcon from "@mui/icons-material/DataObject";
+import PersonIcon from "@mui/icons-material/Person";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
+
+import { useAuth, useAuthDispatch } from "@/contexts/AuthContext";
+import { useSearch, useSearchDispatch } from "@/contexts/SearchContext";
+import { useSnackbar } from "@/contexts/SnackbarContext";
+import { getUserDisplayName } from "@/utils";
+import api from "@/lib/api";
+import { clearPreset } from "@/lib/cookies";
+import LoginDialog from "@/components/user/LoginDialog";
+import RegisterDialog from "@/components/user/RegisterDialog";
+import ThemeToggle from "@/components/ThemeToggle";
+import MobileDrawer from "./MobileDrawer";
+
+const navLinks = [
+  { label: "全部课程", href: "/" },
+  { label: "最近评价", href: "/recent" },
+  { label: "赏金排名", href: "/ranking" },
+  { label: "关于我们", href: "/about" },
+] as const;
+
+export default function Header() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const pathname = usePathname();
+
+  const { isLogin, userProfile } = useAuth();
+  const authDispatch = useAuthDispatch();
+  const { keys, isRegexp } = useSearch();
+  const searchDispatch = useSearchDispatch();
+  const showSnackbar = useSnackbar();
+
+  // Menu state
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
+
+  const handleUserMenuOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget),
+    []
+  );
+  const handleUserMenuClose = useCallback(() => setAnchorEl(null), []);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await api.post("/v1/user/logout");
+    } catch {
+      // Ignore
+    }
+    authDispatch({ type: "LOGOUT" });
+    clearPreset();
+    handleUserMenuClose();
+    showSnackbar("已退出登录", "success");
+  }, [authDispatch, handleUserMenuClose, showSnackbar]);
+
+  return (
+    <>
+      <AppBar position="sticky" color="default" sx={{ bgcolor: "background.paper" }}>
+        <Toolbar className="max-w-7xl w-full mx-auto">
+          {/* Mobile menu button */}
+          {isMobile && (
+            <IconButton
+              edge="start"
+              onClick={() => setDrawerOpen(true)}
+              sx={{ mr: 1 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+
+          {/* Logo */}
+          <Link href="/" className="no-underline flex items-center mr-4">
+            <Typography
+              variant="h6"
+              component="span"
+              sx={{ color: "primary.main", fontWeight: 700 }}
+            >
+              CourseBench
+            </Typography>
+          </Link>
+
+          {/* Desktop nav links */}
+          {!isMobile && (
+            <Box sx={{ display: "flex", gap: 0.5 }}>
+              {navLinks.map((link) => (
+                <Button
+                  key={link.href}
+                  component={Link}
+                  href={link.href}
+                  color={pathname === link.href ? "primary" : "inherit"}
+                  sx={{
+                    fontWeight: pathname === link.href ? 700 : 400,
+                    borderBottom:
+                      pathname === link.href
+                        ? "2px solid"
+                        : "2px solid transparent",
+                    borderRadius: 0,
+                    px: 2,
+                  }}
+                >
+                  {link.label}
+                </Button>
+              ))}
+            </Box>
+          )}
+
+          {/* Spacer */}
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* Search bar (desktop only on home page) */}
+          {!isMobile && pathname === "/" && (
+            <TextField
+              size="small"
+              placeholder="搜索课程..."
+              value={keys}
+              onChange={(e) =>
+                searchDispatch({ type: "SET_KEYS", payload: e.target.value })
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Tooltip title={isRegexp ? "正则表达式已开启" : "开启正则搜索"}>
+                      <IconButton
+                        size="small"
+                        onClick={() => searchDispatch({ type: "TOGGLE_REGEXP" })}
+                        color={isRegexp ? "primary" : "default"}
+                      >
+                        <RegexIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ width: 280, mr: 2 }}
+            />
+          )}
+
+          {/* Theme toggle */}
+          <ThemeToggle />
+
+          {/* Auth buttons / User menu */}
+          {isLogin && userProfile ? (
+            <>
+              <IconButton onClick={handleUserMenuOpen} size="small">
+                <Avatar
+                  src={userProfile.avatar || undefined}
+                  sx={{ width: 32, height: 32, bgcolor: "primary.main" }}
+                >
+                  {getUserDisplayName(userProfile).charAt(0)}
+                </Avatar>
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleUserMenuClose}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              >
+                <MenuItem
+                  component={Link}
+                  href={`/user/${userProfile.id}`}
+                  onClick={handleUserMenuClose}
+                >
+                  <PersonIcon sx={{ mr: 1 }} fontSize="small" />
+                  个人主页
+                </MenuItem>
+                <MenuItem onClick={handleUserMenuClose}>
+                  <SettingsIcon sx={{ mr: 1 }} fontSize="small" />
+                  设置
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <LogoutIcon sx={{ mr: 1 }} fontSize="small" />
+                  退出登录
+                </MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setLoginOpen(true)}
+              >
+                登录
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => setRegisterOpen(true)}
+              >
+                注册
+              </Button>
+            </Box>
+          )}
+        </Toolbar>
+      </AppBar>
+
+      {/* Dialogs */}
+      <LoginDialog
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSwitchToRegister={() => {
+          setLoginOpen(false);
+          setRegisterOpen(true);
+        }}
+      />
+      <RegisterDialog
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        onSwitchToLogin={() => {
+          setRegisterOpen(false);
+          setLoginOpen(true);
+        }}
+      />
+
+      {/* Mobile drawer */}
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        navLinks={navLinks.map((l) => ({ ...l }))}
+      />
+    </>
+  );
+}

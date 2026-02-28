@@ -1,0 +1,76 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ── Custom theme tokens ── */
+@theme inline {
+  --color-background: #fafafa;
+  --color-foreground: #171717;
+
+  /* Institute colors */
+  --color-inst-sist: #b0c4de;
+  --color-inst-spst: #00a650;
+  --color-inst-slst: #f39800;
+  --color-inst-sca: #000000;
+  --color-inst-sem: #7d3c92;
+  --color-inst-ge: #a40050;
+  --color-inst-bme: #101f5b;
+  --color-inst-ims: #2800ae;
+  --color-inst-other: #757575;
+
+  /* Score colors */
+  --color-score-na: #b0b0b0;
+  --color-score-1: #ff5252;
+  --color-score-2: #ff892f;
+  --color-score-3: #ffc107;
+  --color-score-4: #a4be23;
+  --color-score-5: #709800;
+  --color-score-6: #1b5e20;
+  --color-score-7: #b71c1c;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Dark mode - controlled by user preference, not system */
+body.dark {
+  --color-background: #121212;
+  --color-foreground: #ededed;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* ── NProgress ── */
+#nprogress .bar {
+  background: #1976d2;
+  height: 3px;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px #1976d2, 0 0 5px #1976d2;
+}
+
+/* ── Markdown / Prose overrides ── */
+.prose pre {
+  @apply rounded-lg;
+}
+.prose code {
+  @apply text-sm;
+}
+.prose blockquote {
+  @apply border-l-4 border-blue-400 bg-blue-50 dark:bg-blue-900/20 pl-4 py-2 italic;
+}
+.prose img {
+  @apply max-w-full rounded shadow;
+}
+.prose table {
+  @apply w-full border-collapse;
+}
+.prose th,
+.prose td {
+  @apply border border-gray-300 px-3 py-2 text-left;
+}
+.prose th {
+  @apply bg-gray-100 font-semibold dark:bg-gray-800;
+}
