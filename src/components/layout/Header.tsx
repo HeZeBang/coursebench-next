@@ -122,39 +122,6 @@ export default function Header() {
 
           <Box sx={{ flexGrow: 1 }} />
 
-          {/* Search bar (desktop only on home page) */}
-          {pathname === "/" && (
-            <TextField
-              size="small"
-              placeholder="搜索课程..."
-              value={keys}
-              onChange={(e) =>
-                searchDispatch({ type: "SET_KEYS", payload: e.target.value })
-              }
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Tooltip title={isRegexp ? "正则表达式已开启" : "开启正则搜索"}>
-                      <IconButton
-                        size="small"
-                        onClick={() => searchDispatch({ type: "TOGGLE_REGEXP" })}
-                        color={isRegexp ? "primary" : "default"}
-                      >
-                        <RegexIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ width: 280, mr: 2 }}
-            />
-          )}
-
           <Collapse in={!isMobile} orientation="horizontal">
             <Box sx={{ display: "flex", gap: 1, marginX: 1 }}>
               
@@ -218,6 +185,41 @@ export default function Header() {
             </Box>
           )}
         </Toolbar>
+        
+        <Collapse in={pathname === "/"}>
+          <Box className="flex w-full max-w-7xl justify-center items-center mb-1">
+            {/* Search bar (desktop only on home page) */}
+            <TextField
+              size="small"
+              placeholder="搜索课程"
+              value={keys}
+              onChange={(e) =>
+                searchDispatch({ type: "SET_KEYS", payload: e.target.value })
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Tooltip title={isRegexp ? "正则表达式已开启" : "开启正则搜索"}>
+                      <IconButton
+                        size="small"
+                        onClick={() => searchDispatch({ type: "TOGGLE_REGEXP" })}
+                        color={isRegexp ? "primary" : "default"}
+                      >
+                        <RegexIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ width: "50%" }}
+            />
+          </Box>
+        </Collapse>
       </AppBar>
 
       {/* Dialogs */}
