@@ -81,12 +81,22 @@ export default function HomePage() {
           // Invalid regex, ignore
         }
       } else {
-        const lowerKeys = keys.toLowerCase();
-        result = result.filter(
-          (c) =>
-            c.name.toLowerCase().includes(lowerKeys) ||
-            c.code.toLowerCase().includes(lowerKeys)
-        );
+        // Split by whitespace for multi-keyword AND search
+        const keywords = keys
+          .trim()
+          .split(/\s+/)
+          .map((k) => k.toLowerCase())
+          .filter((k) => k.length > 0);
+        
+        result = result.filter((c) => {
+          const name = c.name.toLowerCase();
+          const code = c.code.toLowerCase();
+          // All keywords must match either name or code
+          return keywords.every(
+            (keyword) =>
+              name.includes(keyword) || code.includes(keyword)
+          );
+        });
       }
     }
 

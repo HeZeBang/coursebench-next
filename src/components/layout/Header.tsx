@@ -187,11 +187,11 @@ export default function Header() {
         </Toolbar>
         
         <Collapse in={pathname === "/"}>
-          <Box className="flex w-full max-w-7xl justify-center items-center mb-1">
+          <Box className="flex w-full max-w-7xl justify-center items-center mb-2">
             {/* Search bar (desktop only on home page) */}
             <TextField
               size="small"
-              placeholder="搜索课程"
+              placeholder={isRegexp? "输入正则表达式" : "搜索课程，空格分隔关键词"}
               value={keys}
               onChange={(e) =>
                 searchDispatch({ type: "SET_KEYS", payload: e.target.value })
