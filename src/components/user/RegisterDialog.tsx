@@ -26,8 +26,10 @@ import { useSnackbar } from "@/contexts/SnackbarContext";
 import { validators, validate, gradeItems, yearItems } from "@/constants";
 import api from "@/lib/api";
 import type { CaptchaResponse } from "@/types";
+import Logo from "../Logo";
+import { useMediaQuery, useTheme } from "@mui/material";
 
-const steps = ["邮箱", "个人信息", "密码", "验证码"];
+const steps = ["邮箱", "密码", "个人信息", "验证码"];
 
 interface RegisterDialogProps {
   open: boolean;
@@ -55,7 +57,6 @@ export default function RegisterDialog({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [invitationCode, setInvitationCode] = useState("");
   const [captcha, setCaptcha] = useState("");
-  const [captchaId, setCaptchaId] = useState("");
   const [captchaImage, setCaptchaImage] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
 
@@ -63,6 +64,9 @@ export default function RegisterDialog({
   const [emailError, setEmailError] = useState("");
   const [nicknameError, setNicknameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Step 0 → email
   const handleEmailNext = useCallback(() => {
@@ -75,19 +79,8 @@ export default function RegisterDialog({
     setActiveStep(1);
   }, [email]);
 
-  // Step 1 → personal info
-  const handleInfoNext = useCallback(() => {
-    const err = validate(nickname, validators.nickname);
-    if (err) {
-      setNicknameError(err);
-      return;
-    }
-    setNicknameError("");
-    setActiveStep(2);
-  }, [nickname]);
-
   // Step 2 → password
-  const handlePasswordNext = useCallback(async () => {
+  const handlePasswordNext = useCallback(() => {
     const err = validate(password, validators.password);
     if (err) {
       setPasswordError(err);
@@ -98,17 +91,29 @@ export default function RegisterDialog({
       return;
     }
     setPasswordError("");
+    setActiveStep(2);
+  }, [password, confirmPassword, showSnackbar]);
+
+
+  // Step 2 → personal info
+  const handleInfoNext = useCallback(async () => {
+    const err = validate(nickname, validators.nickname);
+    if (err) {
+      setNicknameError(err);
+      return;
+    }
+    setNicknameError("");
     // Fetch captcha
     try {
       const res = await api.post("/v1/user/get_captcha");
       const data = (res.data as { data: CaptchaResponse }).data;
-      setCaptchaId(data.captcha_id);
-      setCaptchaImage(data.captcha_image);
+      setCaptchaImage(`data:image/png;base64,${data.img}`);
+      setCaptcha("");
       setActiveStep(3);
     } catch {
       showSnackbar("获取验证码失败", "error");
     }
-  }, [password, confirmPassword, showSnackbar]);
+  }, [nickname]);
 
   // Step 3 → register
   const handleRegister = useCallback(async () => {
@@ -123,7 +128,6 @@ export default function RegisterDialog({
         grade,
         year,
         captcha,
-        captcha_id: captchaId,
         invitation_code: invitationCode || undefined,
       });
       showSnackbar("注册成功！请查收激活邮件", "success");
@@ -144,7 +148,6 @@ export default function RegisterDialog({
     grade,
     year,
     captcha,
-    captchaId,
     invitationCode,
     acceptTerms,
     showSnackbar,
@@ -161,7 +164,6 @@ export default function RegisterDialog({
     setConfirmPassword("");
     setInvitationCode("");
     setCaptcha("");
-    setCaptchaId("");
     setCaptchaImage("");
     setAcceptTerms(false);
     setError("");
@@ -176,10 +178,13 @@ export default function RegisterDialog({
   }, [handleReset, onClose]);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-      <DialogTitle>注册</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth fullScreen={fullScreen}>
+      <DialogTitle sx={{ display: "flex", flexDirection: "column"}}>
+        <Logo width={100}/>
+        注册
+      </DialogTitle>
       <DialogContent>
-        <Stepper activeStep={activeStep} sx={{ mb: 3 }} alternativeLabel>
+        <Stepper activeStep={activeStep} sx={{ mb: 3 }} alternativeLabel={fullScreen}>
           {steps.map((label) => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>
@@ -199,6 +204,8 @@ export default function RegisterDialog({
             fullWidth
             label="邮箱"
             type="email"
+            variant="standard"
+            autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={!!emailError}
@@ -208,12 +215,43 @@ export default function RegisterDialog({
           />
         )}
 
-        {/* Step 1: Personal info */}
+        
+        {/* Step 1: Password */}
         {activeStep === 1 && (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <TextField
               fullWidth
+              label="密码"
+              type="password"
+              autoComplete="new-password"
+              variant="standard"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={!!passwordError}
+              helperText={passwordError || "8-16位，须包含字母和数字"}
+              autoFocus
+            />
+            <TextField
+              fullWidth
+              label="确认密码"
+              type="password"
+              autoComplete="new-password"
+              variant="standard"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handlePasswordNext()}
+            />
+          </Box>
+        )}
+
+        {/* Step 2: Personal info */}
+        {activeStep === 2 && (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <TextField
+              fullWidth
               label="用户名"
+              variant="standard"
+              required
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               error={!!nicknameError}
@@ -221,9 +259,10 @@ export default function RegisterDialog({
               autoFocus
             />
             <FormControl fullWidth>
-              <InputLabel>年级</InputLabel>
+              <InputLabel variant="standard">年级</InputLabel>
               <Select
                 value={grade}
+                variant="standard"
                 label="年级"
                 onChange={(e) => setGrade(Number(e.target.value))}
               >
@@ -235,9 +274,10 @@ export default function RegisterDialog({
               </Select>
             </FormControl>
             <FormControl fullWidth>
-              <InputLabel>入学年份</InputLabel>
+              <InputLabel variant="standard">入学年份</InputLabel>
               <Select
                 value={year}
+                variant="standard"
                 label="入学年份"
                 onChange={(e) => setYear(Number(e.target.value))}
               >
@@ -251,33 +291,10 @@ export default function RegisterDialog({
             <TextField
               fullWidth
               label="邀请码（可选）"
+              variant="standard"
               value={invitationCode}
               onChange={(e) => setInvitationCode(e.target.value)}
               helperText="5位字母数字"
-            />
-          </Box>
-        )}
-
-        {/* Step 2: Password */}
-        {activeStep === 2 && (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <TextField
-              fullWidth
-              label="密码"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={!!passwordError}
-              helperText={passwordError || "8-16位，须包含字母和数字"}
-              autoFocus
-            />
-            <TextField
-              fullWidth
-              label="确认密码"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handlePasswordNext()}
             />
           </Box>
         )}
@@ -338,32 +355,32 @@ export default function RegisterDialog({
         <Box>
           <Typography variant="caption" color="text.secondary">
             已有账号？
-            <Link
-              component="button"
-              variant="caption"
-              onClick={onSwitchToLogin}
-              sx={{ ml: 0.5 }}
-            >
-              立即登录
-            </Link>
           </Typography>
+          <Link
+            component="button"
+            variant="caption"
+            onClick={onSwitchToLogin}
+            sx={{ ml: 0.5 }}
+          >
+            立即登录
+          </Link>
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
-          {activeStep > 0 && (
+          {activeStep > 0 ? (
             <Button onClick={() => setActiveStep((s) => s - 1)}>上一步</Button>
-          )}
+          ) : (<Button variant="text" onClick={handleClose}>取消</Button>)}
           {activeStep === 0 && (
             <Button variant="contained" onClick={handleEmailNext}>
               下一步
             </Button>
           )}
           {activeStep === 1 && (
-            <Button variant="contained" onClick={handleInfoNext}>
+            <Button variant="contained" onClick={handlePasswordNext}>
               下一步
             </Button>
           )}
           {activeStep === 2 && (
-            <Button variant="contained" onClick={handlePasswordNext}>
+            <Button variant="contained" onClick={handleInfoNext}>
               下一步
             </Button>
           )}

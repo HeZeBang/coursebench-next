@@ -35,6 +35,7 @@ import RegisterDialog from "@/components/user/RegisterDialog";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileDrawer from "./MobileDrawer";
 import Logo from "../Logo";
+import { Collapse, Tab, Tabs } from "@mui/material";
 
 const navLinks = [
   { label: "全部课程", href: "/" },
@@ -83,7 +84,7 @@ export default function Header() {
       <AppBar position="sticky" color="default" enableColorOnDark>
         <Toolbar className="max-w-7xl w-full mx-auto">
           {/* Mobile menu button */}
-          {isMobile && (
+          <Collapse in={isMobile} orientation="horizontal">
             <IconButton
               edge="start"
               onClick={() => setDrawerOpen(true)}
@@ -91,7 +92,7 @@ export default function Header() {
             >
               <MenuIcon />
             </IconButton>
-          )}
+          </Collapse>
 
           {/* Logo */}
           <Link href="/" className="no-underline flex items-center mr-4">
@@ -100,34 +101,29 @@ export default function Header() {
 
           {/* Desktop nav links */}
           {!isMobile && (
-            <Box sx={{ display: "flex", gap: 0.5 }}>
+            // <Box sx={{ display: "flex", gap: 0.5 }}>
+            <Tabs
+              value={pathname}
+              variant="scrollable"
+              scrollButtons="auto"
+              aria-label="navigation tabs"
+            >
               {navLinks.map((link) => (
-                <Button
-                  key={link.href}
-                  component={Link}
-                  href={link.href}
-                  color={pathname === link.href ? "primary" : "inherit"}
-                  sx={{
-                    fontWeight: pathname === link.href ? 700 : 400,
-                    borderBottom:
-                      pathname === link.href
-                        ? "2px solid"
-                        : "2px solid transparent",
-                    borderRadius: 0,
-                    px: 2,
-                  }}
-                >
-                  {link.label}
-                </Button>
+              <Tab
+                key={link.href}
+                label={link.label}
+                value={link.href}
+                component={Link}
+                href={link.href}
+              />
               ))}
-            </Box>
+            </Tabs>
           )}
 
-          {/* Spacer */}
           <Box sx={{ flexGrow: 1 }} />
 
           {/* Search bar (desktop only on home page) */}
-          {!isMobile && pathname === "/" && (
+          {pathname === "/" && (
             <TextField
               size="small"
               placeholder="搜索课程..."
@@ -159,10 +155,13 @@ export default function Header() {
             />
           )}
 
-          <Box sx={{ display: "flex", gap: 1, marginX: 1 }}>
-            {/* Theme toggle */}
-            <ThemeToggle />
-          </Box>
+          <Collapse in={!isMobile} orientation="horizontal">
+            <Box sx={{ display: "flex", gap: 1, marginX: 1 }}>
+              
+              {/* Theme toggle */}
+              <ThemeToggle />
+            </Box>
+          </Collapse>
 
           {/* Auth buttons / User menu */}
           {isLogin && userProfile ? (

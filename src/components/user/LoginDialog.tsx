@@ -18,7 +18,7 @@ import { useSnackbar } from "@/contexts/SnackbarContext";
 import { validators, validate } from "@/constants";
 import api from "@/lib/api";
 import type { CaptchaResponse } from "@/types";
-import { Grid } from "@mui/material";
+import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import Image from "next/image";
 import Logo from "../Logo";
 
@@ -47,6 +47,9 @@ export default function LoginDialog({
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [captchaError, setCaptchaError] = useState("");
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const fetchCaptcha = useCallback(async () => {
     setCaptchaLoading(true);
@@ -145,7 +148,7 @@ export default function LoginDialog({
   }, [handleReset, onClose]);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs">
+    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullScreen={fullScreen}>
       <DialogTitle sx={{ display: "flex", flexDirection: "column"}}>
         <Logo width={100}/>
         登录
@@ -240,6 +243,7 @@ export default function LoginDialog({
           </Link>
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
+          <Button variant="text" onClick={handleClose}>取消</Button>
           <Button
             variant="contained"
             onClick={handleLogin}

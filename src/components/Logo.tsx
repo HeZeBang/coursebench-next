@@ -100,20 +100,9 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
       />
     );
 
-    // If href is explicitly null, render without Link
-    if (href === null) {
-      return (
-        <Box sx={boxSx} {...props}>
-          {content}
-        </Box>
-      );
-    }
-
     // Render as Link if href is provided
     return (
       <Box
-        component={Link}
-        href={href}
         sx={{
           ...boxSx,
           textDecoration: "none",
