@@ -101,9 +101,12 @@ export default function Header() {
 
           {/* Desktop nav links */}
           {!isMobile && (
-            // <Box sx={{ display: "flex", gap: 0.5 }}>
             <Tabs
-              value={pathname}
+              value={
+                navLinks.some((link) => link.href === pathname)
+                  ? pathname
+                  : false
+              }
               variant="scrollable"
               scrollButtons="auto"
               aria-label="navigation tabs"
