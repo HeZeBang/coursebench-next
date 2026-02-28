@@ -43,7 +43,6 @@ export default function LoginDialog({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captcha, setCaptcha] = useState("");
-  const [captchaId, setCaptchaId] = useState("");
   const [captchaImage, setCaptchaImage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -74,9 +73,8 @@ export default function LoginDialog({
       const res = await api.post<{ data: CaptchaResponse }>(
         "/v1/user/get_captcha"
       );
-      const data = (res.data as unknown as { data: CaptchaResponse }).data;
-      setCaptchaId(data.captcha_id);
-      setCaptchaImage(data.captcha_image);
+      const data = (res.data as { error: boolean, data: CaptchaResponse }).data;
+      setCaptchaImage(`data:image/png;base64,${data.img}`);
       setActiveStep(2);
     } catch {
       showSnackbar("获取验证码失败", "error");
@@ -93,7 +91,6 @@ export default function LoginDialog({
         email,
         password,
         captcha,
-        captcha_id: captchaId,
       });
       // Get user profile
       const myIdRes = await api.get("/v1/user/my_id");
@@ -116,7 +113,6 @@ export default function LoginDialog({
     email,
     password,
     captcha,
-    captchaId,
     authDispatch,
     showSnackbar,
     onClose,
@@ -127,7 +123,6 @@ export default function LoginDialog({
     setEmail("");
     setPassword("");
     setCaptcha("");
-    setCaptchaId("");
     setCaptchaImage("");
     setError("");
     setEmailError("");
@@ -162,6 +157,8 @@ export default function LoginDialog({
             fullWidth
             label="邮箱"
             type="email"
+            variant="filled"
+            autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={!!emailError}
@@ -176,6 +173,8 @@ export default function LoginDialog({
             fullWidth
             label="密码"
             type="password"
+            variant="filled"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             error={!!passwordError}
