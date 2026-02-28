@@ -10,6 +10,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
+import Logo from "../Logo";
 
 interface NavLink {
   label: string;
@@ -32,12 +33,7 @@ export default function MobileDrawer({
   return (
     <Drawer anchor="left" open={open} onClose={onClose}>
       <Box sx={{ width: 260, pt: 2 }}>
-        <Typography
-          variant="h6"
-          sx={{ px: 2, pb: 1, fontWeight: 700, color: "primary.main" }}
-        >
-          CourseBench
-        </Typography>
+        <Logo width={120} sx={{ mx: 2 }}/>
         <Divider />
         <List>
           {navLinks.map((link) => (

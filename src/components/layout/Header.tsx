@@ -34,7 +34,7 @@ import LoginDialog from "@/components/user/LoginDialog";
 import RegisterDialog from "@/components/user/RegisterDialog";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileDrawer from "./MobileDrawer";
-import { Login, LoginOutlined, LoginSharp } from "@mui/icons-material";
+import Logo from "../Logo";
 
 const navLinks = [
   { label: "全部课程", href: "/" },
@@ -95,13 +95,7 @@ export default function Header() {
 
           {/* Logo */}
           <Link href="/" className="no-underline flex items-center mr-4">
-            <Typography
-              variant="h6"
-              component="span"
-              sx={{ color: "primary.main", fontWeight: 700 }}
-            >
-              CourseBench
-            </Typography>
+            <Logo width={130}/>
           </Link>
 
           {/* Desktop nav links */}

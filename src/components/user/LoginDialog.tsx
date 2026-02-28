@@ -1,29 +1,26 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
-import Divider from "@mui/material/Divider";
 
 import { useAuthDispatch } from "@/contexts/AuthContext";
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import { validators, validate } from "@/constants";
 import api from "@/lib/api";
-import type { UserProfile, CaptchaResponse } from "@/types";
-
-const steps = ["输入邮箱", "输入密码", "验证码"];
+import type { CaptchaResponse } from "@/types";
+import { Grid } from "@mui/material";
+import Image from "next/image";
+import Logo from "../Logo";
 
 interface LoginDialogProps {
   open: boolean;
@@ -39,51 +36,54 @@ export default function LoginDialog({
   const authDispatch = useAuthDispatch();
   const showSnackbar = useSnackbar();
 
-  const [activeStep, setActiveStep] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captcha, setCaptcha] = useState("");
   const [captchaImage, setCaptchaImage] = useState("");
+  const [captchaLoading, setCaptchaLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ── Email step ──
   const [emailError, setEmailError] = useState("");
-  const handleEmailNext = useCallback(() => {
-    const err = validate(email, validators.email);
-    if (err) {
-      setEmailError(err);
-      return;
-    }
-    setEmailError("");
-    setActiveStep(1);
-  }, [email]);
-
-  // ── Password step ──
   const [passwordError, setPasswordError] = useState("");
-  const handlePasswordNext = useCallback(async () => {
-    const err = validate(password, validators.password);
-    if (err) {
-      setPasswordError(err);
-      return;
-    }
-    setPasswordError("");
-    // Fetch captcha
+  const [captchaError, setCaptchaError] = useState("");
+
+  const fetchCaptcha = useCallback(async () => {
+    setCaptchaLoading(true);
     try {
       const res = await api.post<{ data: CaptchaResponse }>(
         "/v1/user/get_captcha"
       );
-      const data = (res.data as { error: boolean, data: CaptchaResponse }).data;
+      const data = (res.data as { error: boolean; data: CaptchaResponse }).data;
       setCaptchaImage(`data:image/png;base64,${data.img}`);
-      setActiveStep(2);
+      setCaptcha("");
+      setCaptchaError("");
     } catch {
       showSnackbar("获取验证码失败", "error");
+    } finally {
+      setCaptchaLoading(false);
     }
-  }, [password, showSnackbar]);
+  }, [showSnackbar]);
 
-  // ── Login ──
+  useEffect(() => {
+    if (open) {
+      fetchCaptcha();
+    }
+  }, [open, fetchCaptcha]);
+
   const handleLogin = useCallback(async () => {
-    if (!captcha) return;
+    const emailErr = validate(email, validators.email);
+    const passwordErr = validate(password, validators.password);
+    const captchaErr = captcha.trim() ? "" : "请输入验证码";
+
+    setEmailError(emailErr || "");
+    setPasswordError(passwordErr || "");
+    setCaptchaError(captchaErr);
+
+    if (emailErr || passwordErr || captchaErr) {
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
@@ -106,6 +106,7 @@ export default function LoginDialog({
         (err as { response?: { data?: { msg?: string } } })?.response?.data
           ?.msg ?? "登录失败";
       setError(msg);
+      fetchCaptcha();
     } finally {
       setLoading(false);
     }
@@ -116,10 +117,18 @@ export default function LoginDialog({
     authDispatch,
     showSnackbar,
     onClose,
+    fetchCaptcha,
   ]);
 
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      handleLogin();
+    },
+    [handleLogin]
+  );
+
   const handleReset = useCallback(() => {
-    setActiveStep(0);
     setEmail("");
     setPassword("");
     setCaptcha("");
@@ -127,6 +136,7 @@ export default function LoginDialog({
     setError("");
     setEmailError("");
     setPasswordError("");
+    setCaptchaError("");
   }, []);
 
   const handleClose = useCallback(() => {
@@ -136,124 +146,106 @@ export default function LoginDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-      <DialogTitle>登录</DialogTitle>
+      <DialogTitle>
+        登录
+        <Logo />
+      </DialogTitle>
       <DialogContent>
-        <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
 
-        {activeStep === 0 && (
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          autoComplete="on"
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        >
           <TextField
             fullWidth
             label="邮箱"
+            name="email"
             type="email"
-            variant="filled"
+            variant="standard"
             autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={!!emailError}
             helperText={emailError || "请使用上海科技大学邮箱"}
-            onKeyDown={(e) => e.key === "Enter" && handleEmailNext()}
             autoFocus
           />
-        )}
 
-        {activeStep === 1 && (
           <TextField
             fullWidth
             label="密码"
+            name="password"
             type="password"
-            variant="filled"
+            variant="standard"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             error={!!passwordError}
             helperText={passwordError}
-            onKeyDown={(e) => e.key === "Enter" && handlePasswordNext()}
-            autoFocus
           />
-        )}
 
-        {activeStep === 2 && (
-          <Box>
-            {captchaImage && (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  mb: 2,
-                  cursor: "pointer",
-                }}
-                onClick={handlePasswordNext}
-              >
+          <Grid container spacing={1}>
+            <Grid size={8}>
+              <TextField
+                fullWidth
+                label="验证码"
+                name="captcha"
+                variant="standard"
+                value={captcha}
+                onChange={(e) => setCaptcha(e.target.value)}
+                error={!!captchaError}
+                helperText={captchaError || "点击图片刷新验证码"}
+              />
+            </Grid>
+            <Grid size={4}>
+              {captchaLoading ? (
+                <CircularProgress size={20} />
+              ) : captchaImage ? (
                 <img
                   src={captchaImage}
                   alt="captcha"
-                  style={{ height: 50, borderRadius: 4 }}
+                  style={{ height: 50, borderRadius: 4, cursor: "pointer" }}
+                  onClick={fetchCaptcha}
                 />
-              </Box>
-            )}
-            <TextField
-              fullWidth
-              label="验证码"
-              value={captcha}
-              onChange={(e) => setCaptcha(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              autoFocus
-              helperText="点击图片刷新验证码"
-            />
-          </Box>
-        )}
+              ) : (
+                <Button variant="outlined">加载验证码</Button>
+              )}
+            </Grid>
+          </Grid>
+
+          <button type="submit" style={{ display: "none" }} aria-hidden="true" />
+        </Box>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2, justifyContent: "space-between" }}>
         <Box>
           <Typography variant="caption" color="text.secondary">
             没有账号？
-            <Link
-              component="button"
-              variant="caption"
-              onClick={onSwitchToRegister}
-              sx={{ ml: 0.5 }}
-            >
-              立即注册
-            </Link>
           </Typography>
+          <Link
+            component="button"
+            variant="caption"
+            onClick={onSwitchToRegister}
+            sx={{ ml: 0.5 }}
+          >
+            立即注册
+          </Link>
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
-          {activeStep > 0 && (
-            <Button onClick={() => setActiveStep((s) => s - 1)}>上一步</Button>
-          )}
-          {activeStep === 0 && (
-            <Button variant="contained" onClick={handleEmailNext}>
-              下一步
-            </Button>
-          )}
-          {activeStep === 1 && (
-            <Button variant="contained" onClick={handlePasswordNext}>
-              下一步
-            </Button>
-          )}
-          {activeStep === 2 && (
-            <Button
-              variant="contained"
-              onClick={handleLogin}
-              disabled={loading || !captcha}
-              startIcon={loading ? <CircularProgress size={16} /> : undefined}
-            >
-              登录
-            </Button>
-          )}
+          <Button
+            variant="contained"
+            onClick={handleLogin}
+            disabled={loading || captchaLoading || !captcha}
+            startIcon={loading ? <CircularProgress size={16} /> : undefined}
+          >
+            登录
+          </Button>
         </Box>
       </DialogActions>
     </Dialog>
