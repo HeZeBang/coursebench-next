@@ -34,6 +34,7 @@ import LoginDialog from "@/components/user/LoginDialog";
 import RegisterDialog from "@/components/user/RegisterDialog";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileDrawer from "./MobileDrawer";
+import { Login, LoginOutlined, LoginSharp } from "@mui/icons-material";
 
 const navLinks = [
   { label: "全部课程", href: "/" },
@@ -79,7 +80,7 @@ export default function Header() {
 
   return (
     <>
-      <AppBar position="sticky" color="default" sx={{ bgcolor: "background.paper" }}>
+      <AppBar position="sticky" color="default" enableColorOnDark>
         <Toolbar className="max-w-7xl w-full mx-auto">
           {/* Mobile menu button */}
           {isMobile && (
@@ -164,8 +165,10 @@ export default function Header() {
             />
           )}
 
-          {/* Theme toggle */}
-          <ThemeToggle />
+          <Box sx={{ display: "flex", gap: 1, marginX: 1 }}>
+            {/* Theme toggle */}
+            <ThemeToggle />
+          </Box>
 
           {/* Auth buttons / User menu */}
           {isLogin && userProfile ? (
@@ -206,14 +209,14 @@ export default function Header() {
           ) : (
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
-                variant="outlined"
+                variant="contained"
                 size="small"
                 onClick={() => setLoginOpen(true)}
               >
                 登录
               </Button>
               <Button
-                variant="contained"
+                variant="outlined"
                 size="small"
                 onClick={() => setRegisterOpen(true)}
               >
