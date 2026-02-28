@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -54,6 +54,11 @@ export default function HomePage() {
   const dispatch = useCourseFilterDispatch();
 
   const courses = data?.data ?? [];
+
+  // Reset page to 1 when search input changes
+  useEffect(() => {
+    dispatch({ type: "SET_PAGE", payload: 1 });
+  }, [keys, isRegexp, dispatch]);
 
   // Filter, search, sort
   const filteredCourses = useMemo(() => {
