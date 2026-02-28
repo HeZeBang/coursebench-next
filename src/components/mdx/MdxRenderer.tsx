@@ -26,11 +26,6 @@ const dynamicComponents: MDXComponents = {
       {children}
     </Typography>
   ),
-  p: ({ children }) => (
-    <Typography variant="body2" paragraph>
-      {children}
-    </Typography>
-  ),
   a: ({ href, children }) => (
     <Link href={href} target="_blank" rel="noopener noreferrer">
       {children}
@@ -54,7 +49,10 @@ interface MdxRendererProps {
  */
 export default function MdxRenderer({ source, className }: MdxRendererProps) {
   return (
-    <div className={`prose prose-sm max-w-none dark:prose-invert ${className ?? ""}`}>
+    <div className={`prose prose-sm max-w-none dark:prose-invert ${className ?? ""}`} style={{
+      lineHeight: "1.8",
+      fontSize: "1rem",
+    }}>
       <MDXRemote {...source} components={dynamicComponents} />
     </div>
   );

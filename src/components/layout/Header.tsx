@@ -10,7 +10,6 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
-import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
@@ -27,11 +26,11 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { useAuth, useAuthDispatch } from "@/contexts/AuthContext";
 import { useSearch, useSearchDispatch } from "@/contexts/SearchContext";
 import { useSnackbar } from "@/contexts/SnackbarContext";
-import { getUserDisplayName } from "@/utils";
 import api from "@/lib/api";
 import { clearPreset } from "@/lib/cookies";
 import LoginDialog from "@/components/user/LoginDialog";
 import RegisterDialog from "@/components/user/RegisterDialog";
+import UserAvatar from "@/components/user/UserAvatar";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileDrawer from "./MobileDrawer";
 import Logo from "../Logo";
@@ -137,12 +136,7 @@ export default function Header() {
           {isLogin && userProfile ? (
             <>
               <IconButton onClick={handleUserMenuOpen} size="small">
-                <Avatar
-                  src={userProfile.avatar || undefined}
-                  sx={{ width: 32, height: 32, bgcolor: "primary.main" }}
-                >
-                  {getUserDisplayName(userProfile).charAt(0)}
-                </Avatar>
+                <UserAvatar userProfile={userProfile} size={32} />
               </IconButton>
               <Menu
                 anchorEl={anchorEl}

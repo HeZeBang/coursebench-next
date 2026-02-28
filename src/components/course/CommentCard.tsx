@@ -21,39 +21,53 @@ import { unixToReadable, getUserDisplayName } from "@/utils";
 import api from "@/lib/api";
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import MdxRenderer from "@/components/mdx/MdxRenderer";
-import type { MDXRemoteSerializeResult } from "next-mdx-remote";
+import MarkdownRenderer from "@/components/mdx/MarkdownRenderer";
+import { ThumbDown } from "@mui/icons-material";
 
 interface CommentCardProps {
   comment: Comment;
-  serializedContent?: MDXRemoteSerializeResult;
   onReplyClick?: (commentId: number) => void;
 }
 
 export default function CommentCard({
   comment,
-  serializedContent,
   onReplyClick,
 }: CommentCardProps) {
   const { isLogin } = useAuth();
   const showSnackbar = useSnackbar();
-  const [liked, setLiked] = useState(comment.like_status === 1);
+  const [likeStatus, setLikeStatus] = useState(comment.like_status);
   const [likeCount, setLikeCount] = useState(comment.like);
   const [expanded, setExpanded] = useState(!comment.is_fold);
 
-  const handleLike = useCallback(async () => {
+  const handleLike = useCallback(async (status: number) => {
     if (!isLogin) {
       showSnackbar("请先登录", "warning");
       return;
     }
+    
+    // 计算新状态：如果点击的是当前状态，则取消（变为0）
+    const newStatus = likeStatus === status ? 0 : status;
+    
     try {
-      await api.post("/v1/comment/like", { comment_id: comment.id });
-      setLiked(!liked);
-      setLikeCount((c) => (liked ? c - 1 : c + 1));
+      await api.post("/v1/comment/like", { id: comment.id, status: newStatus });
+      
+      // 计算点赞数变化
+      let countChange = 0;
+      if (likeStatus === 1) {
+        // 之前是赞状态，现在取消了，减1
+        countChange = -1;
+      }
+      if (newStatus === 1) {
+        // 现在变为赞状态，加1
+        countChange = 1;
+      }
+      
+      setLikeStatus(newStatus);
+      setLikeCount((c) => c + countChange);
     } catch {
       showSnackbar("操作失败", "error");
     }
-  }, [comment.id, liked, isLogin, showSnackbar]);
+  }, [comment.id, likeStatus, isLogin, showSnackbar]);
 
   // Display name
   const displayName = getUserDisplayName(
@@ -133,12 +147,8 @@ export default function CommentCard({
 
         {/* Content */}
         <Collapse in={expanded}>
-          {serializedContent ? (
-            <MdxRenderer source={serializedContent} className="mt-2" />
-          ) : (
-            <Typography variant="body2" sx={{ mt: 1, whiteSpace: "pre-wrap" }}>
-              {comment.content}
-            </Typography>
+          {comment.content && expanded && (
+            <MarkdownRenderer content={comment.content} />
           )}
         </Collapse>
 
@@ -164,8 +174,8 @@ export default function CommentCard({
             borderColor: "divider",
           }}
         >
-          <IconButton size="small" onClick={handleLike}>
-            {liked ? (
+          <IconButton size="small" onClick={() => { handleLike(1) }}>
+            {likeStatus === 1 ? (
               <ThumbUpIcon fontSize="small" color="primary" />
             ) : (
               <ThumbUpOutlinedIcon fontSize="small" />
@@ -173,8 +183,12 @@ export default function CommentCard({
           </IconButton>
           <Typography variant="caption">{likeCount}</Typography>
 
-          <IconButton size="small" disabled>
-            <ThumbDownOutlinedIcon fontSize="small" />
+          <IconButton size="small" onClick={() => { handleLike(2) }}>
+            {likeStatus === 2 ? (
+              <ThumbDown fontSize="small" color="primary" />
+            ) : (
+              <ThumbDownOutlinedIcon fontSize="small" />
+            )}
           </IconButton>
 
           {onReplyClick && (
@@ -184,16 +198,6 @@ export default function CommentCard({
             >
               <ChatBubbleOutlineIcon fontSize="small" />
             </IconButton>
-          )}
-
-          {comment.reward > 0 && (
-            <Chip
-              label={`赏金 ¥${comment.reward}`}
-              size="small"
-              color="warning"
-              variant="outlined"
-              sx={{ ml: "auto", fontSize: "0.7rem", height: 22 }}
-            />
           )}
         </Box>
       </CardContent>

@@ -11,20 +11,20 @@ import type { CourseGroup } from "@/types";
 
 interface TeacherGroupFilterProps {
   groups: CourseGroup[];
-  selectedTeachers: number[];
+  selectedGroupIds: number[];
   onSelectedChange: (ids: number[]) => void;
 }
 
 export default function TeacherGroupFilter({
   groups,
-  selectedTeachers,
+  selectedGroupIds,
   onSelectedChange,
 }: TeacherGroupFilterProps) {
-  const handleToggle = (teacherId: number) => {
-    if (selectedTeachers.includes(teacherId)) {
-      onSelectedChange(selectedTeachers.filter((id) => id !== teacherId));
+  const handleToggle = (groupId: number) => {
+    if (selectedGroupIds.includes(groupId)) {
+      onSelectedChange(selectedGroupIds.filter((id) => id !== groupId));
     } else {
-      onSelectedChange([...selectedTeachers, teacherId]);
+      onSelectedChange([...selectedGroupIds, groupId]);
     }
   };
 
@@ -38,7 +38,6 @@ export default function TeacherGroupFilter({
         </Typography>
         <FormGroup>
           {groups.map((group) => {
-            const teacherId = group.teachers[0]?.id ?? 0;
             const teacherName = group.teachers.map((t) => t.name).join(", ") || "未知";
             return (
               <FormControlLabel
@@ -46,8 +45,8 @@ export default function TeacherGroupFilter({
                 control={
                   <Checkbox
                     size="small"
-                    checked={selectedTeachers.includes(teacherId)}
-                    onChange={() => handleToggle(teacherId)}
+                    checked={selectedGroupIds.includes(group.id)}
+                    onChange={() => handleToggle(group.id)}
                   />
                 }
                 label={

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -28,6 +28,8 @@ import { useSnackbar } from "@/contexts/SnackbarContext";
 import api from "@/lib/api";
 import type { CourseGroup, Comment } from "@/types";
 import MdxRenderer from "@/components/mdx/MdxRenderer";
+import { serializeMdx } from "@/lib/mdx";
+import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 
 interface CommentEditorProps {
   courseId: number;
@@ -64,6 +66,16 @@ export default function CommentEditor({
   const [isAnonymous, setIsAnonymous] = useState(
     existingComment?.is_anonymous ?? true
   );
+  const [previewContent, setPreviewContent] = useState<MDXRemoteSerializeResult | null>(null);
+
+  // Serialize markdown for preview when content or tab changes
+  useEffect(() => {
+    if (tab === 1 && content) {
+      serializeMdx(content)
+        .then(setPreviewContent)
+        .catch(() => setPreviewContent(null));
+    }
+  }, [content, tab]);
 
   const handleScoreChange = useCallback(
     (index: number, value: number) => {
@@ -275,9 +287,19 @@ export default function CommentEditor({
                 minHeight: 150,
               }}
             >
-              <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                {content || "预览区域（无内容）"}
-              </Typography>
+              {content ? (
+                previewContent ? (
+                  <MdxRenderer source={previewContent} />
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    渲染中...
+                  </Typography>
+                )
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  预览区域（无内容）
+                </Typography>
+              )}
             </Box>
           )}
 

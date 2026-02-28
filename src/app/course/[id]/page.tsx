@@ -41,7 +41,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     mutate: mutateComments,
   } = useCommentsByCourse(id);
 
-  const [selectedTeachers, setSelectedTeachers] = useState<number[]>([]);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<number[]>([]);
   const [commentSort, setCommentSort] = useState<CommentSortKey>("post_time");
 
   const course = courseData?.data;
@@ -50,15 +50,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   // Filter + sort comments
   const displayedComments = useMemo(() => {
     let result = [...comments];
-    if (selectedTeachers.length > 0) {
-      const groupIds = course?.groups
-        .filter((g) => g.teachers.some((t) => selectedTeachers.includes(t.id)))
-        .map((g) => g.id);
-      result = result.filter((c) => groupIds?.includes(c.group?.id));
+    if (selectedGroupIds.length > 0) {
+      result = result.filter((c) => selectedGroupIds.includes(c.group?.id ?? 0));
     }
     result.sort(sortCmp<Comment>(commentSort, "desc"));
     return result;
-  }, [comments, selectedTeachers, commentSort, course?.groups]);
+  }, [comments, selectedGroupIds, commentSort]);
 
   if (courseLoading) {
     return (
@@ -91,8 +88,8 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         <Grid size={{ xs: 12, md: 3 }}>
           <TeacherGroupFilter
             groups={course.groups}
-            selectedTeachers={selectedTeachers}
-            onSelectedChange={setSelectedTeachers}
+            selectedGroupIds={selectedGroupIds}
+            onSelectedChange={setSelectedGroupIds}
           />
         </Grid>
 
