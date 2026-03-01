@@ -11,6 +11,7 @@ import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import type { Components } from "react-markdown";
+import "./markdown.css";
 
 /**
  * Lightweight markdown renderer for user-generated content (comments).
@@ -139,7 +140,7 @@ export default function MarkdownRenderer({
 
   return (
     <Box 
-        className={className ?? "prose prose-sm max-w-none dark:prose-invert"} 
+        className={className ?? "markdown-body"} 
         sx={{ 
           "& > *:first-of-type": { mt: 0 },
           color: "text.primary",
