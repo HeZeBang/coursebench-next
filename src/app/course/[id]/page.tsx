@@ -16,7 +16,7 @@ import {
   CourseDetailCard,
   TeacherGroupFilter,
   CommentCard,
-  CommentEditor,
+  WriteCommentButton,
 } from "@/components/course";
 import { EmptyState } from "@/components/layout";
 import { sortCmp } from "@/utils";
@@ -134,9 +134,10 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 mb: 2,
               }}
             >
-              <CommentEditor
+              <WriteCommentButton
                 courseId={course.id}
                 groups={course.groups}
+                comments={comments}
                 onSuccess={() => mutateComments()}
               />
             </Box>
