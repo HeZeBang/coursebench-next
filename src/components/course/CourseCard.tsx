@@ -34,14 +34,6 @@ export default function CourseCard({ course }: CourseCardProps) {
   return (
     <Card variant="outlined" sx={{ height: "100%" }}>
       <CardActionArea component={Link} href={`/course/${course.id}`}>
-            {/* <Box>
-              <Typography variant="h6" component="div" noWrap>
-                {course.name}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {course.code}
-              </Typography>
-            </Box> */}
         <CardMedia component="span" sx={{ px: 2, py: 1, backgroundColor: instColor }}>
           <Box sx={{ display: "flex", gap: 1, alignItems: "center", justifyContent: "space-between" }}>
           <Typography variant="caption" color="#fff">
@@ -56,13 +48,7 @@ export default function CourseCard({ course }: CourseCardProps) {
           <Typography variant="h6" component="div" sx={{ mb:1.2 }} noWrap>
             {course.name}
           </Typography>
-          {/* <Rating
-            name={`score-${course.code}`}
-            value={avg}
-            precision={0.1}
-            readOnly
-            size="small"
-          /> */}
+          
           {/* Score badge */}
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
             <Box
@@ -107,7 +93,7 @@ export default function CourseCard({ course }: CourseCardProps) {
               }}
             >
               <Typography
-                variant="h5"
+                fontSize={25}
                 fontWeight={700}
                 sx={{ color: scoreColor, lineHeight: 1 }}
               >
