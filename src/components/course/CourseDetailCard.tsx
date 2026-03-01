@@ -119,17 +119,14 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                     sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}
                   >
                     {teachers.map((t, idx) => (
-                      <MuiLink
+                      <Chip
                         key={t.id}
                         component={NextLink}
                         href={`/teacher/${t.id}`}
-                        underline="hover"
-                        variant="body2"
-                        color="text.secondary"
-                      >
-                        {t.name}
-                        {idx < teachers.length - 1 ? "、" : ""}
-                      </MuiLink>
+                        clickable
+                        size="small"
+                        label={t.name}
+                      />
                     ))}
                   </Box>
                 </Box>
