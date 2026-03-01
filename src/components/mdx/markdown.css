@@ -74,11 +74,11 @@ ol {
 }
 
 .markdown-body ul > li {
-  list-style: inside;
+  list-style: disc;
 }
 
 .markdown-body ol > li {
-  list-style-position: inside;
+  list-style: decimal;
 }
 
 .markdown-body img {
