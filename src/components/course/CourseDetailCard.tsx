@@ -76,7 +76,7 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
   const teachers = useMemo(() => collectTeachers(course), [course]);
 
   return (
-    <Card variant="outlined">
+    <Card sx={{ width: "100%" }}>
       <CardContent>
         <Grid container spacing={3}>
           {/* ─── Left column: course info ─── */}
@@ -135,7 +135,7 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
           </Grid>
 
           {/* ─── Right column: ratings ─── */}
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Typography variant="subtitle1" fontWeight={700}>
               Ratings &amp; Reviews
             </Typography>
@@ -143,7 +143,7 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
             <Box sx={{ display: "flex", gap: 2, alignItems: "center", justifyContent: "center" }}>
               <Box sx={{ display: "flex", gap: 0.5, flexDirection: "column", alignItems: "center" }}>
                 {/* Overall score */}
-                <Box sx={{ display: "flex", alignItems: "baseline", mt: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "baseline" }}>
                   {hasEnoughData ? (
                     <>
                       <Typography
@@ -194,7 +194,7 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
 
               <Divider orientation="vertical" flexItem sx={{ my: 2 }}/>
 
-              {/* Star distribution bars (5→1) */}
+              {/* Star distribution bars */}
               <Box sx={{ my: 2, flexGrow: "1" }}>
                 {[5, 4, 3, 2, 1].map((star) => {
                   const barColor = hasEnoughData

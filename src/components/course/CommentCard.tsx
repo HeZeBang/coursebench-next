@@ -15,14 +15,20 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useState, useCallback } from "react";
 
-import type { Comment } from "@/types";
-import { gradingInfo, judgeItems, gradingEmojis } from "@/constants";
-import { unixToReadable, getUserDisplayName } from "@/utils";
+import type { Comment, UserProfile } from "@/types";
+import { gradingInfo, judgeItems, gradingEmojis, gradeItems } from "@/constants";
+import { unixToReadable, getUserDisplayName, timeAgo } from "@/utils";
 import api from "@/lib/api";
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import MarkdownRenderer from "@/components/mdx/MarkdownRenderer";
-import { ThumbDown } from "@mui/icons-material";
+import { AccessTime, RateReviewOutlined, SchoolOutlined, SubtitlesOutlined, ThumbDown, Update } from "@mui/icons-material";
+import { Button, Divider } from "@mui/material";
+import { judgeToKey } from "@/constants/scores";
+import UserAvatar from "../user/UserAvatar";
+import { userAgent } from "next/server";
+import { gradeEnum, termEnum } from "@/constants/info";
+import { semesterToReadable } from "@/utils/formatTime";
 
 interface CommentCardProps {
   comment: Comment;
@@ -75,21 +81,29 @@ export default function CommentCard({
     comment.is_anonymous
   );
 
-  // Teacher name
-  const teacherName = comment.group?.teachers?.[0]?.name ?? "";
-
   // Score chips
   const scoreChips = comment.score?.map((s, i) => {
     const idx = Math.round(s) - 1;
     const color = gradingInfo.color[idx] ?? "#B0B0B0";
-    const emoji = gradingEmojis[idx] ?? "";
+    const emoji = gradingInfo[judgeToKey[judgeItems[i]]][idx] ?? "";
     return (
-      <Chip
-        key={judgeItems[i]}
-        label={`${judgeItems[i]}: ${emoji}`}
-        size="small"
-        sx={{ bgcolor: color, color: "#fff", fontSize: "0.7rem", height: 22 }}
-      />
+      <Box 
+          key={judgeItems[i]} 
+          sx={{ display: "flex", mr: 1, alignItems: "baseline" }}
+      >
+        <Typography
+          variant="caption"
+          color="textSecondary"
+          sx={{ mr: 0.5 }}
+        >
+          {judgeItems[i]}
+        </Typography>
+        <Chip
+          label={`${emoji}`}
+          size="small"
+          sx={{ bgcolor: color, color: "#fff", fontSize: "0.7rem", height: 15 }}
+        />
+      </Box>
     );
   });
 
@@ -99,7 +113,7 @@ export default function CommentCard({
       <Card variant="outlined" sx={{ mb: 2, opacity: 0.6 }}>
         <CardContent>
           <Typography variant="body2" color="text.secondary" fontStyle="italic">
-            该评论已被管理员隐藏
+            由于违反社区相关规定，该评论已被隐藏
           </Typography>
         </CardContent>
       </Card>
@@ -118,24 +132,119 @@ export default function CommentCard({
             mb: 1,
           }}
         >
-          <Box>
-            <Typography variant="subtitle2" fontWeight={600}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              alignItems: "center",
+            }}
+          >
+            <UserAvatar userProfile={comment.user} size={40} sx={{ borderRadius: 1}} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 0.1,
+              }}
+            >
+              <Typography
+                fontWeight={800}
+                color="textSecondary"
+              >
+                {displayName}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="textSecondary"
+              >
+                {(comment.user?.grade || 0 !== 0) && gradeEnum[comment.user?.grade || 0]}
+              </Typography>
+            </Box>
+          </Box>
+
+          
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 0.1,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Update sx={{ height: 14, mt: 0.1 }}/>
+              <Typography
+                variant="caption"
+                color="textSecondary"
+              >
+                {timeAgo(comment.update_time)}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <RateReviewOutlined sx={{ height: 14, mt: 0.1 }}/>
+              <Typography
+                variant="caption"
+                color="textSecondary"
+              >
+                {timeAgo(comment.post_time)}
+              </Typography>
+            </Box>
+          </Box>
+
+        </Box>
+
+
+        {/* Content */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 1,
+          }}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Typography variant="h5" fontWeight={600}>
+              <SubtitlesOutlined sx={{ mr: 1, display: "inline-block", mb: 0.5 }}/>
               {comment.title || "无标题"}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {displayName} · {unixToReadable(comment.post_time)}
-              {teacherName && ` · ${teacherName}`}
-              {comment.semester ? ` · ${comment.semester}` : ""}
-            </Typography>
+            
+            <Box sx={{ display: "flex",gap: 2 }}>
+              {comment.semester && (
+                <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+                  <AccessTime 
+                    sx={{ height: 16, width: 16, mt: 0.2, mr: 0.5 }}
+                  />
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                  >
+                    {semesterToReadable(comment.semester)}
+                  </Typography>
+                </Box>
+              )}
+              
+              {comment.group.teachers.length > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <SchoolOutlined 
+                    sx={{ height: 16, width: 16, mt: 0.2, mr: 0.5 }}
+                  />
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                  >
+                    {comment.group.teachers.map((e) => (e.name)).join(" ")}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
-          {comment.is_fold && (
-            <IconButton
-              size="small"
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-          )}
+
+          <IconButton
+            size="small"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
         </Box>
 
         {/* Score chips */}
@@ -146,8 +255,8 @@ export default function CommentCard({
         )}
 
         {/* Content */}
-        <Collapse in={expanded}>
-          {comment.content && expanded && (
+        <Collapse in={expanded} sx={{ mt: 2 }}>
+          {comment.content && (
             <MarkdownRenderer content={comment.content} />
           )}
         </Collapse>
@@ -162,6 +271,8 @@ export default function CommentCard({
           </Typography>
         )}
 
+        <Divider sx={{ mx: -2 }} />
+
         {/* Actions */}
         <Box
           sx={{
@@ -169,27 +280,29 @@ export default function CommentCard({
             alignItems: "center",
             gap: 1,
             mt: 1.5,
-            pt: 1,
-            borderTop: 1,
-            borderColor: "divider",
+            pt: 1
           }}
         >
-          <IconButton size="small" onClick={() => { handleLike(1) }}>
-            {likeStatus === 1 ? (
-              <ThumbUpIcon fontSize="small" color="primary" />
-            ) : (
-              <ThumbUpOutlinedIcon fontSize="small" />
-            )}
-          </IconButton>
-          <Typography variant="caption">{likeCount}</Typography>
-
-          <IconButton size="small" onClick={() => { handleLike(2) }}>
-            {likeStatus === 2 ? (
-              <ThumbDown fontSize="small" color="primary" />
-            ) : (
-              <ThumbDownOutlinedIcon fontSize="small" />
-            )}
-          </IconButton>
+          <Button 
+            variant="contained"
+            color={likeStatus === 1 ? "primary" : "inherit"}
+            onClick={() => { handleLike(1) }}
+            startIcon={<ThumbUpIcon />}
+            size="small"
+            disableElevation
+          >
+            赞同 {likeCount}
+          </Button>
+          <Button 
+            variant="contained"
+            color={likeStatus === 2 ? "primary" : "inherit"}
+            onClick={() => { handleLike(2) }}
+            startIcon={<ThumbDown />}
+            size="small"
+            disableElevation
+          >
+            反对
+          </Button>
 
           {onReplyClick && (
             <IconButton

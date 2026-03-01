@@ -21,6 +21,7 @@ import {
 import { EmptyState } from "@/components/layout";
 import { sortCmp } from "@/utils";
 import type { Comment, CommentSortKey } from "@/types";
+import { Card, CardContent, CardHeader, Divider } from "@mui/material";
 
 interface CourseDetailPageProps {
   params: Promise<{ id: string }>;
@@ -84,19 +85,44 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Grid container spacing={3}>
+        
+        <CourseDetailCard course={course} />
+
         {/* Sidebar: filters */}
         <Grid size={{ xs: 12, md: 3 }}>
-          <TeacherGroupFilter
-            groups={course.groups}
-            selectedGroupIds={selectedGroupIds}
-            onSelectedChange={setSelectedGroupIds}
-          />
+          <Card sx={{ position: "sticky", top: "100px"}}>
+            <CardContent>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel variant="standard">排序方式</InputLabel>
+                <Select
+                  value={commentSort}
+                  label="排序方式"
+                  variant="standard"
+                  onChange={(e) =>
+                    setCommentSort(e.target.value as CommentSortKey)
+                  }
+                >
+                  {sortOptions.map((opt) => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Divider variant="middle" sx={{ my: 2 }} />
+              
+              <TeacherGroupFilter
+                groups={course.groups}
+                selectedGroupIds={selectedGroupIds}
+                onSelectedChange={setSelectedGroupIds}
+              />
+            </CardContent>
+          </Card>
         </Grid>
 
         {/* Main: detail + comments */}
         <Grid size={{ xs: 12, md: 9 }}>
-          <CourseDetailCard course={course} />
-
           {/* Comment section */}
           <Box sx={{ mt: 3 }}>
             <Box
@@ -112,22 +138,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 groups={course.groups}
                 onSuccess={() => mutateComments()}
               />
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>排序</InputLabel>
-                <Select
-                  value={commentSort}
-                  label="排序"
-                  onChange={(e) =>
-                    setCommentSort(e.target.value as CommentSortKey)
-                  }
-                >
-                  {sortOptions.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
             </Box>
 
             {commentsLoading ? (

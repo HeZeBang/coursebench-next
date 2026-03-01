@@ -7,7 +7,7 @@ import type { UserProfile } from "@/types";
 
 interface UserAvatarProps extends Omit<AvatarProps, "src" | "children"> {
   /** User profile object */
-  userProfile: UserProfile;
+  userProfile: UserProfile | null;
   /** Avatar size in pixels
    * @default 32
    */
@@ -38,17 +38,20 @@ const UserAvatar = forwardRef<HTMLDivElement, UserAvatarProps>(
     },
     ref
   ) => {
-    const displayName = getUserDisplayName(userProfile);
+    const displayName = userProfile && getUserDisplayName(userProfile) || "?";
     const initial = displayName.charAt(0);
 
     return (
       <Avatar
         ref={ref}
-        src={userProfile.avatar || undefined}
+        src={userProfile?.avatar || undefined}
         sx={{
           width: size,
           height: size,
+          fontSize: size / 2,
           bgcolor: "primary.main",
+          color: "white",
+          pb: "0.1rem",
           ...sx,
         }}
         {...props}

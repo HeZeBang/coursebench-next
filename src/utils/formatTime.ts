@@ -1,3 +1,5 @@
+import { termEnum } from "@/constants/info";
+
 /**
  * Convert a Unix timestamp (seconds) to a localized Chinese date string.
  */
@@ -23,4 +25,15 @@ export function timeAgo(timestamp: number): string {
   if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`;
   if (diff < 2592000) return `${Math.floor(diff / 86400)} 天前`;
   return unixToReadable(timestamp);
+}
+
+
+/**
+ * Semester number (202401) to string (2024 年春学期)
+ */
+export function semesterToReadable(semester: number): string {
+  const year = Math.floor(semester / 100);
+  const term = semester % 100;
+  const termName = termEnum[term] || "";
+  return `${year} 年 ${termName}`;
 }
