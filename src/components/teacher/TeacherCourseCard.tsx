@@ -22,7 +22,7 @@ export default function TeacherCourseCard({ course }: TeacherCourseCardProps) {
   const score = parseScore(avg, course.comment_num);
   const { label: scoreLabel, color: scoreColor } = getScoreInfo(
     avg,
-    course.comment_num
+    course.comment_num,
   );
 
   return (

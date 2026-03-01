@@ -30,13 +30,13 @@ export function useCourse(id: number | string) {
 
 export function useCommentsByCourse(courseId: number | string) {
   return useSWR<ApiResponse<Comment[]>>(
-    courseId ? `/v1/comment/course/${courseId}` : null
+    courseId ? `/v1/comment/course/${courseId}` : null,
   );
 }
 
 export function useCommentsByUser(userId: number | string) {
   return useSWR<ApiResponse<Comment[]>>(
-    userId ? `/v1/comment/user/${userId}` : null
+    userId ? `/v1/comment/user/${userId}` : null,
   );
 }
 
@@ -46,7 +46,7 @@ export function useRecentComments() {
 
 export function useReplies(commentId: number | string) {
   return useSWR<ApiResponse<Reply[]>>(
-    commentId ? `/v1/reply/${commentId}/chain` : null
+    commentId ? `/v1/reply/${commentId}/chain` : null,
   );
 }
 
@@ -59,9 +59,7 @@ export function useTeacher(id: number | string) {
 // ── User hooks ──
 
 export function useUserProfile(id: number | string) {
-  return useSWR<ApiResponse<UserProfile>>(
-    id ? `/v1/user/profile/${id}` : null
-  );
+  return useSWR<ApiResponse<UserProfile>>(id ? `/v1/user/profile/${id}` : null);
 }
 
 // ── Reward hooks ──

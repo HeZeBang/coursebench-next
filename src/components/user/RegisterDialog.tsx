@@ -69,7 +69,7 @@ export default function RegisterDialog({
   const [passwordError, setPasswordError] = useState("");
 
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Step 0 → email
   const handleEmailNext = useCallback(() => {
@@ -96,7 +96,6 @@ export default function RegisterDialog({
     setPasswordError("");
     setActiveStep(2);
   }, [password, confirmPassword, showSnackbar]);
-
 
   // Step 2 → personal info
   const handleInfoNext = useCallback(async () => {
@@ -181,13 +180,23 @@ export default function RegisterDialog({
   }, [handleReset, onClose]);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth fullScreen={fullScreen}>
-      <DialogTitle sx={{ display: "flex", flexDirection: "column"}}>
-        <Logo width={100}/>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="xs"
+      fullWidth
+      fullScreen={fullScreen}
+    >
+      <DialogTitle sx={{ display: "flex", flexDirection: "column" }}>
+        <Logo width={100} />
         注册
       </DialogTitle>
       <DialogContent>
-        <Stepper activeStep={activeStep} sx={{ mb: 3 }} alternativeLabel={fullScreen}>
+        <Stepper
+          activeStep={activeStep}
+          sx={{ mb: 3 }}
+          alternativeLabel={fullScreen}
+        >
           {steps.map((label) => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>
@@ -218,7 +227,6 @@ export default function RegisterDialog({
           />
         )}
 
-        
         {/* Step 1: Password */}
         {activeStep === 1 && (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -357,15 +365,18 @@ export default function RegisterDialog({
       <DialogActions sx={{ px: 3, pb: 2, flexDirection: "column", gap: 1 }}>
         <Box sx={{ width: "100%" }}>
           <Divider sx={{ mb: 1 }}>或</Divider>
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={startCasdoorLogin}
-          >
+          <Button fullWidth variant="outlined" onClick={startCasdoorLogin}>
             使用 GeekPie 账户注册
           </Button>
         </Box>
-        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Box>
             <Typography variant="caption" color="text.secondary">
               已有账号？
@@ -383,7 +394,11 @@ export default function RegisterDialog({
         <Box sx={{ display: "flex", gap: 1 }}>
           {activeStep > 0 ? (
             <Button onClick={() => setActiveStep((s) => s - 1)}>上一步</Button>
-          ) : (<Button variant="text" onClick={handleClose}>取消</Button>)}
+          ) : (
+            <Button variant="text" onClick={handleClose}>
+              取消
+            </Button>
+          )}
           {activeStep === 0 && (
             <Button variant="contained" onClick={handleEmailNext}>
               下一步

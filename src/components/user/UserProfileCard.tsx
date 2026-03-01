@@ -54,7 +54,15 @@ export default function UserProfileCard({ user }: UserProfileCardProps) {
             {user.realname}
           </Typography>
         )}
-        <Box sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 0.5, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            mt: 1,
+            display: "flex",
+            justifyContent: "center",
+            gap: 0.5,
+            flexWrap: "wrap",
+          }}
+        >
           {gradeLabel && (
             <Chip label={gradeLabel} size="small" variant="outlined" />
           )}
@@ -65,7 +73,15 @@ export default function UserProfileCard({ user }: UserProfileCardProps) {
 
         {/* GeekPie account binding status (self only) */}
         {isSelf && (
-          <Box sx={{ mt: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               {user.has_casdoor_bound ? (
                 <CheckCircleIcon fontSize="small" color="success" />

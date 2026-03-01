@@ -49,10 +49,7 @@ export const validators = {
   reward(value: string): ValidationResult {
     const pattern = /^([1-9]+[\d]*(.[0-9]{1,2})?)$/;
     return (
-      !value ||
-      value.length === 0 ||
-      pattern.test(value) ||
-      "赏金为两位小数"
+      !value || value.length === 0 || pattern.test(value) || "赏金为两位小数"
     );
   },
 } satisfies Record<string, Validator>;
@@ -61,10 +58,7 @@ export const validators = {
  * Validate a value with a validator function.
  * Returns error message string or null if valid.
  */
-export function validate(
-  value: string,
-  validator: Validator
-): string | null {
+export function validate(value: string, validator: Validator): string | null {
   const result = validator(value);
   return result === true ? null : result;
 }

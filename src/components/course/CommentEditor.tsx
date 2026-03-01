@@ -22,7 +22,13 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import EditIcon from "@mui/icons-material/Edit";
 
-import { judgeItems, gradingInfo, gradingEmojis, termItems, rawYearItems } from "@/constants";
+import {
+  judgeItems,
+  gradingInfo,
+  gradingEmojis,
+  termItems,
+  rawYearItems,
+} from "@/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import api from "@/lib/api";
@@ -57,16 +63,17 @@ export default function CommentEditor({
   const [title, setTitle] = useState(existingComment?.title ?? "");
   const [content, setContent] = useState(existingComment?.content ?? "");
   const [scores, setScores] = useState<number[]>(
-    existingComment?.score ?? [3, 3, 3, 3]
+    existingComment?.score ?? [3, 3, 3, 3],
   );
   const [groupId, setGroupId] = useState(existingComment?.group?.id ?? 0);
   const [semester, setSemester] = useState(
-    existingComment?.semester ? String(existingComment.semester) : ""
+    existingComment?.semester ? String(existingComment.semester) : "",
   );
   const [isAnonymous, setIsAnonymous] = useState(
-    existingComment?.is_anonymous ?? true
+    existingComment?.is_anonymous ?? true,
   );
-  const [previewContent, setPreviewContent] = useState<MDXRemoteSerializeResult | null>(null);
+  const [previewContent, setPreviewContent] =
+    useState<MDXRemoteSerializeResult | null>(null);
 
   // Serialize markdown for preview when content or tab changes
   useEffect(() => {
@@ -83,7 +90,7 @@ export default function CommentEditor({
       newScores[index] = value;
       setScores(newScores);
     },
-    [scores]
+    [scores],
   );
 
   const handleSubmit = useCallback(async () => {
@@ -161,9 +168,7 @@ export default function CommentEditor({
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>
-          {existingComment ? "编辑评价" : "写评价"}
-        </DialogTitle>
+        <DialogTitle>{existingComment ? "编辑评价" : "写评价"}</DialogTitle>
         <DialogContent>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -206,7 +211,7 @@ export default function CommentEditor({
                     >
                       {year} {term.label}
                     </MenuItem>
-                  ))
+                  )),
                 )}
               </Select>
             </FormControl>
@@ -251,8 +256,7 @@ export default function CommentEditor({
                   onChange={(_, val) => handleScoreChange(i, val as number)}
                   marks
                   sx={{
-                    color:
-                      gradingInfo.color[scores[i] - 1] ?? "#B0B0B0",
+                    color: gradingInfo.color[scores[i] - 1] ?? "#B0B0B0",
                   }}
                 />
               </Box>

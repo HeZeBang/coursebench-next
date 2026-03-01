@@ -50,7 +50,8 @@ function courseComparator(key: SortKey, order: SortOrder) {
 export default function HomePage() {
   const { data, isLoading } = useCourses();
   const { keys, isRegexp } = useSearch();
-  const { page, selected, sortKey, order, includeDataInsufficient } = useCourseFilter();
+  const { page, selected, sortKey, order, includeDataInsufficient } =
+    useCourseFilter();
   const dispatch = useCourseFilterDispatch();
 
   const courses = data?.data ?? [];
@@ -75,7 +76,7 @@ export default function HomePage() {
         try {
           const regex = new RegExp(keys, "i");
           result = result.filter(
-            (c) => regex.test(c.name) || regex.test(c.code)
+            (c) => regex.test(c.name) || regex.test(c.code),
           );
         } catch {
           // Invalid regex, ignore
@@ -87,14 +88,13 @@ export default function HomePage() {
           .split(/\s+/)
           .map((k) => k.toLowerCase())
           .filter((k) => k.length > 0);
-        
+
         result = result.filter((c) => {
           const name = c.name.toLowerCase();
           const code = c.code.toLowerCase();
           // All keywords must match either name or code
           return keywords.every(
-            (keyword) =>
-              name.includes(keyword) || code.includes(keyword)
+            (keyword) => name.includes(keyword) || code.includes(keyword),
           );
         });
       }
@@ -116,12 +116,20 @@ export default function HomePage() {
     }
 
     return result;
-  }, [courses, selected, keys, isRegexp, sortKey, order, includeDataInsufficient]);
+  }, [
+    courses,
+    selected,
+    keys,
+    isRegexp,
+    sortKey,
+    order,
+    includeDataInsufficient,
+  ]);
 
   const totalPages = Math.ceil(filteredCourses.length / ITEMS_PER_PAGE);
   const pagedCourses = filteredCourses.slice(
     (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
+    page * ITEMS_PER_PAGE,
   );
 
   return (
@@ -150,9 +158,7 @@ export default function HomePage() {
             onSortKeyChange={(k) =>
               dispatch({ type: "SET_SORT_KEY", payload: k })
             }
-            onOrderChange={(o) =>
-              dispatch({ type: "SET_ORDER", payload: o })
-            }
+            onOrderChange={(o) => dispatch({ type: "SET_ORDER", payload: o })}
             includeDataInsufficient={includeDataInsufficient}
             onIncludeDataInsufficientChange={(v) =>
               dispatch({ type: "SET_INCLUDE_DATA_INSUFFICIENT", payload: v })
@@ -171,7 +177,11 @@ export default function HomePage() {
             <EmptyState message="没有找到匹配的课程" />
           ) : (
             <>
-              <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mb: 1, display: "block" }}
+              >
                 共 {filteredCourses.length} 门课程
               </Typography>
               <Grid container spacing={2}>

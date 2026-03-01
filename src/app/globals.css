@@ -48,7 +48,9 @@ body {
   height: 3px;
 }
 #nprogress .peg {
-  box-shadow: 0 0 10px #1976d2, 0 0 5px #1976d2;
+  box-shadow:
+    0 0 10px #1976d2,
+    0 0 5px #1976d2;
 }
 
 /* ── Markdown / Prose overrides ── */

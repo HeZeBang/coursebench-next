@@ -62,7 +62,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
       sx = {},
       ...props
     },
-    ref
+    ref,
   ) => {
     const { mode } = useThemeMode();
 
@@ -117,7 +117,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
         {content}
       </Box>
     );
-  }
+  },
 );
 
 Logo.displayName = "Logo";

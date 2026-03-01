@@ -58,9 +58,7 @@ function ResetPasswordActiveContent() {
       setStatus("success");
     } catch (err: any) {
       setStatus("error");
-      setErrorMsg(
-        err.response?.data?.msg || err.message || "重置失败，请重试"
-      );
+      setErrorMsg(err.response?.data?.msg || err.message || "重置失败，请重试");
     }
   }, [password, id, code]);
 
@@ -129,10 +127,7 @@ function ResetPasswordActiveContent() {
           )}
           {status === "success" && (
             <>
-              <CheckCircleIcon
-                color="success"
-                sx={{ fontSize: 64, mb: 2 }}
-              />
+              <CheckCircleIcon color="success" sx={{ fontSize: 64, mb: 2 }} />
               <Typography variant="h6" fontWeight={600}>
                 密码重置成功！
               </Typography>
@@ -147,11 +142,7 @@ function ResetPasswordActiveContent() {
               <Typography variant="h6" fontWeight={600}>
                 重置失败
               </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                 {errorMsg}
               </Typography>
             </>
@@ -175,7 +166,13 @@ export default function ResetPasswordActivePage() {
       fallback={
         <Container
           maxWidth="sm"
-          sx={{ py: 8, display: "flex", justifyContent: "center", minHeight: "60vh", alignItems: "center" }}
+          sx={{
+            py: 8,
+            display: "flex",
+            justifyContent: "center",
+            minHeight: "60vh",
+            alignItems: "center",
+          }}
         >
           <CircularProgress />
         </Container>

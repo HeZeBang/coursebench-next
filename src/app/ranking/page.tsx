@@ -24,7 +24,7 @@ export default function RankingPage() {
     .sort((a, b) => b.reward - a.reward)
     .map((item, idx) => ({
       rank: idx + 1,
-      nickname: item.is_anonymous ? "匿名用户" : (item.nick_name || "匿名用户"),
+      nickname: item.is_anonymous ? "匿名用户" : item.nick_name || "匿名用户",
       reward: (item.reward / 100).toFixed(2),
     }));
 
@@ -63,8 +63,8 @@ export default function RankingPage() {
                             row.rank === 1
                               ? "warning"
                               : row.rank === 2
-                              ? "default"
-                              : "info"
+                                ? "default"
+                                : "info"
                           }
                           sx={{ fontWeight: 700, minWidth: 28 }}
                         />

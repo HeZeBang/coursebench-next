@@ -34,7 +34,8 @@ export default function TeacherGroupFilter({
     <>
       <FormGroup>
         {groups.map((group) => {
-          const teacherName = group.teachers.map((t) => t.name).join(", ") || "未知";
+          const teacherName =
+            group.teachers.map((t) => t.name).join(", ") || "未知";
           return (
             <FormControlLabel
               key={group.id}

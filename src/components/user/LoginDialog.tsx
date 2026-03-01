@@ -52,13 +52,13 @@ export default function LoginDialog({
   const [captchaError, setCaptchaError] = useState("");
 
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const fetchCaptcha = useCallback(async () => {
     setCaptchaLoading(true);
     try {
       const res = await api.post<{ data: CaptchaResponse }>(
-        "/v1/user/get_captcha"
+        "/v1/user/get_captcha",
       );
       const data = (res.data as { error: boolean; data: CaptchaResponse }).data;
       setCaptchaImage(`data:image/png;base64,${data.img}`);
@@ -131,7 +131,7 @@ export default function LoginDialog({
       e.preventDefault();
       handleLogin();
     },
-    [handleLogin]
+    [handleLogin],
   );
 
   const handleReset = useCallback(() => {
@@ -151,9 +151,14 @@ export default function LoginDialog({
   }, [handleReset, onClose]);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullScreen={fullScreen}>
-      <DialogTitle sx={{ display: "flex", flexDirection: "column"}}>
-        <Logo width={100}/>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="xs"
+      fullScreen={fullScreen}
+    >
+      <DialogTitle sx={{ display: "flex", flexDirection: "column" }}>
+        <Logo width={100} />
         登录
       </DialogTitle>
       <DialogContent>
@@ -211,7 +216,13 @@ export default function LoginDialog({
             </Grid>
             <Grid size={4} alignContent="center" overflow="hidden">
               {captchaLoading ? (
-                <Box sx={{ width: 150, alignContent: "center", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    width: 150,
+                    alignContent: "center",
+                    alignItems: "center",
+                  }}
+                >
                   <CircularProgress size={20} />
                 </Box>
               ) : captchaImage ? (
@@ -222,27 +233,36 @@ export default function LoginDialog({
                   onClick={fetchCaptcha}
                 />
               ) : (
-                <Button variant="text" sx={{ width: 150 }}>加载验证码</Button>
+                <Button variant="text" sx={{ width: 150 }}>
+                  加载验证码
+                </Button>
               )}
             </Grid>
           </Grid>
 
-          <button type="submit" style={{ display: "none" }} aria-hidden="true" />
+          <button
+            type="submit"
+            style={{ display: "none" }}
+            aria-hidden="true"
+          />
         </Box>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2, flexDirection: "column", gap: 1 }}>
         <Box sx={{ width: "100%" }}>
           <Divider sx={{ mb: 1 }}>或</Divider>
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={startCasdoorLogin}
-          >
+          <Button fullWidth variant="outlined" onClick={startCasdoorLogin}>
             使用 GeekPie 账户登录
           </Button>
         </Box>
-        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Box>
             <Typography variant="caption" color="text.secondary">
               没有账号？
@@ -257,7 +277,9 @@ export default function LoginDialog({
             </Link>
           </Box>
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button variant="text" onClick={handleClose}>取消</Button>
+            <Button variant="text" onClick={handleClose}>
+              取消
+            </Button>
             <Button
               variant="contained"
               onClick={handleLogin}

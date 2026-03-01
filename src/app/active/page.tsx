@@ -18,7 +18,7 @@ function ActiveContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading"
+    "loading",
   );
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -41,7 +41,7 @@ function ActiveContent() {
       .catch((err) => {
         setStatus("error");
         setErrorMsg(
-          err.response?.data?.msg || err.message || "激活失败，请重试"
+          err.response?.data?.msg || err.message || "激活失败，请重试",
         );
       });
   }, [searchParams]);
@@ -67,10 +67,7 @@ function ActiveContent() {
           )}
           {status === "success" && (
             <>
-              <CheckCircleIcon
-                color="success"
-                sx={{ fontSize: 64, mb: 2 }}
-              />
+              <CheckCircleIcon color="success" sx={{ fontSize: 64, mb: 2 }} />
               <Typography variant="h6" fontWeight={600}>
                 电子邮箱验证成功！
               </Typography>
@@ -85,11 +82,7 @@ function ActiveContent() {
               <Typography variant="h6" fontWeight={600}>
                 验证失败
               </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                 {errorMsg}
               </Typography>
             </>
@@ -111,7 +104,13 @@ export default function ActivePage() {
       fallback={
         <Container
           maxWidth="sm"
-          sx={{ py: 8, display: "flex", justifyContent: "center", minHeight: "60vh", alignItems: "center" }}
+          sx={{
+            py: 8,
+            display: "flex",
+            justifyContent: "center",
+            minHeight: "60vh",
+            alignItems: "center",
+          }}
         >
           <CircularProgress />
         </Container>

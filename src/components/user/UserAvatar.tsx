@@ -29,16 +29,8 @@ interface UserAvatarProps extends Omit<AvatarProps, "src" | "children"> {
  * <UserAvatar userProfile={user} size={48} />
  */
 const UserAvatar = forwardRef<HTMLDivElement, UserAvatarProps>(
-  (
-    {
-      userProfile,
-      size = 32,
-      sx = {},
-      ...props
-    },
-    ref
-  ) => {
-    const displayName = userProfile && getUserDisplayName(userProfile) || "?";
+  ({ userProfile, size = 32, sx = {}, ...props }, ref) => {
+    const displayName = (userProfile && getUserDisplayName(userProfile)) || "?";
     const initial = displayName.charAt(0);
 
     return (
@@ -59,7 +51,7 @@ const UserAvatar = forwardRef<HTMLDivElement, UserAvatarProps>(
         {initial}
       </Avatar>
     );
-  }
+  },
 );
 
 UserAvatar.displayName = "UserAvatar";

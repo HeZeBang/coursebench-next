@@ -8,5 +8,5 @@ export interface Teacher {
   job: string;
   introduction: string;
   photo: string;
-  courses: Course[];  // same shape as /v1/course/all items
+  courses: Course[]; // same shape as /v1/course/all items
 }

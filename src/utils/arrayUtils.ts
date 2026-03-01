@@ -3,7 +3,7 @@
  */
 export function sortCmp<T>(
   key: keyof T,
-  order: "asc" | "desc" = "desc"
+  order: "asc" | "desc" = "desc",
 ): (a: T, b: T) => number {
   return (a, b) => {
     const va = a[key] as unknown as number;
@@ -28,7 +28,7 @@ export function averageOf<T>(arr: T[], key: keyof T): number {
 export function toDistribute<T>(
   arr: T[],
   key: keyof T,
-  labels: string[]
+  labels: string[],
 ): { label: string; count: number }[] {
   const counts = new Array(labels.length).fill(0);
   arr.forEach((item) => {

@@ -11,7 +11,7 @@ interface UserLike {
  */
 export function getUserDisplayName(
   user: UserLike,
-  isAnonymous = false
+  isAnonymous = false,
 ): string {
   if (isAnonymous) return "匿名用户";
   if (user.nickname) return user.nickname;

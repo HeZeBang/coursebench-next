@@ -33,7 +33,7 @@ export default function MobileDrawer({
   return (
     <Drawer anchor="left" open={open} onClose={onClose}>
       <Box sx={{ width: 260, pt: 2 }}>
-        <Logo width={120} sx={{ mx: 2 }}/>
+        <Logo width={120} sx={{ mx: 2 }} />
         <Divider />
         <List>
           {navLinks.map((link) => (

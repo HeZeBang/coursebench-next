@@ -29,7 +29,7 @@ type CourseFilterAction =
 
 function courseFilterReducer(
   state: CourseFilterState,
-  action: CourseFilterAction
+  action: CourseFilterAction,
 ): CourseFilterState {
   switch (action.type) {
     case "SET_PAGE":
@@ -43,7 +43,13 @@ function courseFilterReducer(
     case "SET_INCLUDE_DATA_INSUFFICIENT":
       return { ...state, includeDataInsufficient: action.payload, page: 1 };
     case "RESET":
-      return { page: 1, selected: [], sortKey: "score", order: "desc", includeDataInsufficient: false };
+      return {
+        page: 1,
+        selected: [],
+        sortKey: "score",
+        order: "desc",
+        includeDataInsufficient: false,
+      };
     default:
       return state;
   }
@@ -59,7 +65,7 @@ const CourseFilterContext = createContext<CourseFilterState>({
 });
 
 const CourseFilterDispatchContext = createContext<Dispatch<CourseFilterAction>>(
-  () => {}
+  () => {},
 );
 
 // ── Provider ──

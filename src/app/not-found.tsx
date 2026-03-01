@@ -28,7 +28,15 @@ export default function NotFound() {
         页面不存在
       </Typography>
       <Box sx={{ mt: 3 }}>
-        <Link href="/" style={{ fontWeight: 600, fontSize: "1rem", color: "#1976d2", textDecoration: "none" }}>
+        <Link
+          href="/"
+          style={{
+            fontWeight: 600,
+            fontSize: "1rem",
+            color: "#1976d2",
+            textDecoration: "none",
+          }}
+        >
           返回首页
         </Link>
       </Box>

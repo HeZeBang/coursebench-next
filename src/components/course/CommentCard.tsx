@@ -16,13 +16,25 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useState, useCallback } from "react";
 
 import type { Comment, UserProfile } from "@/types";
-import { gradingInfo, judgeItems, gradingEmojis, gradeItems } from "@/constants";
+import {
+  gradingInfo,
+  judgeItems,
+  gradingEmojis,
+  gradeItems,
+} from "@/constants";
 import { unixToReadable, getUserDisplayName, timeAgo } from "@/utils";
 import api from "@/lib/api";
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import MarkdownRenderer from "@/components/mdx/MarkdownRenderer";
-import { AccessTime, RateReviewOutlined, SchoolOutlined, SubtitlesOutlined, ThumbDown, Update } from "@mui/icons-material";
+import {
+  AccessTime,
+  RateReviewOutlined,
+  SchoolOutlined,
+  SubtitlesOutlined,
+  ThumbDown,
+  Update,
+} from "@mui/icons-material";
 import { Button, Divider } from "@mui/material";
 import { judgeToKey } from "@/constants/scores";
 import UserAvatar from "../user/UserAvatar";
@@ -45,40 +57,46 @@ export default function CommentCard({
   const [likeCount, setLikeCount] = useState(comment.like);
   const [expanded, setExpanded] = useState(!comment.is_fold);
 
-  const handleLike = useCallback(async (status: number) => {
-    if (!isLogin) {
-      showSnackbar("请先登录", "warning");
-      return;
-    }
-    
-    // 计算新状态：如果点击的是当前状态，则取消（变为0）
-    const newStatus = likeStatus === status ? 0 : status;
-    
-    try {
-      await api.post("/v1/comment/like", { id: comment.id, status: newStatus });
-      
-      // 计算点赞数变化
-      let countChange = 0;
-      if (likeStatus === 1) {
-        // 之前是赞状态，现在取消了，减1
-        countChange = -1;
+  const handleLike = useCallback(
+    async (status: number) => {
+      if (!isLogin) {
+        showSnackbar("请先登录", "warning");
+        return;
       }
-      if (newStatus === 1) {
-        // 现在变为赞状态，加1
-        countChange = 1;
+
+      // 计算新状态：如果点击的是当前状态，则取消（变为0）
+      const newStatus = likeStatus === status ? 0 : status;
+
+      try {
+        await api.post("/v1/comment/like", {
+          id: comment.id,
+          status: newStatus,
+        });
+
+        // 计算点赞数变化
+        let countChange = 0;
+        if (likeStatus === 1) {
+          // 之前是赞状态，现在取消了，减1
+          countChange = -1;
+        }
+        if (newStatus === 1) {
+          // 现在变为赞状态，加1
+          countChange = 1;
+        }
+
+        setLikeStatus(newStatus);
+        setLikeCount((c) => c + countChange);
+      } catch {
+        showSnackbar("操作失败", "error");
       }
-      
-      setLikeStatus(newStatus);
-      setLikeCount((c) => c + countChange);
-    } catch {
-      showSnackbar("操作失败", "error");
-    }
-  }, [comment.id, likeStatus, isLogin, showSnackbar]);
+    },
+    [comment.id, likeStatus, isLogin, showSnackbar],
+  );
 
   // Display name
   const displayName = getUserDisplayName(
     { nickname: comment.user?.nickname, id: comment.user?.id },
-    comment.is_anonymous
+    comment.is_anonymous,
   );
 
   // Score chips
@@ -87,15 +105,11 @@ export default function CommentCard({
     const color = gradingInfo.color[idx] ?? "#B0B0B0";
     const emoji = gradingInfo[judgeToKey[judgeItems[i]]][idx] ?? "";
     return (
-      <Box 
-          key={judgeItems[i]} 
-          sx={{ display: "flex", mr: 1, alignItems: "baseline" }}
+      <Box
+        key={judgeItems[i]}
+        sx={{ display: "flex", mr: 1, alignItems: "baseline" }}
       >
-        <Typography
-          variant="caption"
-          color="textSecondary"
-          sx={{ mr: 0.5 }}
-        >
+        <Typography variant="caption" color="textSecondary" sx={{ mr: 0.5 }}>
           {judgeItems[i]}
         </Typography>
         <Chip
@@ -139,7 +153,11 @@ export default function CommentCard({
               alignItems: "center",
             }}
           >
-            <UserAvatar userProfile={comment.user} size={40} sx={{ borderRadius: 1}} />
+            <UserAvatar
+              userProfile={comment.user}
+              size={40}
+              sx={{ borderRadius: 1 }}
+            />
             <Box
               sx={{
                 display: "flex",
@@ -147,22 +165,16 @@ export default function CommentCard({
                 gap: 0.1,
               }}
             >
-              <Typography
-                fontWeight={800}
-                color="textSecondary"
-              >
+              <Typography fontWeight={800} color="textSecondary">
                 {displayName}
               </Typography>
-              <Typography
-                variant="caption"
-                color="textSecondary"
-              >
-                {(comment.user?.grade || 0 !== 0) && gradeEnum[comment.user?.grade || 0]}
+              <Typography variant="caption" color="textSecondary">
+                {(comment.user?.grade || 0 !== 0) &&
+                  gradeEnum[comment.user?.grade || 0]}
               </Typography>
             </Box>
           </Box>
 
-          
           <Box
             sx={{
               display: "flex",
@@ -171,27 +183,19 @@ export default function CommentCard({
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Update sx={{ height: 14, mt: 0.1 }}/>
-              <Typography
-                variant="caption"
-                color="textSecondary"
-              >
+              <Update sx={{ height: 14, mt: 0.1 }} />
+              <Typography variant="caption" color="textSecondary">
                 {timeAgo(comment.update_time)}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <RateReviewOutlined sx={{ height: 14, mt: 0.1 }}/>
-              <Typography
-                variant="caption"
-                color="textSecondary"
-              >
+              <RateReviewOutlined sx={{ height: 14, mt: 0.1 }} />
+              <Typography variant="caption" color="textSecondary">
                 {timeAgo(comment.post_time)}
               </Typography>
             </Box>
           </Box>
-
         </Box>
-
 
         {/* Content */}
         <Box
@@ -204,45 +208,44 @@ export default function CommentCard({
         >
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <Typography variant="h5" fontWeight={600}>
-              <SubtitlesOutlined sx={{ mr: 1, display: "inline-block", mb: 0.5 }}/>
+              <SubtitlesOutlined
+                sx={{ mr: 1, display: "inline-block", mb: 0.5 }}
+              />
               {comment.title || "无标题"}
             </Typography>
-            
-            <Box sx={{ display: "flex",gap: 2 }}>
+
+            <Box sx={{ display: "flex", gap: 2 }}>
               {comment.semester && (
-                <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-                  <AccessTime 
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <AccessTime
                     sx={{ height: 16, width: 16, mt: 0.2, mr: 0.5 }}
                   />
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                  >
+                  <Typography variant="body2" color="textSecondary">
                     {semesterToReadable(comment.semester)}
                   </Typography>
                 </Box>
               )}
-              
+
               {comment.group.teachers.length > 0 && (
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <SchoolOutlined 
+                  <SchoolOutlined
                     sx={{ height: 16, width: 16, mt: 0.2, mr: 0.5 }}
                   />
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                  >
-                    {comment.group.teachers.map((e) => (e.name)).join(" ")}
+                  <Typography variant="body2" color="textSecondary">
+                    {comment.group.teachers.map((e) => e.name).join(" ")}
                   </Typography>
                 </Box>
               )}
             </Box>
           </Box>
 
-          <IconButton
-            size="small"
-            onClick={() => setExpanded(!expanded)}
-          >
+          <IconButton size="small" onClick={() => setExpanded(!expanded)}>
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Box>
@@ -256,9 +259,7 @@ export default function CommentCard({
 
         {/* Content */}
         <Collapse in={expanded} sx={{ mt: 2 }}>
-          {comment.content && (
-            <MarkdownRenderer content={comment.content} />
-          )}
+          {comment.content && <MarkdownRenderer content={comment.content} />}
         </Collapse>
 
         {comment.is_fold && !expanded && (
@@ -280,23 +281,27 @@ export default function CommentCard({
             alignItems: "center",
             gap: 1,
             mt: 1.5,
-            pt: 1
+            pt: 1,
           }}
         >
-          <Button 
+          <Button
             variant="contained"
             color={likeStatus === 1 ? "primary" : "inherit"}
-            onClick={() => { handleLike(1) }}
+            onClick={() => {
+              handleLike(1);
+            }}
             startIcon={<ThumbUpIcon />}
             size="small"
             disableElevation
           >
             赞同 {likeCount}
           </Button>
-          <Button 
+          <Button
             variant="contained"
             color={likeStatus === 2 ? "primary" : "inherit"}
-            onClick={() => { handleLike(2) }}
+            onClick={() => {
+              handleLike(2);
+            }}
             startIcon={<ThumbDown />}
             size="small"
             disableElevation
@@ -305,10 +310,7 @@ export default function CommentCard({
           </Button>
 
           {onReplyClick && (
-            <IconButton
-              size="small"
-              onClick={() => onReplyClick(comment.id)}
-            >
+            <IconButton size="small" onClick={() => onReplyClick(comment.id)}>
               <ChatBubbleOutlineIcon fontSize="small" />
             </IconButton>
           )}

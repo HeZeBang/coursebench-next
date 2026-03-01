@@ -37,8 +37,11 @@ export default function UserDetailPage({
   const { userProfile: selfProfile } = useAuth();
   const isSelf = selfProfile?.id === userId;
 
-  const { data: profileData, error: profileError, isLoading: profileLoading } =
-    useUserProfile(userId);
+  const {
+    data: profileData,
+    error: profileError,
+    isLoading: profileLoading,
+  } = useUserProfile(userId);
   const { data: commentsData, isLoading: commentsLoading } =
     useCommentsByUser(userId);
 

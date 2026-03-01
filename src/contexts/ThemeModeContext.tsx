@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
 
 type ThemeMode = "light" | "dark";
 
@@ -9,7 +15,9 @@ interface ThemeModeContextType {
   toggleTheme: () => void;
 }
 
-const ThemeModeContext = createContext<ThemeModeContextType | undefined>(undefined);
+const ThemeModeContext = createContext<ThemeModeContextType | undefined>(
+  undefined,
+);
 
 export function ThemeModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>("light");

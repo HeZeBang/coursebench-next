@@ -41,8 +41,8 @@ export interface Comment {
   is_anonymous: boolean;
   like: number;
   dislike: number;
-  like_status: number;   // 0=none, 1=liked, 2=disliked
-  score: number[];       // [quality, workload, difficulty, distribution] raw
+  like_status: number; // 0=none, 1=liked, 2=disliked
+  score: number[]; // [quality, workload, difficulty, distribution] raw
   user: CommentUser | null;
   course: CommentCourse;
   group: CommentGroup;

@@ -40,7 +40,9 @@ export default function TeacherProfile({ teacher }: TeacherProfileProps) {
             {teacher.job}
           </Typography>
         )}
-        <Box sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 0.5 }}>
+        <Box
+          sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 0.5 }}
+        >
           <Chip
             label={getInstituteAbbr(teacher.institute)}
             size="small"

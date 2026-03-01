@@ -15,7 +15,10 @@ export default async function TermsOfServicePage() {
         用户协议
       </Typography>
       <article className="prose prose-sm max-w-none">
-        <MDXRemote source={source} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+        <MDXRemote
+          source={source}
+          options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+        />
       </article>
     </Container>
   );

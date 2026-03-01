@@ -4,14 +4,14 @@ export interface UserProfile {
   email: string;
   nickname: string;
   realname: string;
-  grade: number;         // 0=unknown, 1=本科, 2=硕士, 3=博士
+  grade: number; // 0=unknown, 1=本科, 2=硕士, 3=博士
   year: number;
   avatar: string;
   is_anonymous: boolean;
   is_admin: boolean;
   is_community_admin: boolean;
   invitation_code: string;
-  reward: number;        // -1 if hidden
+  reward: number; // -1 if hidden
   has_casdoor_bound: boolean;
 }
 

@@ -52,7 +52,9 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const displayedComments = useMemo(() => {
     let result = [...comments];
     if (selectedGroupIds.length > 0) {
-      result = result.filter((c) => selectedGroupIds.includes(c.group?.id ?? 0));
+      result = result.filter((c) =>
+        selectedGroupIds.includes(c.group?.id ?? 0),
+      );
     }
     result.sort(sortCmp<Comment>(commentSort, "desc"));
     return result;
@@ -85,12 +87,11 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Grid container spacing={3}>
-        
         <CourseDetailCard course={course} />
 
         {/* Sidebar: filters */}
         <Grid size={{ xs: 12, md: 3 }}>
-          <Card sx={{ position: "sticky", top: "100px"}}>
+          <Card sx={{ position: "sticky", top: "100px" }}>
             <CardContent>
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel variant="standard">排序方式</InputLabel>
@@ -111,7 +112,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               </FormControl>
 
               <Divider variant="middle" sx={{ my: 2 }} />
-              
+
               <TeacherGroupFilter
                 groups={course.groups}
                 selectedGroupIds={selectedGroupIds}
@@ -142,7 +143,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
             {commentsLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} variant="rounded" height={120} sx={{ mb: 2 }} />
+                <Skeleton
+                  key={i}
+                  variant="rounded"
+                  height={120}
+                  sx={{ mb: 2 }}
+                />
               ))
             ) : displayedComments.length === 0 ? (
               <EmptyState message="暂无评价，来写第一条吧！" />

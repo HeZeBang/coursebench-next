@@ -16,7 +16,11 @@ import FormGroup from "@mui/material/FormGroup";
 import { TeacherProfile, TeacherCourseCard } from "@/components/teacher";
 import EmptyState from "@/components/layout/EmptyState";
 import { useTeacher } from "@/hooks";
-import { getInstituteColor, getInstituteAbbr, instituteInfo } from "@/constants";
+import {
+  getInstituteColor,
+  getInstituteAbbr,
+  instituteInfo,
+} from "@/constants";
 
 export default function TeacherDetailPage({
   params,
@@ -47,7 +51,7 @@ export default function TeacherDetailPage({
 
   const handleInstituteToggle = (inst: string) => {
     setSelectedInstitutes((prev) =>
-      prev.includes(inst) ? prev.filter((i) => i !== inst) : [...prev, inst]
+      prev.includes(inst) ? prev.filter((i) => i !== inst) : [...prev, inst],
     );
   };
 

@@ -27,7 +27,6 @@ export function timeAgo(timestamp: number): string {
   return unixToReadable(timestamp);
 }
 
-
 /**
  * Semester number (202401) to string (2024 年春学期)
  */

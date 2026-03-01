@@ -8,7 +8,7 @@ export interface GroupTeacher {
 export interface CourseGroup {
   id: number;
   code: string;
-  score: number[];       // [quality, workload, difficulty, distribution]
+  score: number[]; // [quality, workload, difficulty, distribution]
   comment_num: number;
   teachers: GroupTeacher[];
 }
@@ -20,7 +20,7 @@ export interface Course {
   code: string;
   institute: string;
   credit: number;
-  score: number[];       // [quality, workload, difficulty, distribution] — averaged
+  score: number[]; // [quality, workload, difficulty, distribution] — averaged
   comment_num: number;
 }
 

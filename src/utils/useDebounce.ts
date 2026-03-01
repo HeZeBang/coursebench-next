@@ -5,7 +5,7 @@ import { useRef, useEffect, useCallback } from "react";
  */
 export function useDebounce<T extends (...args: unknown[]) => void>(
   callback: T,
-  delay = 200
+  delay = 200,
 ): T {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -20,7 +20,7 @@ export function useDebounce<T extends (...args: unknown[]) => void>(
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => callback(...args), delay);
     },
-    [callback, delay]
+    [callback, delay],
   ) as T;
 
   return debouncedFn;

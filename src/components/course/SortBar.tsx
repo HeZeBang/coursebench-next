@@ -38,7 +38,15 @@ export default function SortBar({
   onIncludeDataInsufficientChange,
 }: SortBarProps) {
   return (
-    <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2, flexWrap: "wrap" }}>
+    <Box
+      sx={{
+        display: "flex",
+        gap: 2,
+        alignItems: "center",
+        mb: 2,
+        flexWrap: "wrap",
+      }}
+    >
       <FormControl size="small" sx={{ minWidth: 120 }}>
         <InputLabel>排序方式</InputLabel>
         <Select

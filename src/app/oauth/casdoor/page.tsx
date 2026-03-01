@@ -21,8 +21,7 @@ function CasdoorCallbackContent() {
 
     // Validate return_url is same-origin or relative
     const isSafe =
-      returnUrl.startsWith("/") ||
-      returnUrl.startsWith(window.location.origin);
+      returnUrl.startsWith("/") || returnUrl.startsWith(window.location.origin);
     const finalUrl = isSafe ? returnUrl : "/";
 
     (async () => {
@@ -76,7 +75,13 @@ export default function CasdoorCallbackPage() {
       fallback={
         <Container
           maxWidth="sm"
-          sx={{ py: 12, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}
+          sx={{
+            py: 12,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "60vh",
+          }}
         >
           <CircularProgress />
         </Container>

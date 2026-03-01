@@ -17,7 +17,7 @@ import "./markdown.css";
  * Lightweight markdown renderer for user-generated content (comments).
  * Uses react-markdown for synchronous rendering without heavy serialization.
  * Much faster than MDX serialization for simple markdown content.
- * 
+ *
  * Now uses MUI theme for consistent dark/light mode support that responds to
  * the ThemeModeContext, ensuring dark mode toggling works properly.
  */
@@ -50,12 +50,22 @@ export default function MarkdownRenderer({
       </Typography>
     ),
     h3: ({ children }) => (
-      <Typography variant="subtitle1" component="h3" gutterBottom fontWeight={600}>
+      <Typography
+        variant="subtitle1"
+        component="h3"
+        gutterBottom
+        fontWeight={600}
+      >
         {children}
       </Typography>
     ),
     h4: ({ children }) => (
-      <Typography variant="subtitle2" component="h4" gutterBottom fontWeight={600}>
+      <Typography
+        variant="subtitle2"
+        component="h4"
+        gutterBottom
+        fontWeight={600}
+      >
         {children}
       </Typography>
     ),
@@ -106,7 +116,9 @@ export default function MarkdownRenderer({
           <Typography
             component="code"
             sx={{
-              bgcolor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.05)",
+              bgcolor: isDark
+                ? "rgba(255, 255, 255, 0.1)"
+                : "rgba(0, 0, 0, 0.05)",
               px: 0.5,
               py: 0.25,
               borderRadius: 0.5,
@@ -139,16 +151,16 @@ export default function MarkdownRenderer({
   };
 
   return (
-    <Box 
-        className={className ?? "markdown-body"} 
-        sx={{ 
-          "& > *:first-of-type": { mt: 0 },
-          color: "text.primary",
-        }}
-        style={{
-          lineHeight: "1.8",
-          fontSize: "1rem",
-        }}
+    <Box
+      className={className ?? "markdown-body"}
+      sx={{
+        "& > *:first-of-type": { mt: 0 },
+        color: "text.primary",
+      }}
+      style={{
+        lineHeight: "1.8",
+        fontSize: "1rem",
+      }}
     >
       <ReactMarkdown
         components={components}

@@ -45,10 +45,7 @@ function collectTeachers(course: CourseDetail): GroupTeacher[] {
 }
 
 /** Convert comment scores into a star distribution [1★, 2★, 3★, 4★, 5★] as percentages */
-function toStarDistribution(
-  scores: number[],
-  commentNum: number
-): number[] {
+function toStarDistribution(scores: number[], commentNum: number): number[] {
   // scores[] is already averaged per-dimension; for star distribution we'd
   // need per-comment data. Since the API only gives aggregated scores, we
   // don't have a real per-comment histogram. Return an empty array to skip
@@ -70,7 +67,7 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
   const hasEnoughData = course.comment_num >= ENOUGH_DATA_THRESHOLD;
   const { label: scoreLabel, color: scoreColor } = getScoreInfo(
     avg,
-    course.comment_num
+    course.comment_num,
   );
 
   const teachers = useMemo(() => collectTeachers(course), [course]);
@@ -99,7 +96,8 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                   color="text.secondary"
                   sx={{ mt: 0.5 }}
                 >
-                  {course.code} | {course.credit} 学分 | {course.comment_num} 评论
+                  {course.code} | {course.credit} 学分 | {course.comment_num}{" "}
+                  评论
                 </Typography>
               </Box>
 
@@ -116,7 +114,12 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                 <Box sx={{ mt: 2 }}>
                   <Typography variant="subtitle1">授课老师:</Typography>
                   <Box
-                    sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 0.5,
+                      mt: 0.5,
+                    }}
                   >
                     {teachers.map((t, idx) => (
                       <Chip
@@ -140,8 +143,22 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
               Ratings &amp; Reviews
             </Typography>
 
-            <Box sx={{ display: "flex", gap: 2, alignItems: "center", justifyContent: "center" }}>
-              <Box sx={{ display: "flex", gap: 0.5, flexDirection: "column", alignItems: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 0.5,
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
                 {/* Overall score */}
                 <Box sx={{ display: "flex", alignItems: "baseline" }}>
                   {hasEnoughData ? (
@@ -166,7 +183,10 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                   <Typography
                     variant="h5"
                     fontWeight={700}
-                    sx={{ ml: 0.5, color: hasEnoughData ? scoreColor : "#B0B0B0" }}
+                    sx={{
+                      ml: 0.5,
+                      color: hasEnoughData ? scoreColor : "#B0B0B0",
+                    }}
                   >
                     /5
                   </Typography>
@@ -183,7 +203,7 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                     }}
                   />
                 )}
-                <Typography 
+                <Typography
                   variant="body2"
                   fontSize={12}
                   color="text.secondary"
@@ -192,20 +212,22 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                 </Typography>
               </Box>
 
-              <Divider orientation="vertical" flexItem sx={{ my: 2 }}/>
+              <Divider orientation="vertical" flexItem sx={{ my: 2 }} />
 
               {/* Star distribution bars */}
               <Box sx={{ my: 2, flexGrow: "1" }}>
                 {[5, 4, 3, 2, 1].map((star) => {
                   const barColor = hasEnoughData
-                    ? scoreInfo[star + 1]?.color ?? "#B0B0B0"
+                    ? (scoreInfo[star + 1]?.color ?? "#B0B0B0")
                     : "#B0B0B0";
                   return (
                     <Box
                       key={star}
                       sx={{ display: "flex", alignItems: "center", mb: 0.25 }}
                     >
-                      <Typography variant="body2" sx={{ mr: 0.5 }}>{star}</Typography>
+                      <Typography variant="body2" sx={{ mr: 0.5 }}>
+                        {star}
+                      </Typography>
                       <Rating
                         value={1}
                         max={1}
@@ -228,7 +250,6 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                   );
                 })}
               </Box>
-
             </Box>
 
             {/* Dimension scores as chips (matching Vue layout) */}
@@ -237,7 +258,7 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                 {judgeItems.map((label, i) => {
                   const dimScore = parseScore(
                     course.score[i],
-                    course.comment_num
+                    course.comment_num,
                   );
                   const info =
                     dimScore > 0

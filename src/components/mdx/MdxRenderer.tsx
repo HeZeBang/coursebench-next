@@ -22,7 +22,12 @@ const dynamicComponents: MDXComponents = {
     </Typography>
   ),
   h3: ({ children }) => (
-    <Typography variant="subtitle1" component="h3" gutterBottom fontWeight={600}>
+    <Typography
+      variant="subtitle1"
+      component="h3"
+      gutterBottom
+      fontWeight={600}
+    >
       {children}
     </Typography>
   ),
@@ -49,10 +54,13 @@ interface MdxRendererProps {
  */
 export default function MdxRenderer({ source, className }: MdxRendererProps) {
   return (
-    <div className={`prose prose-sm max-w-none dark:prose-invert ${className ?? ""}`} style={{
-      lineHeight: "1.8",
-      fontSize: "1rem",
-    }}>
+    <div
+      className={`prose prose-sm max-w-none dark:prose-invert ${className ?? ""}`}
+      style={{
+        lineHeight: "1.8",
+        fontSize: "1rem",
+      }}
+    >
       <MDXRemote {...source} components={dynamicComponents} />
     </div>
   );

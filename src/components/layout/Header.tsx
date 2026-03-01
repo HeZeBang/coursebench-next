@@ -34,7 +34,14 @@ import UserAvatar from "@/components/user/UserAvatar";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileDrawer from "./MobileDrawer";
 import Logo from "../Logo";
-import { Collapse, Fab, Slide, Tab, Tabs, useScrollTrigger } from "@mui/material";
+import {
+  Collapse,
+  Fab,
+  Slide,
+  Tab,
+  Tabs,
+  useScrollTrigger,
+} from "@mui/material";
 import React from "react";
 import { ArrowUpward } from "@mui/icons-material";
 
@@ -45,7 +52,9 @@ const navLinks = [
   { label: "关于我们", href: "/about" },
 ] as const;
 
-function ElevationScroll(props: { children?: React.ReactElement<{ elevation?: number }>; }) {
+function ElevationScroll(props: {
+  children?: React.ReactElement<{ elevation?: number }>;
+}) {
   const { children } = props;
   const trigger = useScrollTrigger({
     disableHysteresis: true,
@@ -59,28 +68,30 @@ function ElevationScroll(props: { children?: React.ReactElement<{ elevation?: nu
     : null;
 }
 
-function BackToTop(props: { ref : React.Ref<React.ReactElement> }){
+function BackToTop(props: { ref: React.Ref<React.ReactElement> }) {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 20,
   });
 
-  return <Slide in={trigger} direction="up">
-    <Fab
-      variant="extended"
-      size="small"
-      color="primary"
-      sx={{
-        position: "fixed",
-        bottom: "20px",
-        left: "50%",
-        translate: "-50%"
-      }}
-    >
-      <ArrowUpward sx={{ mr: 0.2 }} />
-      返回顶部
-    </Fab>
-  </Slide>
+  return (
+    <Slide in={trigger} direction="up">
+      <Fab
+        variant="extended"
+        size="small"
+        color="primary"
+        sx={{
+          position: "fixed",
+          bottom: "20px",
+          left: "50%",
+          translate: "-50%",
+        }}
+      >
+        <ArrowUpward sx={{ mr: 0.2 }} />
+        返回顶部
+      </Fab>
+    </Slide>
+  );
 }
 
 export default function Header() {
@@ -103,7 +114,7 @@ export default function Header() {
 
   const handleUserMenuOpen = useCallback(
     (e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget),
-    []
+    [],
   );
   const handleUserMenuClose = useCallback(() => setAnchorEl(null), []);
 
@@ -143,7 +154,7 @@ export default function Header() {
 
             {/* Logo */}
             <Link href="/" className="no-underline flex items-center mr-4">
-              <Logo width={130}/>
+              <Logo width={130} />
             </Link>
 
             {/* Desktop nav links */}
@@ -159,13 +170,13 @@ export default function Header() {
                 aria-label="navigation tabs"
               >
                 {navLinks.map((link) => (
-                <Tab
-                  key={link.href}
-                  label={link.label}
-                  value={link.href}
-                  component={Link}
-                  href={link.href}
-                />
+                  <Tab
+                    key={link.href}
+                    label={link.label}
+                    value={link.href}
+                    component={Link}
+                    href={link.href}
+                  />
                 ))}
               </Tabs>
             )}
@@ -174,7 +185,6 @@ export default function Header() {
 
             <Collapse in={!isMobile} orientation="horizontal">
               <Box sx={{ display: "flex", gap: 1, marginX: 1 }}>
-                
                 {/* Theme toggle */}
                 <ThemeToggle />
               </Box>
@@ -230,13 +240,15 @@ export default function Header() {
               </Box>
             )}
           </Toolbar>
-          
+
           <Collapse in={pathname === "/"}>
             <Box className="flex w-full max-w-7xl justify-center items-center mb-2">
               {/* Search bar (desktop only on home page) */}
               <TextField
                 size="small"
-                placeholder={isRegexp? "输入正则表达式" : "搜索课程，空格分隔关键词"}
+                placeholder={
+                  isRegexp ? "输入正则表达式" : "搜索课程，空格分隔关键词"
+                }
                 value={keys}
                 onChange={(e) =>
                   searchDispatch({ type: "SET_KEYS", payload: e.target.value })
@@ -249,10 +261,14 @@ export default function Header() {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Tooltip title={isRegexp ? "正则表达式已开启" : "开启正则搜索"}>
+                      <Tooltip
+                        title={isRegexp ? "正则表达式已开启" : "开启正则搜索"}
+                      >
                         <IconButton
                           size="small"
-                          onClick={() => searchDispatch({ type: "TOGGLE_REGEXP" })}
+                          onClick={() =>
+                            searchDispatch({ type: "TOGGLE_REGEXP" })
+                          }
                           color={isRegexp ? "primary" : "default"}
                         >
                           <RegexIcon fontSize="small" />

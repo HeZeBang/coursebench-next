@@ -19,7 +19,7 @@ interface UserCommentCardProps {
 export default function UserCommentCard({ comment }: UserCommentCardProps) {
   const { color: scoreColor } = getScoreInfo(
     comment.score?.[0] ?? 0,
-    1 // user comments always have data
+    1, // user comments always have data
   );
 
   return (
@@ -39,7 +39,8 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {comment.course?.name}
-                {comment.group?.teachers?.[0]?.name && ` · ${comment.group.teachers[0].name}`}
+                {comment.group?.teachers?.[0]?.name &&
+                  ` · ${comment.group.teachers[0].name}`}
                 {` · ${unixToReadable(comment.post_time)}`}
               </Typography>
               <Typography

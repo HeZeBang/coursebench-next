@@ -15,7 +15,7 @@ api.interceptors.response.use(
   (error) => {
     // Let SWR / caller handle errors
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

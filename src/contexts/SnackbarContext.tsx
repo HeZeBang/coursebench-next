@@ -34,7 +34,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       setSnack({ message, severity });
       setOpen(true);
     },
-    []
+    [],
   );
 
   const handleClose = useCallback(
@@ -42,7 +42,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       if (reason === "clickaway") return;
       setOpen(false);
     },
-    []
+    [],
   );
 
   return (

@@ -17,7 +17,9 @@ export function classifyError(error: unknown): ClassifiedError {
       return { type: "network", message: "网络连接失败，请检查网络设置" };
     }
     const status = error.response.status;
-    const data = error.response.data as { error?: number; msg?: string } | undefined;
+    const data = error.response.data as
+      | { error?: number; msg?: string }
+      | undefined;
     if (status >= 500) {
       return {
         type: "backend",

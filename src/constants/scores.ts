@@ -22,13 +22,18 @@ export const gradingInfo = {
   color: ["#FF5252", "#FF892F", "#FFC107", "#A4BE23", "#709800"],
 } as const;
 
-export const judgeItems = ["课程质量", "作业用时", "考核难度", "给分情况"] as const;
+export const judgeItems = [
+  "课程质量",
+  "作业用时",
+  "考核难度",
+  "给分情况",
+] as const;
 export type JudgeItem = (typeof judgeItems)[number];
 export const judgeToKey = {
-  "课程质量": "quality",
-  "作业用时": "workload",
-  "考核难度": "difficulty",
-  "给分情况": "distribution",
+  课程质量: "quality",
+  作业用时: "workload",
+  考核难度: "difficulty",
+  给分情况: "distribution",
 } as const satisfies Record<JudgeItem, keyof typeof gradingInfo>;
 
 export const gradingEmojis = ["😭", "☹️", "🙁", "🙂", "😊"] as const;
@@ -41,10 +46,7 @@ export const ENOUGH_DATA_THRESHOLD = 3;
  * score range: 1 ~ 5 (float), mapped to scoreInfo indices 1-6
  * If commentCount < threshold, returns scoreInfo[0] ("数据不足")
  */
-export function getScoreInfo(
-  score: number,
-  commentCount: number
-): ScoreLabel {
+export function getScoreInfo(score: number, commentCount: number): ScoreLabel {
   if (commentCount < ENOUGH_DATA_THRESHOLD || score <= 0) return scoreInfo[0];
   const rounded = Math.round(score);
   if (rounded <= 1) return scoreInfo[1];
@@ -52,9 +54,12 @@ export function getScoreInfo(
   return scoreInfo[rounded];
 }
 
-export function getJudgeInfo(idx: number, value: number): { label: string; color: string } {
+export function getJudgeInfo(
+  idx: number,
+  value: number,
+): { label: string; color: string } {
   const index = Math.min(Math.max(Math.round(value), 1), 5) - 1;
-  
+
   return {
     label: gradingInfo[judgeToKey[judgeItems[idx]]][index],
     color: gradingInfo.color[index],

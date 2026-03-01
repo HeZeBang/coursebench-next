@@ -2,7 +2,7 @@ import type { SelectOption } from "@/types";
 import { gradeEnum, termEnum } from "./info";
 
 export const gradeItems: SelectOption<string>[] = Object.entries(gradeEnum).map(
-  ([key, value]) => ({ label: key, value: String(value) })
+  ([key, value]) => ({ label: key, value: String(value) }),
 );
 
 export const visibleItems: SelectOption[] = [
@@ -15,7 +15,7 @@ const nowYear = new Date().getFullYear();
 
 export const rawYearItems: number[] = Array.from(
   { length: nowYear - startYear + 1 },
-  (_, i) => nowYear - i
+  (_, i) => nowYear - i,
 );
 
 export const yearItems: SelectOption<number | string>[] = [
@@ -24,5 +24,5 @@ export const yearItems: SelectOption<number | string>[] = [
 ];
 
 export const termItems: SelectOption<string>[] = Object.entries(termEnum).map(
-  ([key, value]) => ({ label: key, value: `0${value}` })
+  ([key, value]) => ({ label: key, value: `0${value}` }),
 );
