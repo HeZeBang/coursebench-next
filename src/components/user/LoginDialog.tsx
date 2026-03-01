@@ -14,9 +14,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 
 import { useAuthDispatch } from "@/contexts/AuthContext";
+import Divider from "@mui/material/Divider";
+
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import { validators, validate } from "@/constants";
 import api from "@/lib/api";
+import { startCasdoorLogin } from "@/lib/casdoor";
 import type { CaptchaResponse } from "@/types";
 import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import Image from "next/image";
@@ -228,30 +231,42 @@ export default function LoginDialog({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2, justifyContent: "space-between" }}>
-        <Box>
-          <Typography variant="caption" color="text.secondary">
-            没有账号？
-          </Typography>
-          <Link
-            component="button"
-            variant="caption"
-            onClick={onSwitchToRegister}
-            sx={{ ml: 0.5 }}
-          >
-            立即注册
-          </Link>
-        </Box>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button variant="text" onClick={handleClose}>取消</Button>
+      <DialogActions sx={{ px: 3, pb: 2, flexDirection: "column", gap: 1 }}>
+        <Box sx={{ width: "100%" }}>
+          <Divider sx={{ mb: 1 }}>或</Divider>
           <Button
-            variant="contained"
-            onClick={handleLogin}
-            disabled={loading || captchaLoading || !captcha}
-            startIcon={loading ? <CircularProgress size={16} /> : undefined}
+            fullWidth
+            variant="outlined"
+            onClick={startCasdoorLogin}
           >
-            登录
+            使用 GeekPie 账户登录
           </Button>
+        </Box>
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              没有账号？
+            </Typography>
+            <Link
+              component="button"
+              variant="caption"
+              onClick={onSwitchToRegister}
+              sx={{ ml: 0.5 }}
+            >
+              立即注册
+            </Link>
+          </Box>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button variant="text" onClick={handleClose}>取消</Button>
+            <Button
+              variant="contained"
+              onClick={handleLogin}
+              disabled={loading || captchaLoading || !captcha}
+              startIcon={loading ? <CircularProgress size={16} /> : undefined}
+            >
+              登录
+            </Button>
+          </Box>
         </Box>
       </DialogActions>
     </Dialog>

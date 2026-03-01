@@ -22,9 +22,12 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 
+import Divider from "@mui/material/Divider";
+
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import { validators, validate, gradeItems, yearItems } from "@/constants";
 import api from "@/lib/api";
+import { startCasdoorLogin } from "@/lib/casdoor";
 import type { CaptchaResponse } from "@/types";
 import Logo from "../Logo";
 import { useMediaQuery, useTheme } from "@mui/material";
@@ -351,19 +354,31 @@ export default function RegisterDialog({
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2, justifyContent: "space-between" }}>
-        <Box>
-          <Typography variant="caption" color="text.secondary">
-            已有账号？
-          </Typography>
-          <Link
-            component="button"
-            variant="caption"
-            onClick={onSwitchToLogin}
-            sx={{ ml: 0.5 }}
+      <DialogActions sx={{ px: 3, pb: 2, flexDirection: "column", gap: 1 }}>
+        <Box sx={{ width: "100%" }}>
+          <Divider sx={{ mb: 1 }}>或</Divider>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={startCasdoorLogin}
           >
-            立即登录
-          </Link>
+            使用 GeekPie 账户注册
+          </Button>
+        </Box>
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              已有账号？
+            </Typography>
+            <Link
+              component="button"
+              variant="caption"
+              onClick={onSwitchToLogin}
+              sx={{ ml: 0.5 }}
+            >
+              立即登录
+            </Link>
+          </Box>
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
           {activeStep > 0 ? (

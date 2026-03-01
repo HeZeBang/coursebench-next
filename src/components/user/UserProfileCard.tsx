@@ -6,9 +6,14 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
+import Button from "@mui/material/Button";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 import type { UserProfile } from "@/types";
 import { getUserDisplayName } from "@/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { startCasdoorBind } from "@/lib/casdoor";
 
 const gradeLabels: Record<number, string> = {
   1: "本科",
@@ -22,6 +27,8 @@ interface UserProfileCardProps {
 
 export default function UserProfileCard({ user }: UserProfileCardProps) {
   const gradeLabel = gradeLabels[user.grade] ?? "";
+  const { userProfile: selfProfile } = useAuth();
+  const isSelf = selfProfile?.id === user.id;
 
   return (
     <Card>
@@ -55,6 +62,31 @@ export default function UserProfileCard({ user }: UserProfileCardProps) {
             <Chip label={`${user.year} 级`} size="small" variant="outlined" />
           )}
         </Box>
+
+        {/* GeekPie account binding status (self only) */}
+        {isSelf && (
+          <Box sx={{ mt: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              {user.has_casdoor_bound ? (
+                <CheckCircleIcon fontSize="small" color="success" />
+              ) : (
+                <CancelIcon fontSize="small" color="disabled" />
+              )}
+              <Typography variant="body2" color="text.secondary">
+                GeekPie 账户：{user.has_casdoor_bound ? "已关联" : "未关联"}
+              </Typography>
+            </Box>
+            {!user.has_casdoor_bound && (
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={startCasdoorBind}
+              >
+                绑定 GeekPie 账户
+              </Button>
+            )}
+          </Box>
+        )}
       </CardContent>
     </Card>
   );
