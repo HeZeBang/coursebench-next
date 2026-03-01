@@ -2,14 +2,11 @@
   word-break: break-word;
 }
 
-.markdown-body h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  padding-bottom: 16px;
-  line-height: 1.25;
+.markdown-body {
+  h1, h2, h3, h4, h5, h6 {
+    padding-bottom: 16px;
+    line-height: 1.25;
+  }
 }
 
 .markdown-body a :hover {
