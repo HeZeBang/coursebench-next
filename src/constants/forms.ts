@@ -1,8 +1,10 @@
 import type { SelectOption } from "@/types";
 import { gradeEnum, termEnum } from "./info";
 
-export const gradeItems: SelectOption<string>[] = Object.entries(gradeEnum).map(
-  ([key, value]) => ({ label: key, value: String(value) }),
+export const gradeItems: SelectOption<string>[] = Object.entries(gradeEnum)
+  .filter(([key]) => isNaN(Number(key)))
+  .map(
+    ([key, value]) => ({ label: key, value: String(value) }),
 );
 
 export const visibleItems: SelectOption[] = [
@@ -23,6 +25,8 @@ export const yearItems: SelectOption<number | string>[] = [
   ...rawYearItems.map((y) => ({ label: String(y), value: y })),
 ];
 
-export const termItems: SelectOption<string>[] = Object.entries(termEnum).map(
-  ([key, value]) => ({ label: key, value: `0${value}` }),
+export const termItems: SelectOption<string>[] = Object.entries(termEnum)
+  .filter(([key]) => isNaN(Number(key)))
+  .map(
+    ([key, value]) => ({ label: key, value: String(value).padStart(2, '0') }),
 );

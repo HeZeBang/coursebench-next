@@ -51,6 +51,11 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const course = courseData?.data;
   const comments = commentsData?.data ?? [];
 
+  const commentDialog = useCommentDialog({
+    comments,
+    onSuccess: () => mutateComments(),
+  });
+
   // Filter + sort comments
   const displayedComments = useMemo(() => {
     let result = [...comments];
@@ -86,11 +91,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       </Container>
     );
   }
-
-  const commentDialog = useCommentDialog({
-    comments,
-    onSuccess: () => mutateComments(),
-  });
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>

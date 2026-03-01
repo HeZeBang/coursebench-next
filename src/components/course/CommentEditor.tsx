@@ -36,6 +36,7 @@ import type { CourseGroup, Comment } from "@/types";
 import MdxRenderer from "@/components/mdx/MdxRenderer";
 import { serializeMdx } from "@/lib/mdx";
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { Grid } from "@mui/material";
 
 /**
  * Pure editor form — renders DialogTitle + DialogContent + DialogActions.
@@ -74,9 +75,12 @@ export default function CommentEditor({
   const [scores, setScores] = useState<number[]>(
     existingComment?.score ?? [3, 3, 3, 3],
   );
-  const [groupId, setGroupId] = useState(existingComment?.group?.id ?? 0);
+  const [groupId, setGroupId] = useState(existingComment?.group?.id ?? null);
+  const [year, setYear] = useState(
+    existingComment?.semester ? String(Math.floor(existingComment.semester / 100)) : "",
+  );
   const [semester, setSemester] = useState(
-    existingComment?.semester ? String(existingComment.semester) : "",
+    existingComment?.semester ? String(existingComment.semester % 100).padStart(2, "0") : "",
   );
   const [isAnonymous, setIsAnonymous] = useState(
     existingComment?.is_anonymous ?? true,
@@ -89,9 +93,12 @@ export default function CommentEditor({
     setTitle(existingComment?.title ?? "");
     setContent(existingComment?.content ?? "");
     setScores(existingComment?.score ?? [3, 3, 3, 3]);
-    setGroupId(existingComment?.group?.id ?? 0);
+    setGroupId(existingComment?.group?.id ?? null);
+    setYear(
+      existingComment?.semester ? String(Math.floor(existingComment.semester / 100)) : "",
+    );
     setSemester(
-      existingComment?.semester ? String(existingComment.semester) : "",
+      existingComment?.semester ? String(existingComment.semester % 100).padStart(2, "0") : "",
     );
     setIsAnonymous(existingComment?.is_anonymous ?? true);
     setError("");
@@ -121,8 +128,8 @@ export default function CommentEditor({
       setError("请输入评价内容");
       return;
     }
-    if (groupId === 0) {
-      setError("请选择教师");
+    if (groupId === null || year == "" || semester == "" || title == "") {
+      setError("请填写所有必填项");
       return;
     }
     setLoading(true);
@@ -131,16 +138,29 @@ export default function CommentEditor({
       const endpoint = existingComment
         ? "/v1/comment/update"
         : "/v1/comment/post";
-      const payload = {
-        ...(existingComment ? { comment_id: existingComment.id } : {}),
-        course_id: courseId,
-        group_id: groupId,
-        title,
-        content,
-        score: scores,
-        semester: semester ? Number(semester) : 0,
-        is_anonymous: isAnonymous,
-      };
+      const semesterValue = year && semester ? Number(year) * 100 + Number(semester) : 0;
+      
+      // Match backend API signature
+      const payload = existingComment
+        ? {
+            id: existingComment.id,
+            title,
+            content,
+            semester: semesterValue,
+            is_anonymous: isAnonymous,
+            scores: scores,
+            student_score_ranking: 2, // Default value, not yet supported
+          }
+        : {
+            group: groupId,
+            title,
+            content,
+            semester: semesterValue,
+            is_anonymous: isAnonymous,
+            scores: scores,
+            student_score_ranking: 2, // Default value, not yet supported
+          };
+      
       await api.post(endpoint, payload);
       showSnackbar(existingComment ? "评价已更新" : "评价发布成功", "success");
       onSuccess();
@@ -156,9 +176,9 @@ export default function CommentEditor({
     content,
     groupId,
     existingComment,
-    courseId,
     title,
     scores,
+    year,
     semester,
     isAnonymous,
     showSnackbar,
@@ -203,19 +223,18 @@ export default function CommentEditor({
           </Alert>
         )}
 
-        {/* Teacher select + Semester */}
+        {/* Teacher select + Year + Semester */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>教师</InputLabel>
+            <InputLabel variant="standard" required error={!groupId}>教师</InputLabel>
             <Select
+              variant="standard"
               value={groupId}
               label="教师"
               onChange={(e) => setGroupId(Number(e.target.value))}
               disabled={!!existingComment}
+              required error={!groupId}
             >
-              <MenuItem value={0} disabled>
-                请选择教师
-              </MenuItem>
               {groups.map((g) => (
                 <MenuItem key={g.id} value={g.id}>
                   {g.teachers.map((t) => t.name).join(", ") || "未知"}
@@ -223,24 +242,36 @@ export default function CommentEditor({
               ))}
             </Select>
           </FormControl>
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>学期</InputLabel>
+          <FormControl size="small" sx={{ minWidth: 100 }}>
+            <InputLabel variant="standard" required error={year == ""}>修读年份</InputLabel>
             <Select
+              required error={year == ""}
+              variant="standard"
+              value={year}
+              label="修读年份"
+              onChange={(e) => setYear(e.target.value)}
+            >
+              {rawYearItems.map((y) => (
+                <MenuItem key={y} value={y}>
+                  {y}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 100 }}>
+            <InputLabel variant="standard" required error={semester == ""}>修读学期</InputLabel>
+            <Select
+              required error={semester == ""}
+              variant="standard"
               value={semester}
-              label="学期"
+              label="修读学期"
               onChange={(e) => setSemester(e.target.value)}
             >
-              <MenuItem value="">不选择</MenuItem>
-              {rawYearItems.flatMap((year) =>
-                termItems.map((term) => (
-                  <MenuItem
-                    key={`${year}${term.value}`}
-                    value={`${year}${term.value}`}
-                  >
-                    {year} {term.label}
-                  </MenuItem>
-                )),
-              )}
+              {termItems.map((term) => (
+                <MenuItem key={term.value} value={term.value}>
+                  {term.label}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
@@ -248,17 +279,20 @@ export default function CommentEditor({
         {/* Title */}
         <TextField
           fullWidth
+          variant="standard"
           size="small"
-          label="标题（可选）"
+          label="标题"
+          required
+          error={title == ""}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           sx={{ mb: 2 }}
         />
 
         {/* Score sliders */}
-        <Box sx={{ mb: 2 }}>
+        <Grid sx={{ mb: 2 }}>
           {judgeItems.map((label, i) => (
-            <Box key={label} sx={{ mb: 1 }}>
+            <Grid key={label} sx={{ mb: 1 }} size={{ sm: 6, md: 6 }}>
               <Box
                 sx={{
                   display: "flex",
@@ -287,9 +321,9 @@ export default function CommentEditor({
                   color: gradingInfo.color[scores[i] - 1] ?? "#B0B0B0",
                 }}
               />
-            </Box>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
 
         {/* Content: Edit / Preview tabs */}
         <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 1 }}>
