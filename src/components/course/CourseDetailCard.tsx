@@ -10,7 +10,6 @@ import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import LinearProgress from "@mui/material/LinearProgress";
 import Rating from "@mui/material/Rating";
-import MuiLink from "@mui/material/Link";
 import NextLink from "next/link";
 
 import type { CourseDetail, GroupTeacher } from "@/types";

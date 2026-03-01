@@ -90,7 +90,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         <CourseDetailCard course={course} />
 
         {/* Sidebar: filters */}
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ position: "sticky", top: "100px" }}>
             <CardContent>
               <FormControl size="small" sx={{ minWidth: 120 }}>
@@ -123,7 +123,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         </Grid>
 
         {/* Main: detail + comments */}
-        <Grid size={{ xs: 12, md: 9 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
           {/* Comment section */}
           <Box sx={{ mt: 3 }}>
             <Box

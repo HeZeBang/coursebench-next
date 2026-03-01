@@ -89,7 +89,6 @@ export default function TeacherDetailPage({
         sx={{
           height: 120,
           bgcolor: instColor,
-          opacity: 0.85,
         }}
       />
 
