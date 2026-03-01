@@ -47,9 +47,16 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
   const [selectedGroupIds, setSelectedGroupIds] = useState<number[]>([]);
   const [commentSort, setCommentSort] = useState<CommentSortKey>("post_time");
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const course = courseData?.data;
   const comments = commentsData?.data ?? [];
+
+  // Initialize selectedGroupIds with all groups (default all selected)
+  if (course && !isInitialized) {
+    setSelectedGroupIds(course.groups.map(g => g.id));
+    setIsInitialized(true);
+  }
 
   // Handler to refresh both course and comments data
   const handleDataRefresh = () => {
@@ -63,16 +70,28 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   });
 
   // Filter + sort comments
+  // - All selected (selectedGroupIds.length === groups.length): show all
+  // - None selected (selectedGroupIds.length === 0): show none
+  // - Partial selection: show filtered
   const displayedComments = useMemo(() => {
     let result = [...comments];
-    if (selectedGroupIds.length > 0) {
+    const totalGroups = course?.groups.length ?? 0;
+    
+    // If none selected, return empty
+    if (selectedGroupIds.length === 0) {
+      return [];
+    }
+    
+    // If not all selected, filter by selected groups
+    if (selectedGroupIds.length < totalGroups) {
       result = result.filter((c) =>
         selectedGroupIds.includes(c.group?.id ?? 0),
       );
     }
+    
     result.sort(sortCmp<Comment>(commentSort, "desc"));
     return result;
-  }, [comments, selectedGroupIds, commentSort]);
+  }, [comments, selectedGroupIds, commentSort, course?.groups.length]);
 
   if (courseLoading) {
     return (
@@ -142,7 +161,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         />
       </SpeedDial>
       <Grid container spacing={3}>
-        <CourseDetailCard course={course} comments={comments} />
+        <CourseDetailCard course={course} comments={displayedComments} />
 
         {/* Sidebar: filters */}
         <Grid size={{ xs: 12, md: 4 }}>

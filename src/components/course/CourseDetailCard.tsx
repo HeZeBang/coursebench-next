@@ -58,15 +58,50 @@ interface CourseDetailCardProps {
 }
 
 export default function CourseDetailCard({ course, comments = [] }: CourseDetailCardProps) {
-  const avg = averageScore(course.score);
-  const score = parseScore(avg, course.comment_num);
-  const hasEnoughData = course.comment_num >= ENOUGH_DATA_THRESHOLD;
-  const { label: scoreLabel, color: scoreColor } = getScoreInfo(
-    avg,
-    course.comment_num,
-  );
-
   const teachers = useMemo(() => collectTeachers(course), [course]);
+  
+  // Calculate dynamic scores based on filtered comments
+  const dynamicScores = useMemo(() => {
+    if (comments.length === 0) {
+      return {
+        avg: averageScore(course.score),
+        score: parseScore(averageScore(course.score), course.comment_num),
+        hasEnoughData: course.comment_num >= ENOUGH_DATA_THRESHOLD,
+        dimensionScores: course.score,
+        commentCount: course.comment_num,
+      };
+    }
+    
+    // Calculate average scores from filtered comments
+    const dimensionSums = [0, 0, 0, 0];
+    let validCommentCount = 0;
+    
+    for (const comment of comments) {
+      if (comment.score && comment.score.length >= 4) {
+        validCommentCount++;
+        for (let i = 0; i < 4; i++) {
+          dimensionSums[i] += comment.score[i];
+        }
+      }
+    }
+    
+    const dimensionScores = validCommentCount > 0
+      ? dimensionSums.map(sum => sum / validCommentCount)
+      : [0, 0, 0, 0];
+    
+    const avg = averageScore(dimensionScores);
+    
+    return {
+      avg,
+      score: parseScore(avg, validCommentCount),
+      hasEnoughData: validCommentCount >= ENOUGH_DATA_THRESHOLD,
+      dimensionScores,
+      commentCount: validCommentCount,
+    };
+  }, [comments, course.score, course.comment_num]);
+  
+  const { avg, score, hasEnoughData, dimensionScores, commentCount } = dynamicScores;
+  const { label: scoreLabel, color: scoreColor } = getScoreInfo(avg, commentCount);
   
   // Calculate star distribution from comments
   const starDistribution = useMemo(
@@ -214,7 +249,7 @@ export default function CourseDetailCard({ course, comments = [] }: CourseDetail
                   fontSize={12}
                   color="text.secondary"
                 >
-                  {course.comment_num} 人评分
+                  {commentCount} 人评分
                 </Typography>
               </Box>
 
@@ -272,16 +307,16 @@ export default function CourseDetailCard({ course, comments = [] }: CourseDetail
             </Box>
 
             {/* Dimension scores as chips (matching Vue layout) */}
-            {course.score && course.score.length >= 4 && (
+            {dimensionScores && dimensionScores.length >= 4 && (
               <Grid container spacing={1} sx={{ mt: 2 }}>
                 {judgeItems.map((label, i) => {
                   const dimScore = parseScore(
-                    course.score[i],
-                    course.comment_num,
+                    dimensionScores[i],
+                    commentCount,
                   );
                   const info =
                     dimScore > 0
-                      ? getJudgeInfo(i, course.score[i])
+                      ? getJudgeInfo(i, dimensionScores[i])
                       : { label: "数据不足", color: "#B0B0B0" };
                   return (
                     <Grid key={label} size={{ xs: 6, sm: 3, md: 6 }}>

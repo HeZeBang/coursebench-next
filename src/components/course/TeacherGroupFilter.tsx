@@ -8,6 +8,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 
 import type { CourseGroup } from "@/types";
+import { Chip, Collapse, Stack } from "@mui/material";
+import { CheckOutlined } from "@mui/icons-material";
 
 interface TeacherGroupFilterProps {
   groups: CourseGroup[];
@@ -31,30 +33,36 @@ export default function TeacherGroupFilter({
   if (groups.length === 0) return null;
 
   return (
-    <>
-      <FormGroup>
-        {groups.map((group) => {
-          const teacherName =
-            group.teachers.map((t) => t.name).join(", ") || "未知";
-          return (
-            <FormControlLabel
-              key={group.id}
-              control={
-                <Checkbox
-                  size="small"
-                  checked={selectedGroupIds.includes(group.id)}
-                  onChange={() => handleToggle(group.id)}
-                />
-              }
-              label={
+    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+      {groups.map((group) => {
+        const teacherName =
+          group.teachers.map((t) => t.name).join(", ") || "未知";
+        return (
+          <Chip
+            key={group.id}
+            size="medium"
+            variant={selectedGroupIds.includes(group.id) ? "filled" : "outlined"}
+            onClick={() => handleToggle(group.id)}
+            sx={{
+              height: 'auto',
+              '& .MuiChip-label': {
+                display: 'block',
+                whiteSpace: 'normal',
+              },
+            }}
+            label={
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ my: 1 }}>
+                <Collapse in={selectedGroupIds.includes(group.id)} orientation="horizontal">
+                  <CheckOutlined />
+                </Collapse>
                 <Typography variant="body2">
                   {teacherName} ({group.comment_num})
                 </Typography>
-              }
-            />
-          );
-        })}
-      </FormGroup>
-    </>
+              </Stack>
+            }
+          />
+        );
+      })}
+    </Stack>
   );
 }

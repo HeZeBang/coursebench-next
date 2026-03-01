@@ -51,7 +51,7 @@ export default function CommentCard({
   comment,
   onReplyClick,
 }: CommentCardProps) {
-  const { isLogin } = useAuth();
+  const { isLogin, userProfile } = useAuth();
   const showSnackbar = useSnackbar();
   const [likeStatus, setLikeStatus] = useState(comment.like_status);
   const [likeCount, setLikeCount] = useState(comment.like);
@@ -292,6 +292,7 @@ export default function CommentCard({
             }}
             startIcon={<ThumbUpIcon />}
             size="small"
+            disabled={!isLogin || (userProfile?.id === comment.user?.id)}
             disableElevation
           >
             赞同 {likeCount}
@@ -304,6 +305,7 @@ export default function CommentCard({
             }}
             startIcon={<ThumbDown />}
             size="small"
+            disabled={!isLogin || (userProfile?.id === comment.user?.id)}
             disableElevation
           >
             反对
