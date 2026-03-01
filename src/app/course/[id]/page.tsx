@@ -16,12 +16,15 @@ import {
   CourseDetailCard,
   TeacherGroupFilter,
   CommentCard,
+  CommentDialog,
   WriteCommentButton,
+  useCommentDialog,
 } from "@/components/course";
 import { EmptyState } from "@/components/layout";
 import { sortCmp } from "@/utils";
 import type { Comment, CommentSortKey } from "@/types";
-import { Card, CardContent, CardHeader, Divider } from "@mui/material";
+import { Card, CardContent, CardHeader, Divider, SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
+import { ArrowUpward, Edit } from "@mui/icons-material";
 
 interface CourseDetailPageProps {
   params: Promise<{ id: string }>;
@@ -84,8 +87,54 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     );
   }
 
+  const commentDialog = useCommentDialog({
+    comments,
+    onSuccess: () => mutateComments(),
+  });
+
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
+      {/* Dialog lives outside SpeedDial so it doesn't break the action list */}
+      <CommentDialog
+        courseId={course.id}
+        groups={course.groups}
+        {...commentDialog}
+      />
+
+      <SpeedDial
+        ariaLabel="SpeedDial basic example"
+        sx={{ position: 'fixed', 
+            bottom: { sm: 16, md: 32 }, 
+            right: { sm: 16, md: 32 },
+            "& .MuiSpeedDialIcon-icon": {
+              mb: "4px !important"
+            }
+         }}
+        icon={<SpeedDialIcon />}
+      >
+        <SpeedDialAction
+          key="comment"
+          icon={<Edit />}
+          slotProps={{
+            tooltip: {
+              open: true,
+              title: commentDialog.hasComments ? "我的评价" : "写评价",
+            },
+          }}
+          onClick={commentDialog.handleOpen}
+        />
+        <SpeedDialAction
+          key="edit"
+          icon={<ArrowUpward />}
+          slotProps={{
+            tooltip: {
+              open: true,
+              title: "返回顶部",
+            },
+          }}
+          onClick={() => { window?.scrollTo({ top: 0, behavior: "smooth" }) }}
+        />
+      </SpeedDial>
       <Grid container spacing={3}>
         <CourseDetailCard course={course} />
 
