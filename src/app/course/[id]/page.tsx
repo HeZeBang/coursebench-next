@@ -38,7 +38,7 @@ const sortOptions: { label: string; value: CommentSortKey }[] = [
 
 export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const { id } = use(params);
-  const { data: courseData, isLoading: courseLoading } = useCourse(id);
+  const { data: courseData, isLoading: courseLoading, mutate: mutateCourse } = useCourse(id);
   const {
     data: commentsData,
     isLoading: commentsLoading,
@@ -51,9 +51,15 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const course = courseData?.data;
   const comments = commentsData?.data ?? [];
 
+  // Handler to refresh both course and comments data
+  const handleDataRefresh = () => {
+    mutateComments();
+    mutateCourse();
+  };
+
   const commentDialog = useCommentDialog({
     comments,
-    onSuccess: () => mutateComments(),
+    onSuccess: handleDataRefresh,
   });
 
   // Filter + sort comments
@@ -136,7 +142,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         />
       </SpeedDial>
       <Grid container spacing={3}>
-        <CourseDetailCard course={course} />
+        <CourseDetailCard course={course} comments={comments} />
 
         {/* Sidebar: filters */}
         <Grid size={{ xs: 12, md: 4 }}>
@@ -187,7 +193,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 courseId={course.id}
                 groups={course.groups}
                 comments={comments}
-                onSuccess={() => mutateComments()}
+                onSuccess={handleDataRefresh}
               />
             </Box>
 

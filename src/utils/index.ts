@@ -1,4 +1,9 @@
-export { parseScore } from "./parseScore";
+export {
+  parseScore,
+  averageScore,
+  calculateStarDistribution,
+  starDistributionToPercentages,
+} from "./parseScore";
 export { getUserDisplayName } from "./getUserDisplayName";
 export { unixToReadable, timeAgo } from "./formatTime";
 export { sortCmp, sumOf, averageOf, toDistribute } from "./arrayUtils";

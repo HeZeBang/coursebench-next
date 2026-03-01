@@ -12,7 +12,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Rating from "@mui/material/Rating";
 import NextLink from "next/link";
 
-import type { CourseDetail, GroupTeacher } from "@/types";
+import type { CourseDetail, GroupTeacher, Comment } from "@/types";
 import {
   getScoreInfo,
   getInstituteColor,
@@ -22,7 +22,12 @@ import {
   ENOUGH_DATA_THRESHOLD,
   scoreInfo,
 } from "@/constants";
-import { parseScore, averageScore } from "@/utils/parseScore";
+import {
+  parseScore,
+  averageScore,
+  calculateStarDistribution,
+  starDistributionToPercentages,
+} from "@/utils";
 import { BarcodeReader } from "@mui/icons-material";
 
 /* ── helpers ─────────────────────────────────────────────── */
@@ -43,24 +48,16 @@ function collectTeachers(course: CourseDetail): GroupTeacher[] {
   return result;
 }
 
-/** Convert comment scores into a star distribution [1★, 2★, 3★, 4★, 5★] as percentages */
-function toStarDistribution(scores: number[], commentNum: number): number[] {
-  // scores[] is already averaged per-dimension; for star distribution we'd
-  // need per-comment data. Since the API only gives aggregated scores, we
-  // don't have a real per-comment histogram. Return an empty array to skip
-  // star distribution when not available.
-  // If we get a groups-level breakdown we could approximate, but for now
-  // we keep the distribution section hidden when we can't compute it.
-  return [];
-}
+
 
 /* ── component ───────────────────────────────────────────── */
 
 interface CourseDetailCardProps {
   course: CourseDetail;
+  comments?: Comment[];
 }
 
-export default function CourseDetailCard({ course }: CourseDetailCardProps) {
+export default function CourseDetailCard({ course, comments = [] }: CourseDetailCardProps) {
   const avg = averageScore(course.score);
   const score = parseScore(avg, course.comment_num);
   const hasEnoughData = course.comment_num >= ENOUGH_DATA_THRESHOLD;
@@ -70,6 +67,16 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
   );
 
   const teachers = useMemo(() => collectTeachers(course), [course]);
+  
+  // Calculate star distribution from comments
+  const starDistribution = useMemo(
+    () => calculateStarDistribution(comments),
+    [comments]
+  );
+  const starPercentages = useMemo(
+    () => starDistributionToPercentages(starDistribution),
+    [starDistribution]
+  );
 
   return (
     <Card sx={{ width: "100%" }}>
@@ -219,12 +226,19 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                   const barColor = hasEnoughData
                     ? (scoreInfo[star + 1]?.color ?? "#B0B0B0")
                     : "#B0B0B0";
+                  const percentage = hasEnoughData && comments.length > 0
+                    ? starPercentages[star - 1]
+                    : 0;
+                  const count = hasEnoughData && comments.length > 0
+                    ? starDistribution[star - 1]
+                    : 0;
                   return (
                     <Box
                       key={star}
                       sx={{ display: "flex", alignItems: "center", mb: 0.25 }}
+                      title={`${count} 人评为 ${star} 星`}
                     >
-                      <Typography variant="body2" sx={{ mr: 0.5 }}>
+                      <Typography variant="body2" sx={{ mr: 0.5, minWidth: 12 }}>
                         {star}
                       </Typography>
                       <Rating
@@ -236,15 +250,21 @@ export default function CourseDetailCard({ course }: CourseDetailCardProps) {
                       />
                       <LinearProgress
                         variant="determinate"
-                        value={0} // TODO: use real data
+                        value={percentage}
                         sx={{
                           flex: 1,
                           height: 4,
                           borderRadius: 2,
-                          bgcolor: `${barColor}88`,
+                          bgcolor: `${barColor}22`,
                           "& .MuiLinearProgress-bar": { bgcolor: barColor },
                         }}
                       />
+                      <Typography 
+                        variant="caption" 
+                        sx={{ ml: 1, minWidth: 28, fontSize: 10, color: "text.secondary" }}
+                      >
+                        {count > 0 ? count : ""}
+                      </Typography>
                     </Box>
                   );
                 })}
