@@ -62,16 +62,6 @@ export default function CourseDetailCard({ course, comments = [] }: CourseDetail
   
   // Calculate dynamic scores based on filtered comments
   const dynamicScores = useMemo(() => {
-    if (comments.length === 0) {
-      return {
-        avg: averageScore(course.score),
-        score: parseScore(averageScore(course.score), course.comment_num),
-        hasEnoughData: course.comment_num >= ENOUGH_DATA_THRESHOLD,
-        dimensionScores: course.score,
-        commentCount: course.comment_num,
-      };
-    }
-    
     // Calculate average scores from filtered comments
     const dimensionSums = [0, 0, 0, 0];
     let validCommentCount = 0;
