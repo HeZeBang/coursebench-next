@@ -170,7 +170,11 @@ export default function CommentCard({ comment }: CommentCardProps) {
               alignItems: "center",
             }}
           >
-            <ButtonBase onClick={() => { router.push(comment.user? `/user/${comment.user.id}`: "#") }}>
+            <ButtonBase
+              onClick={() => {
+                router.push(comment.user ? `/user/${comment.user.id}` : "#");
+              }}
+            >
               <UserAvatar
                 userProfile={comment.user}
                 size={40}
@@ -184,16 +188,19 @@ export default function CommentCard({ comment }: CommentCardProps) {
                 gap: 0.1,
               }}
             >
-
               <Typography fontWeight={800} color="textSecondary">
                 {comment.user ? (
-                  <ButtonBase sx={{ mx: -0.5, px: 0.5, borderRadius: 0.5 }}
-                    onClick={() => { router.push(`/user/${comment.user?.id}`) }}
+                  <ButtonBase
+                    sx={{ mx: -0.5, px: 0.5, borderRadius: 0.5 }}
+                    onClick={() => {
+                      router.push(`/user/${comment.user?.id}`);
+                    }}
                   >
                     {displayName}
                   </ButtonBase>
-                ) : (displayName)
-                }
+                ) : (
+                  displayName
+                )}
               </Typography>
 
               <Typography variant="caption" color="textSecondary">

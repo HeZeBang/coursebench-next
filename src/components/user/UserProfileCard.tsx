@@ -58,7 +58,9 @@ export default function UserProfileCard({ user }: UserProfileCardProps) {
             </Typography>
           )}
 
-          <Typography variant="body2" color="text.secondary"
+          <Typography
+            variant="body2"
+            color="text.secondary"
             sx={{
               textOverflow: "ellipsis",
               overflow: "hidden",

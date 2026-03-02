@@ -36,7 +36,13 @@ export interface EditProfileDialogState {
   /** Update form data */
   updateFormData: (data: Partial<EditProfileFormData>) => void;
   /** Update password data */
-  updatePasswordData: (data: Partial<{ oldPassword: string; newPassword: string, captcha: string }>) => void;
+  updatePasswordData: (
+    data: Partial<{
+      oldPassword: string;
+      newPassword: string;
+      captcha: string;
+    }>,
+  ) => void;
   /** Submit profile changes */
   handleSubmitProfile: () => Promise<void>;
   /** Submit password change */
@@ -67,11 +73,12 @@ export function useEditProfileDialog(): EditProfileDialogState {
     is_anonymous: userProfile?.is_anonymous ?? false,
   };
 
-  const [formData, setFormData] = useState<EditProfileFormData>(initialFormData);
+  const [formData, setFormData] =
+    useState<EditProfileFormData>(initialFormData);
   const [passwordData, setPasswordData] = useState({
     oldPassword: "",
     newPassword: "",
-    captcha: ""
+    captcha: "",
   });
 
   const handleOpen = useCallback(() => {
@@ -98,7 +105,7 @@ export function useEditProfileDialog(): EditProfileDialogState {
     (data: Partial<{ oldPassword: string; newPassword: string }>) => {
       setPasswordData((prev) => ({ ...prev, ...data }));
     },
-    []
+    [],
   );
 
   const handleSubmitProfile = useCallback(async () => {
@@ -126,8 +133,7 @@ export function useEditProfileDialog(): EditProfileDialogState {
       showSnackbar("个人信息已更新", "success");
       handleClose();
     } catch (error: any) {
-      const errorMsg =
-        error?.response?.data?.msg || "更新个人信息失败，请重试";
+      const errorMsg = error?.response?.data?.msg || "更新个人信息失败，请重试";
       showSnackbar(errorMsg, "error");
     } finally {
       setIsLoading(false);
@@ -155,7 +161,7 @@ export function useEditProfileDialog(): EditProfileDialogState {
       await api.post("/v1/user/update_password", {
         old_password: passwordData.oldPassword,
         new_password: passwordData.newPassword,
-        captcha: passwordData.captcha
+        captcha: passwordData.captcha,
       });
 
       showSnackbar("密码已修改", "success");

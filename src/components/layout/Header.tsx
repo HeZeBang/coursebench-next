@@ -254,8 +254,7 @@ export default function Header() {
                     />
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <Typography>
-                        <b>{userProfile.nickname}</b>
-                        {" "}
+                        <b>{userProfile.nickname}</b>{" "}
                         {userProfile.realname && `(${userProfile.realname})`}
                       </Typography>
                       <Typography variant="caption" color="textSecondary">

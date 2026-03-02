@@ -92,30 +92,30 @@ export default function UserDetailPage({
         {/* Sidebar */}
         <Grid size={{ xs: 12, md: 3 }}>
           <UserProfileCard user={user} />
-          <Card sx={{ mt : 2 }}>
+          <Card sx={{ mt: 2 }}>
             <CardContent>
               <Typography variant="h6">成就</Typography>
               <Divider sx={{ my: 1 }} />
               <Stack sx={{ my: 2 }} spacing={1.5}>
                 <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                  <ThumbUp fontSize="small"/>
-                  <Typography
-                    variant="body2"
-                  >
+                  <ThumbUp fontSize="small" />
+                  <Typography variant="body2">
                     获得{" "}
-                    {comments.map((i) => i.like).reduce((prev, cur) => prev + cur, 0)}
-                    {" "}次赞同
+                    {comments
+                      .map((i) => i.like)
+                      .reduce((prev, cur) => prev + cur, 0)}{" "}
+                    次赞同
                   </Typography>
                 </Box>
 
                 <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                  <RateReview fontSize="small"/>
-                  <Typography
-                    variant="body2"
-                  >
+                  <RateReview fontSize="small" />
+                  <Typography variant="body2">
                     发表{" "}
-                    {comments.map((i) => i.like).reduce((prev, cur) => prev + cur, 0)}
-                    {" "}篇评价
+                    {comments
+                      .map((i) => i.like)
+                      .reduce((prev, cur) => prev + cur, 0)}{" "}
+                    篇评价
                   </Typography>
                 </Box>
               </Stack>

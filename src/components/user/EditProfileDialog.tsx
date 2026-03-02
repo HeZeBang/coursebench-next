@@ -78,19 +78,23 @@ export default function EditProfileDialog({
       setCaptchaImage(`data:image/png;base64,${data.img}`);
       setCaptchaError("");
     } catch {
-      setCaptchaError("获取验证码失败")
+      setCaptchaError("获取验证码失败");
     } finally {
       setCaptchaLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (step === 1)
-      fetchCaptcha();
+    if (step === 1) fetchCaptcha();
   }, [step]);
 
   return (
-    <Dialog open={dialogOpen} onClose={handleClose} maxWidth={maxWidth} fullWidth>
+    <Dialog
+      open={dialogOpen}
+      onClose={handleClose}
+      maxWidth={maxWidth}
+      fullWidth
+    >
       {step === 0 ? (
         /* ── Step 0: Edit Profile ── */
         <>
@@ -104,9 +108,7 @@ export default function EditProfileDialog({
                 fullWidth
                 label="用户名"
                 value={formData.nickname}
-                onChange={(e) =>
-                  updateFormData({ nickname: e.target.value })
-                }
+                onChange={(e) => updateFormData({ nickname: e.target.value })}
                 disabled={isLoading}
                 required
                 inputProps={{ maxLength: 50 }}
@@ -117,9 +119,7 @@ export default function EditProfileDialog({
                 fullWidth
                 label="真实姓名"
                 value={formData.realname}
-                onChange={(e) =>
-                  updateFormData({ realname: e.target.value })
-                }
+                onChange={(e) => updateFormData({ realname: e.target.value })}
                 disabled={isLoading}
                 inputProps={{ maxLength: 50 }}
               />
@@ -265,7 +265,6 @@ export default function EditProfileDialog({
                 }}
               />
 
-
               <Grid container spacing={1}>
                 <Grid size={8}>
                   <TextField
@@ -274,7 +273,9 @@ export default function EditProfileDialog({
                     name="captcha"
                     variant="standard"
                     value={passwordData.captcha}
-                    onChange={(e) => updatePasswordData({ captcha: e.target.value })}
+                    onChange={(e) =>
+                      updatePasswordData({ captcha: e.target.value })
+                    }
                     error={!!captchaError}
                     helperText={captchaError || "点击图片刷新验证码"}
                   />
@@ -320,7 +321,10 @@ export default function EditProfileDialog({
             </Button>
             <Button
               variant="contained"
-              onClick={() => { handleSubmitPassword(); fetchCaptcha(); }}
+              onClick={() => {
+                handleSubmitPassword();
+                fetchCaptcha();
+              }}
               disabled={isLoading}
             >
               {isLoading ? <CircularProgress size={20} /> : "确认修改"}
