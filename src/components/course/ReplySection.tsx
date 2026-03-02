@@ -59,7 +59,6 @@ export default function ReplySection({ commentId }: ReplySectionProps) {
 
   // Sort & pagination state
   const [sortBy, setSortBy] = useState<"latest" | "hottest">("latest");
-  const [showAll, setShowAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Reply input state
@@ -78,7 +77,7 @@ export default function ReplySection({ commentId }: ReplySectionProps) {
   const { data, isLoading, mutate } = useReplies(
     commentId,
     sortBy,
-    showAll,
+    true,
   );
   const replyData = data?.data;
   const replies = replyData?.replies ?? [];
@@ -87,10 +86,7 @@ export default function ReplySection({ commentId }: ReplySectionProps) {
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(replies.length / PAGE_SIZE));
-  const paginatedReplies =
-    showAll
-      ? replies.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-      : replies;
+  const paginatedReplies = replies.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   // ── Handlers ──
 
@@ -103,16 +99,6 @@ export default function ReplySection({ commentId }: ReplySectionProps) {
     },
     [],
   );
-
-  const handleShowAll = useCallback(() => {
-    setShowAll(true);
-    setCurrentPage(1);
-  }, []);
-
-  const handleCollapse = useCallback(() => {
-    setShowAll(false);
-    setCurrentPage(1);
-  }, []);
 
   const handleSetReplyTarget = useCallback(
     (reply: Reply) => {
@@ -201,38 +187,28 @@ export default function ReplySection({ commentId }: ReplySectionProps) {
         </Box>
       ) : (
         <>
-          {/* Sort controls (only when showAll) */}
-          {showAll && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 1,
-              }}
+          {/* Sort controls */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 1,
+            }}
+          >
+            <ToggleButtonGroup
+              value={sortBy}
+              exclusive
+              onChange={handleSortChange}
+              size="small"
             >
-              <ToggleButtonGroup
-                value={sortBy}
-                exclusive
-                onChange={handleSortChange}
-                size="small"
-              >
-                <ToggleButton value="latest">最新</ToggleButton>
-                <ToggleButton value="hottest">最热</ToggleButton>
-              </ToggleButtonGroup>
-
-              <Button
-                size="small"
-                startIcon={<UnfoldLessIcon />}
-                onClick={handleCollapse}
-              >
-                折叠
-              </Button>
-            </Box>
-          )}
+              <ToggleButton value="latest">最新</ToggleButton>
+              <ToggleButton value="hottest">最热</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
 
           {/* Paginated info */}
-          {showAll && totalPages > 1 && (
+          {totalPages > 1 && (
             <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
               第 {currentPage} 页，共 {totalPages} 页
             </Typography>
@@ -349,7 +325,7 @@ export default function ReplySection({ commentId }: ReplySectionProps) {
           ))}
 
           {/* Pagination */}
-          {showAll && totalPages > 1 && (
+          {totalPages > 1 && (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <Pagination
                 count={totalPages}
@@ -358,18 +334,6 @@ export default function ReplySection({ commentId }: ReplySectionProps) {
                 size="small"
               />
             </Box>
-          )}
-
-          {/* Show all button */}
-          {!showAll && totalCount > filteredCount && (
-            <Button
-              size="small"
-              color="primary"
-              onClick={handleShowAll}
-              sx={{ mb: 1, textTransform: "none" }}
-            >
-              查看所有 {totalCount} 条回复
-            </Button>
           )}
 
           {/* Reply input */}

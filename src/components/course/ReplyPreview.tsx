@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -9,13 +9,17 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
-import type { Reply } from "@/types";
+import type { ApiResponse, Reply, ReplyListData } from "@/types";
 import { useReplies } from "@/hooks";
 import { unixToReadable } from "@/utils";
 import ReplyDialog from "./ReplyDialog";
 
 interface ReplyPreviewProps {
   commentId: number;
+  dialogOpen: boolean;
+  setDialogOpen: Dispatch<SetStateAction<boolean>>;
+  data: ApiResponse<ReplyListData> | undefined;
+  isLoading: boolean;
 }
 
 /** Max number of featured replies to show inline */
@@ -30,11 +34,8 @@ function getDisplayName(user: Reply["user"]): string {
  * Displays reply count + a few featured replies.
  * Clicking opens the full ReplyDialog.
  */
-export default function ReplyPreview({ commentId }: ReplyPreviewProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
-
+export default function ReplyPreview({ data, isLoading, commentId, dialogOpen, setDialogOpen }: ReplyPreviewProps) {
   // Fetch only featured (filtered) replies for the preview
-  const { data, isLoading } = useReplies(commentId, "hottest", false);
   const replyData = data?.data;
   const featured = replyData?.replies ?? [];
   const totalCount = replyData?.total_count ?? 0;
@@ -43,18 +44,6 @@ export default function ReplyPreview({ commentId }: ReplyPreviewProps) {
 
   return (
     <>
-      {/* Reply button + count */}
-      <Button
-        variant="outlined"
-        size="small"
-        startIcon={<ChatBubbleOutlineIcon />}
-        onClick={() => setDialogOpen(true)}
-        disableElevation
-        sx={{ textTransform: "none" }}
-      >
-        回复{totalCount > 0 ? ` ${totalCount}` : ""}
-      </Button>
-
       {/* Featured replies preview */}
       {!isLoading && previewReplies.length > 0 && (
         <Box

@@ -4,15 +4,10 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
 import Chip from "@mui/material/Chip";
 import Collapse from "@mui/material/Collapse";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
-import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+
 import { useState, useCallback } from "react";
 
 import type { Comment, UserProfile } from "@/types";
@@ -29,11 +24,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import SmartMarkdown from "@/components/mdx/SmartMarkdown";
 import {
   AccessTime,
+  Chat,
+  ChatBubble,
+  ChatBubbleOutline,
   RateReviewOutlined,
-  Reply,
   SchoolOutlined,
   SubtitlesOutlined,
   ThumbDown,
+  ThumbDownAltOutlined,
+  ThumbUpAltOutlined,
   Update,
 } from "@mui/icons-material";
 import { Alert, Button, Divider, Link } from "@mui/material";
@@ -43,7 +42,8 @@ import { userAgent } from "next/server";
 import { gradeEnum, termEnum } from "@/constants/info";
 import { semesterToReadable } from "@/utils/formatTime";
 import { useRouter } from "next/navigation";
-import ReplySection from "./ReplySection";
+import ReplyPreview from "./ReplyPreview";
+import { useReplies } from "@/hooks";
 
 interface CommentCardProps {
   comment: Comment;
@@ -57,6 +57,8 @@ export default function CommentCard({
   const [likeStatus, setLikeStatus] = useState(comment.like_status);
   const [likeCount, setLikeCount] = useState(comment.like);
   const [expanded, setExpanded] = useState(!comment.is_fold);
+  const [commentOpen, setCommentOpen] = useState(false);
+  const { data: commentData, isLoading: isCommentLoading } = useReplies(comment.id, "hottest", false);
 
   const router = useRouter();
 
@@ -306,7 +308,7 @@ export default function CommentCard({
             onClick={() => {
               handleLike(1);
             }}
-            startIcon={<ThumbUpIcon />}
+            startIcon={likeStatus === 1 ? <ThumbUpIcon /> : <ThumbUpAltOutlined />}
             size="small"
             disabled={!isLogin || (userProfile?.id === comment.user?.id)}
             disableElevation
@@ -318,29 +320,32 @@ export default function CommentCard({
             onClick={() => {
               handleLike(2);
             }}
-            startIcon={<ThumbDown />}
+            startIcon={likeStatus === 2 ? <ThumbDown /> : <ThumbDownAltOutlined />}
             size="small"
             disabled={!isLogin || (userProfile?.id === comment.user?.id)}
             disableElevation
           >
             反对
           </Button>
-
+          
+          {/* Reply button + count */}
           <Button
             variant="outlined"
-            onClick={() => {
-            }}
-            startIcon={<Reply />}
             size="small"
-            disabled={!isLogin || (userProfile?.id === comment.user?.id)}
+            startIcon={<ChatBubbleOutline />}
+            onClick={() => setCommentOpen(true)}
             disableElevation
+            sx={{ textTransform: "none" }}
           >
-            回复
+            回复 {commentData?.data.total_count ?? ""}
           </Button>
         </Box>
 
-        {/* Nested replies (楼中楼) */}
-        <ReplySection commentId={comment.id} />
+        {/* Reply preview: button + featured replies */}
+        <ReplyPreview 
+          commentId={comment.id} data={commentData} isLoading={isCommentLoading}
+          dialogOpen={commentOpen} setDialogOpen={setCommentOpen}
+        />
       </CardContent>
     </Card>
   );
