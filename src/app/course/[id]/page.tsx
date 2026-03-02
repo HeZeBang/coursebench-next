@@ -22,8 +22,8 @@ import {
 } from "@/components/course";
 import { EmptyState } from "@/components/layout";
 import { sortCmp } from "@/utils";
-import type { Comment, CommentSortKey } from "@/types";
-import { Card, CardContent, CardHeader, Divider, SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
+import type { Comment, CommentSortKey, SortOrder } from "@/types";
+import { Card, CardContent, CardHeader, Divider, SpeedDial, SpeedDialAction, SpeedDialIcon, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { ArrowUpward, Edit } from "@mui/icons-material";
 
 interface CourseDetailPageProps {
@@ -47,6 +47,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
   const [selectedGroupIds, setSelectedGroupIds] = useState<number[]>([]);
   const [commentSort, setCommentSort] = useState<CommentSortKey>("post_time");
+  const [order, setOrder] = useState<SortOrder>("desc");
   const [isInitialized, setIsInitialized] = useState(false);
 
   const course = courseData?.data;
@@ -89,9 +90,9 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       );
     }
     
-    result.sort(sortCmp<Comment>(commentSort, "desc"));
+    result.sort(sortCmp<Comment>(commentSort, order));
     return result;
-  }, [comments, selectedGroupIds, commentSort, course?.groups.length]);
+  }, [comments, selectedGroupIds, commentSort, course?.groups.length, order]);
 
   if (courseLoading) {
     return (
@@ -167,23 +168,34 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ position: "sticky", top: "100px" }}>
             <CardContent>
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel variant="standard">排序方式</InputLabel>
-                <Select
-                  value={commentSort}
-                  label="排序方式"
-                  variant="standard"
-                  onChange={(e) =>
-                    setCommentSort(e.target.value as CommentSortKey)
-                  }
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>排序方式</InputLabel>
+                  <Select
+                    value={commentSort}
+                    label="排序方式"
+                    onChange={(e) =>
+                      setCommentSort(e.target.value as CommentSortKey)
+                    }
+                  >
+                    {sortOptions.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <ToggleButtonGroup
+                  value={order}
+                  exclusive
+                  onChange={(_, v) => v && setOrder(v)}
+                  size="small"
                 >
-                  {sortOptions.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                  <ToggleButton value="desc">降序</ToggleButton>
+                  <ToggleButton value="asc">升序</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
 
               <Divider variant="middle" sx={{ my: 2 }} />
 
