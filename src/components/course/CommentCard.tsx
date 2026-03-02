@@ -151,6 +151,7 @@ export default function CommentCard({
         <Box
           sx={{
             display: "flex",
+            flexWrap: "wrap",
             justifyContent: "space-between",
             alignItems: "center",
             mb: 1,

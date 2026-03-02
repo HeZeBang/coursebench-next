@@ -12,6 +12,7 @@ export default function ThemeToggle() {
       <IconButton
         onClick={toggleTheme}
         color="inherit"
+        size="small"
         aria-label="toggle theme"
       >
         {mode === "light" ? <Brightness4 /> : <Brightness7 />}
