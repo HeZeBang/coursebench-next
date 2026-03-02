@@ -35,12 +35,13 @@ import {
   ThumbDown,
   Update,
 } from "@mui/icons-material";
-import { Button, Divider } from "@mui/material";
+import { Alert, Button, Divider, Link } from "@mui/material";
 import { judgeToKey } from "@/constants/scores";
 import UserAvatar from "../user/UserAvatar";
 import { userAgent } from "next/server";
 import { gradeEnum, termEnum } from "@/constants/info";
 import { semesterToReadable } from "@/utils/formatTime";
+import { useRouter } from "next/navigation";
 
 interface CommentCardProps {
   comment: Comment;
@@ -56,6 +57,8 @@ export default function CommentCard({
   const [likeStatus, setLikeStatus] = useState(comment.like_status);
   const [likeCount, setLikeCount] = useState(comment.like);
   const [expanded, setExpanded] = useState(!comment.is_fold);
+
+  const router = useRouter();
 
   const handleLike = useCallback(
     async (status: number) => {
@@ -124,11 +127,18 @@ export default function CommentCard({
   // Covered comment
   if (comment.is_covered) {
     return (
-      <Card variant="outlined" sx={{ mb: 2, opacity: 0.6 }}>
+      <Card variant="outlined" sx={{ mb: 2 }}>
         <CardContent>
-          <Typography variant="body2" color="text.secondary" fontStyle="italic">
-            由于违反社区相关规定，该评论已被隐藏
-          </Typography>
+          <Alert severity="error">
+            由于违反
+            <Link
+              onClick={() => { router.push("/terms-of-service") }}
+              sx={{ cursor: "pointer" }}
+            >
+              相关社区规定
+            </Link>
+            ，该评论已被隐藏
+          </Alert>
         </CardContent>
       </Card>
     );
@@ -198,78 +208,84 @@ export default function CommentCard({
         </Box>
 
         {/* Content */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 1,
-          }}
-        >
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <Typography variant="h5" fontWeight={600}>
-              <SubtitlesOutlined
-                sx={{ mr: 1, display: "inline-block", mb: 0.5 }}
-              />
-              {comment.title || "无标题"}
-            </Typography>
+        <Collapse in={expanded} sx={{ mt: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 1,
+            }}
+          >
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Typography variant="h5" fontWeight={600}>
+                <SubtitlesOutlined
+                  sx={{ mr: 1, display: "inline-block", mb: 0.5 }}
+                />
+                {comment.title || "无标题"}
+              </Typography>
 
-            <Box sx={{ display: "flex", gap: 2 }}>
-              {comment.semester && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <AccessTime
-                    sx={{ height: 16, width: 16, mt: 0.2, mr: 0.5 }}
-                  />
-                  <Typography variant="body2" color="textSecondary">
-                    {semesterToReadable(comment.semester)}
-                  </Typography>
-                </Box>
-              )}
+              <Box sx={{ display: "flex", gap: 2 }}>
+                {comment.semester && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <AccessTime
+                      sx={{ height: 16, width: 16, mt: 0.2, mr: 0.5 }}
+                    />
+                    <Typography variant="body2" color="textSecondary">
+                      {semesterToReadable(comment.semester)}
+                    </Typography>
+                  </Box>
+                )}
 
-              {comment.group.teachers.length > 0 && (
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <SchoolOutlined
-                    sx={{ height: 16, width: 16, mt: 0.2, mr: 0.5 }}
-                  />
-                  <Typography variant="body2" color="textSecondary">
-                    {comment.group.teachers.map((e) => e.name).join(" ")}
-                  </Typography>
-                </Box>
-              )}
+                {comment.group.teachers.length > 0 && (
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <SchoolOutlined
+                      sx={{ height: 16, width: 16, mt: 0.2, mr: 0.5 }}
+                    />
+                    <Typography variant="body2" color="textSecondary">
+                      {comment.group.teachers.map((e) => e.name).join(" ")}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
             </Box>
           </Box>
 
-          <IconButton size="small" onClick={() => setExpanded(!expanded)}>
-            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconButton>
-        </Box>
+          {/* Score chips */}
+          {scoreChips && scoreChips.length > 0 && (
+            <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mb: 1 }}>
+              {scoreChips}
+            </Box>
+          )}
 
-        {/* Score chips */}
-        {scoreChips && scoreChips.length > 0 && (
-          <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mb: 1 }}>
-            {scoreChips}
-          </Box>
-        )}
-
-        {/* Content */}
-        <Collapse in={expanded} sx={{ mt: 2 }}>
+          {/* Content */}
           {comment.content && <SmartMarkdown content={comment.content} />}
         </Collapse>
 
-        {comment.is_fold && !expanded && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            fontStyle="italic"
-          >
-            该评论已被折叠，点击展开
-          </Typography>
+        {comment.is_fold && (
+          <Alert sx={{ mb: 2 }} severity="warning">
+            此评论可能包含违反
+            <Link
+              onClick={() => { router.push("/terms-of-service") }}
+              sx={{ cursor: "pointer" }}
+            >
+              相关社区规定
+            </Link>
+            的内容而被折叠，
+            <Link
+              variant="body2"
+              onClick={() => setExpanded(!expanded)}
+              sx={{ cursor: "pointer" }}
+            >
+              点击{expanded? "收起":"展开"}
+            </Link>
+          </Alert>
         )}
 
         <Divider sx={{ mx: -2 }} />
