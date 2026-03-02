@@ -35,7 +35,7 @@ import {
   ThumbUpAltOutlined,
   Update,
 } from "@mui/icons-material";
-import { Alert, Button, Divider, Link } from "@mui/material";
+import { Alert, Button, ButtonBase, Divider, Link } from "@mui/material";
 import { judgeToKey } from "@/constants/scores";
 import UserAvatar from "../user/UserAvatar";
 import { userAgent } from "next/server";
@@ -170,11 +170,13 @@ export default function CommentCard({ comment }: CommentCardProps) {
               alignItems: "center",
             }}
           >
-            <UserAvatar
-              userProfile={comment.user}
-              size={40}
-              sx={{ borderRadius: 1 }}
-            />
+            <ButtonBase onClick={() => { router.push(comment.user? `/user/${comment.user.id}`: "#") }}>
+              <UserAvatar
+                userProfile={comment.user}
+                size={40}
+                sx={{ borderRadius: 1 }}
+              />
+            </ButtonBase>
             <Box
               sx={{
                 display: "flex",
@@ -182,9 +184,18 @@ export default function CommentCard({ comment }: CommentCardProps) {
                 gap: 0.1,
               }}
             >
+
               <Typography fontWeight={800} color="textSecondary">
-                {displayName}
+                {comment.user ? (
+                  <ButtonBase sx={{ mx: -0.5, px: 0.5, borderRadius: 0.5 }}
+                    onClick={() => { router.push(`/user/${comment.user?.id}`) }}
+                  >
+                    {displayName}
+                  </ButtonBase>
+                ) : (displayName)
+                }
               </Typography>
+
               <Typography variant="caption" color="textSecondary">
                 {(comment.user?.year || 0 !== 0) && `${comment.user?.year} 级`}
                 {(comment.user?.grade || 0 !== 0) &&
@@ -197,6 +208,8 @@ export default function CommentCard({ comment }: CommentCardProps) {
             sx={{
               display: "flex",
               flexDirection: "column",
+              flexGrow: "1",
+              alignItems: "end",
               gap: 0.1,
             }}
           >

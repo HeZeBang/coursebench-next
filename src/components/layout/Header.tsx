@@ -44,7 +44,7 @@ import {
   useScrollTrigger,
 } from "@mui/material";
 import React from "react";
-import { ArrowUpward } from "@mui/icons-material";
+import { ArrowUpward, Feedback } from "@mui/icons-material";
 
 const navLinks = [
   { label: "全部课程", href: "/" },
@@ -255,6 +255,7 @@ export default function Header() {
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <Typography>
                         <b>{userProfile.nickname}</b>
+                        {" "}
                         {userProfile.realname && `(${userProfile.realname})`}
                       </Typography>
                       <Typography variant="caption" color="textSecondary">
@@ -273,9 +274,16 @@ export default function Header() {
                     <PersonIcon sx={{ mr: 1 }} fontSize="small" />
                     个人主页
                   </MenuItem>
-                  <MenuItem onClick={handleUserMenuClose}>
+                  {/* <MenuItem onClick={handleUserMenuClose}>
                     <SettingsIcon sx={{ mr: 1 }} fontSize="small" />
                     设置
+                  </MenuItem> */}
+                  <MenuItem
+                    component={Link}
+                    href="https://github.com/ShanghaitechGeekPie/coursebench_official/issues"
+                  >
+                    <Feedback sx={{ mr: 1 }} fontSize="small" />
+                    反馈 (Github)
                   </MenuItem>
                   <MenuItem onClick={handleLogout}>
                     <LogoutIcon sx={{ mr: 1 }} fontSize="small" />

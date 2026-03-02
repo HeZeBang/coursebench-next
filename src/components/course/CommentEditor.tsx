@@ -88,11 +88,13 @@ export default function CommentEditor({
       ? String(existingComment.semester % 100).padStart(2, "0")
       : "",
   );
-  const [isAnonymous, setIsAnonymous] = useState(
-    existingComment?.is_anonymous ?? true,
-  );
 
   const { userProfile } = useAuth();
+
+  const [isAnonymous, setIsAnonymous] = useState(
+    existingComment?.is_anonymous ?? (userProfile?.is_anonymous || false),
+  );
+
 
   // Reset form when switching between edit targets
   useEffect(() => {
@@ -110,7 +112,7 @@ export default function CommentEditor({
         ? String(existingComment.semester % 100).padStart(2, "0")
         : "",
     );
-    setIsAnonymous(existingComment?.is_anonymous ?? true);
+    setIsAnonymous(existingComment?.is_anonymous ?? (userProfile?.is_anonymous || false));
     setError("");
     setTab(0);
   }, [existingComment]);

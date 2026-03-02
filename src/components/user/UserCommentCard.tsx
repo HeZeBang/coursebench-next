@@ -78,8 +78,10 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
                 gap: 0.1,
               }}
             >
-              <Typography fontWeight={800} color="textSecondary">
-                {comment.course.name}
+              <Box sx={{ display: "flex", gap: 0.5, alignItems: "baseline", flexWrap: "wrap" }}>
+                <Typography fontWeight={800} color="textSecondary">
+                  {comment.course.name}
+                </Typography>
                 <Chip
                   label={comment.course.code}
                   size="small"
@@ -93,10 +95,9 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
                       px: 0.5,
                     },
                     mb: 0.3,
-                    ml: 0.5,
                   }}
                 />
-              </Typography>
+              </Box>
               <Typography variant="caption" color="textSecondary">
                 {displayName}
               </Typography>
@@ -107,6 +108,8 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
             sx={{
               display: "flex",
               flexDirection: "column",
+              flexGrow: "1",
+              alignItems: "end",
               gap: 0.1,
             }}
           >
