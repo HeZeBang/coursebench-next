@@ -298,7 +298,7 @@ export default function Header() {
           </Toolbar>
 
           <Collapse in={pathname === "/"}>
-            <Box className="flex w-full max-w-7xl justify-center items-center mb-2">
+            <Box className="flex w-full justify-center items-center mb-2 px-5">
               {/* Search bar (desktop only on home page) */}
               <TextField
                 size="small"
@@ -333,7 +333,7 @@ export default function Header() {
                     </InputAdornment>
                   ),
                 }}
-                sx={{ width: "50%" }}
+                className="w-full max-w-2xl"
               />
             </Box>
           </Collapse>

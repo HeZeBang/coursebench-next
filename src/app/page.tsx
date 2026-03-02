@@ -16,10 +16,11 @@ import {
 } from "@/contexts/CourseFilterContext";
 import { CourseCard, InstituteFilter, SortBar } from "@/components/course";
 import { EmptyState } from "@/components/layout";
-import { sortCmp } from "@/utils";
 import { averageScore } from "@/utils/parseScore";
 import type { Course, SortKey, SortOrder } from "@/types";
 import { ENOUGH_DATA_THRESHOLD } from "@/constants/scores";
+import { Card, CardActions, CardContent, Divider } from "@mui/material";
+import { instituteNames } from "@/constants";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -66,9 +67,7 @@ export default function HomePage() {
     let result = [...courses];
 
     // Institute filter
-    if (selected.length > 0) {
-      result = result.filter((c) => selected.includes(c.institute));
-    }
+    result = result.filter((c) => selected.includes(instituteNames.includes(c.institute) ? c.institute : "其他学院"));
 
     // Search filter
     if (keys.trim()) {
@@ -140,36 +139,54 @@ export default function HomePage() {
           {isLoading ? (
             <Skeleton variant="rounded" height={300} />
           ) : (
-            <InstituteFilter
-              courses={courses}
-              selected={selected}
-              onSelectedChange={(s) =>
-                dispatch({ type: "SET_SELECTED", payload: s })
-              }
-            />
+            <Card sx={{ position: "sticky", top: "130px" }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  排序和筛选
+                </Typography>
+
+                <SortBar
+                  sortKey={sortKey}
+                  order={order}
+                  onSortKeyChange={(k) =>
+                    dispatch({ type: "SET_SORT_KEY", payload: k })
+                  }
+                  onOrderChange={(o) => dispatch({ type: "SET_ORDER", payload: o })}
+                  includeDataInsufficient={includeDataInsufficient}
+                  onIncludeDataInsufficientChange={(v) =>
+                    dispatch({ type: "SET_INCLUDE_DATA_INSUFFICIENT", payload: v })
+                  }
+                />
+
+                <Divider variant="fullWidth" sx={{ my: 2 }}/>
+
+                <InstituteFilter
+                  courses={courses}
+                  selected={selected}
+                  onSelectedChange={(s) =>
+                    dispatch({ type: "SET_SELECTED", payload: s })
+                  }
+                />
+
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 1, display: "block", width: "100%" }}
+                >
+                  共 {filteredCourses.length} 门课程
+                </Typography>
+              </CardContent>
+            </Card>
           )}
         </Grid>
 
         {/* Main content */}
         <Grid size={{ xs: 12, md: 9 }}>
-          <SortBar
-            sortKey={sortKey}
-            order={order}
-            onSortKeyChange={(k) =>
-              dispatch({ type: "SET_SORT_KEY", payload: k })
-            }
-            onOrderChange={(o) => dispatch({ type: "SET_ORDER", payload: o })}
-            includeDataInsufficient={includeDataInsufficient}
-            onIncludeDataInsufficientChange={(v) =>
-              dispatch({ type: "SET_INCLUDE_DATA_INSUFFICIENT", payload: v })
-            }
-          />
-
           {isLoading ? (
             <Grid container spacing={2}>
               {Array.from({ length: 6 }).map((_, i) => (
-                <Grid key={i} size={{ xs: 12, sm: 6, lg: 4 }}>
-                  <Skeleton variant="rounded" height={120} />
+                <Grid key={i} size={{ xs: 12, sm: 6 }}>
+                  <Skeleton variant="rounded" height={200} />
                 </Grid>
               ))}
             </Grid>
@@ -177,13 +194,6 @@ export default function HomePage() {
             <EmptyState message="没有找到匹配的课程" />
           ) : (
             <>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mb: 1, display: "block" }}
-              >
-                共 {filteredCourses.length} 门课程
-              </Typography>
               <Grid container spacing={2}>
                 {pagedCourses.map((course) => (
                   <Grid key={course.id} size={{ xs: 12, sm: 6 }}>

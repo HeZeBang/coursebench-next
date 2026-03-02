@@ -4,7 +4,7 @@ export interface InstituteInfo {
 }
 
 export const instituteInfo: Record<string, InstituteInfo> = {
-  信息科学与技术学院: { name: "SIST", color: "#b0c4de" },
+  信息科学与技术学院: { name: "SIST", color: "#4690f0" },
   物质科学与技术学院: { name: "SPST", color: "#00a650" },
   生命科学与技术学院: { name: "SLST", color: "#f39800" },
   创意与艺术学院: { name: "SCA", color: "#000000" },

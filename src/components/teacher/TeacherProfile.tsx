@@ -28,7 +28,9 @@ export default function TeacherProfile({ teacher }: TeacherProfileProps) {
             mb: 2,
             bgcolor: instColor,
             fontSize: "2rem",
+            color: "white"
           }}
+          src={teacher.photo}
         >
           {teacher.name.charAt(0)}
         </Avatar>
@@ -44,7 +46,7 @@ export default function TeacherProfile({ teacher }: TeacherProfileProps) {
           sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 0.5 }}
         >
           <Chip
-            label={getInstituteAbbr(teacher.institute)}
+            label={teacher.institute}
             size="small"
             sx={{ bgcolor: instColor, color: "#fff" }}
           />

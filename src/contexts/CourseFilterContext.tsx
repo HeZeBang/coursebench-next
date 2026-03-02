@@ -8,6 +8,7 @@ import {
   type Dispatch,
 } from "react";
 import type { SortKey, SortOrder } from "@/types";
+import { instituteNames } from "@/constants";
 
 // ── State ──
 interface CourseFilterState {
@@ -45,7 +46,7 @@ function courseFilterReducer(
     case "RESET":
       return {
         page: 1,
-        selected: [],
+        selected: instituteNames,
         sortKey: "score",
         order: "desc",
         includeDataInsufficient: false,
@@ -58,7 +59,7 @@ function courseFilterReducer(
 // ── Context ──
 const CourseFilterContext = createContext<CourseFilterState>({
   page: 1,
-  selected: [],
+  selected: instituteNames,
   sortKey: "score",
   order: "desc",
   includeDataInsufficient: false,
@@ -72,7 +73,7 @@ const CourseFilterDispatchContext = createContext<Dispatch<CourseFilterAction>>(
 export function CourseFilterProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(courseFilterReducer, {
     page: 1,
-    selected: [],
+    selected: instituteNames,
     sortKey: "score",
     order: "desc",
     includeDataInsufficient: false,

@@ -41,9 +41,8 @@ export default function SortBar({
     <Box
       sx={{
         display: "flex",
-        gap: 2,
+        gap: 1,
         alignItems: "center",
-        mb: 2,
         flexWrap: "wrap",
       }}
     >

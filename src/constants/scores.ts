@@ -19,7 +19,7 @@ export const gradingInfo = {
   workload: [">8h ", "4-8h", "2-4h", "1-2h", "<1h "],
   difficulty: ["很难", "较难", "适中", "偏易", "简单"],
   distribution: ["很差", "较差", "一般", "较好", "很好"],
-  color: ["#FF5252", "#FF892F", "#FFC107", "#A4BE23", "#709800"],
+  color: ["#FF5252", "#FF892F", "#FFC107", "#A4BE23", "#1B5E20"],
 } as const;
 
 export const judgeItems = [

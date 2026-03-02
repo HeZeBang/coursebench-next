@@ -102,7 +102,7 @@ export default function TeacherDetailPage({
             <Card sx={{ mt: 2 }}>
               <CardContent>
                 <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                  课程统计 ({courses.length})
+                  开课统计 ({courses.length})
                 </Typography>
                 <FormGroup>
                   {Array.from(instituteStats.entries())
@@ -128,7 +128,7 @@ export default function TeacherDetailPage({
                         }
                         label={
                           <Typography variant="body2">
-                            {getInstituteAbbr(inst)} ({count})
+                            {inst} ({count})
                           </Typography>
                         }
                       />

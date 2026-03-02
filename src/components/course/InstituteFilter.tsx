@@ -10,6 +10,9 @@ import Badge from "@mui/material/Badge";
 
 import { instituteNames, getInstituteColor } from "@/constants";
 import type { Course } from "@/types";
+import { Box, Button, Chip, Collapse, Stack } from "@mui/material";
+import { CheckCircle, CheckOutlined } from "@mui/icons-material";
+import { group } from "console";
 
 interface InstituteFilterProps {
   courses: Course[];
@@ -25,7 +28,7 @@ export default function InstituteFilter({
   // Count courses per institute
   const instituteCounts: Record<string, number> = {};
   courses.forEach((c) => {
-    const inst = c.institute || "其他学院";
+    const inst = instituteNames.includes(c.institute) ? c.institute : "其他学院";
     instituteCounts[inst] = (instituteCounts[inst] ?? 0) + 1;
   });
 
@@ -38,51 +41,50 @@ export default function InstituteFilter({
   };
 
   return (
-    <Card variant="outlined">
-      <CardContent>
-        <Typography variant="subtitle2" gutterBottom fontWeight={600}>
-          按学院筛选
-        </Typography>
-        <FormGroup>
-          {instituteNames.map((inst) => {
-            const count = instituteCounts[inst] ?? 0;
-            if (count === 0) return null;
-            return (
-              <FormControlLabel
-                key={inst}
-                control={
-                  <Checkbox
-                    checked={selected.includes(inst)}
-                    onChange={() => handleToggle(inst)}
-                    size="small"
-                    sx={{
-                      color: getInstituteColor(inst),
-                      "&.Mui-checked": { color: getInstituteColor(inst) },
-                    }}
-                  />
-                }
-                label={
-                  <Badge
-                    badgeContent={count}
-                    color="default"
-                    max={999}
-                    sx={{
-                      "& .MuiBadge-badge": {
-                        position: "relative",
-                        transform: "none",
-                        ml: 1,
-                        fontSize: "0.7rem",
-                      },
-                    }}
-                  >
-                    <Typography variant="body2">{inst}</Typography>
-                  </Badge>
-                }
-              />
-            );
-          })}
-        </FormGroup>
-      </CardContent>
-    </Card>
+    <>
+      <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
+        <Button onClick={() => { onSelectedChange(instituteNames) }}>全选</Button>
+        <Button onClick={() => { onSelectedChange([]) }}>全不选</Button>
+        <Button onClick={() => { onSelectedChange(instituteNames.filter((s) => !selected.includes(s))) }}>反选</Button>
+        {/* <Chip
+          label={
+            <Typography variant="body2">全选</Typography>
+          }
+          onClick={() => { onSelectedChange(instituteNames) }}
+        />
+        <Chip
+          label={
+            <Typography variant="body2">全不选</Typography>
+          }
+          onClick={() => { onSelectedChange([]) }}
+        />
+        <Chip
+          label={
+            <Typography variant="body2">反选</Typography>
+          }
+          onClick={() => { onSelectedChange(instituteNames.filter((s) => !selected.includes(s))) }}
+        /> */}
+      </Box>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+        {instituteNames.map((inst) => (
+          <Chip
+            key={inst}
+            icon={
+              <Collapse in={selected.includes(inst)} orientation="horizontal">
+                <CheckOutlined sx={{ backgroundColor: getInstituteColor(inst), color: "white", borderRadius: "50%" }}/>
+              </Collapse>
+            }
+            label={
+              <Typography variant="body2">
+                {inst}
+              </Typography>
+            }
+            variant={selected.includes(inst) ? "filled" : "outlined"}
+            onClick={() => handleToggle(inst)}
+            sx={{ width: "min-content" }}
+          />
+        ))}
+      </Box>
+    </>
   );
 }

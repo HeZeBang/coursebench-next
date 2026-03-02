@@ -59,7 +59,7 @@ export default function CourseCard({ course }: CourseCardProps) {
           </Box>
         </CardMedia>
         <CardContent>
-          <Typography variant="h6" component="div" sx={{ mb: 1.2 }} noWrap>
+          <Typography variant="h6" fontWeight={800} component="div" sx={{ mb: 1.2 }} noWrap>
             {course.name}
           </Typography>
 
@@ -79,7 +79,7 @@ export default function CourseCard({ course }: CourseCardProps) {
                   key={i}
                   sx={{ display: "flex", alignItems: "first baseline", gap: 1 }}
                 >
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" fontWeight={600} color="text.secondary">
                     {judgeItems[i]}
                   </Typography>
                   <Chip
@@ -90,11 +90,12 @@ export default function CourseCard({ course }: CourseCardProps) {
                     }
                     variant="outlined"
                     sx={{
-                      color:
+                      color: "white",
+                      borderColor:
                         course.comment_num >= ENOUGH_DATA_THRESHOLD
                           ? getJudgeInfo(i, course.score[i]).color
                           : "#8c8c8c",
-                      borderColor:
+                      backgroundColor:
                         course.comment_num >= ENOUGH_DATA_THRESHOLD
                           ? getJudgeInfo(i, course.score[i]).color
                           : "#8c8c8c",
