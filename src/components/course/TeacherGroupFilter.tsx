@@ -41,19 +41,24 @@ export default function TeacherGroupFilter({
           <Chip
             key={group.id}
             size="medium"
-            variant={selectedGroupIds.includes(group.id) ? "filled" : "outlined"}
+            variant={
+              selectedGroupIds.includes(group.id) ? "filled" : "outlined"
+            }
             onClick={() => handleToggle(group.id)}
             sx={{
-              height: 'auto',
-              '& .MuiChip-label': {
-                display: 'block',
-                whiteSpace: 'normal',
+              height: "auto",
+              "& .MuiChip-label": {
+                display: "block",
+                whiteSpace: "normal",
               },
             }}
             label={
               <Stack direction="row" alignItems="center" sx={{ my: 1 }}>
-                <Collapse in={selectedGroupIds.includes(group.id)} orientation="horizontal">
-                  <CheckOutlined sx={{ mr: 1 }}/>
+                <Collapse
+                  in={selectedGroupIds.includes(group.id)}
+                  orientation="horizontal"
+                >
+                  <CheckOutlined sx={{ mr: 1 }} />
                 </Collapse>
                 <Typography variant="body2">
                   {teacherName} ({group.comment_num})

@@ -49,16 +49,18 @@ interface CommentCardProps {
   comment: Comment;
 }
 
-export default function CommentCard({
-  comment,
-}: CommentCardProps) {
+export default function CommentCard({ comment }: CommentCardProps) {
   const { isLogin, userProfile } = useAuth();
   const showSnackbar = useSnackbar();
   const [likeStatus, setLikeStatus] = useState(comment.like_status);
   const [likeCount, setLikeCount] = useState(comment.like);
   const [expanded, setExpanded] = useState(!comment.is_fold);
   const [commentOpen, setCommentOpen] = useState(false);
-  const { ref: cardRef, data: commentData, isLoading: isCommentLoading } = useLazyReplies(comment.id, "hottest", false);
+  const {
+    ref: cardRef,
+    data: commentData,
+    isLoading: isCommentLoading,
+  } = useLazyReplies(comment.id, "hottest", false);
 
   const router = useRouter();
 
@@ -134,7 +136,9 @@ export default function CommentCard({
           <Alert severity="error">
             由于违反
             <Link
-              onClick={() => { router.push("/terms-of-service") }}
+              onClick={() => {
+                router.push("/terms-of-service");
+              }}
               sx={{ cursor: "pointer" }}
             >
               相关社区规定
@@ -276,7 +280,9 @@ export default function CommentCard({
           <Alert sx={{ mb: 2 }} severity="warning">
             此评论可能包含违反
             <Link
-              onClick={() => { router.push("/terms-of-service") }}
+              onClick={() => {
+                router.push("/terms-of-service");
+              }}
               sx={{ cursor: "pointer" }}
             >
               相关社区规定
@@ -287,7 +293,7 @@ export default function CommentCard({
               onClick={() => setExpanded(!expanded)}
               sx={{ cursor: "pointer" }}
             >
-              点击{expanded? "收起":"展开"}
+              点击{expanded ? "收起" : "展开"}
             </Link>
           </Alert>
         )}
@@ -309,9 +315,11 @@ export default function CommentCard({
             onClick={() => {
               handleLike(1);
             }}
-            startIcon={likeStatus === 1 ? <ThumbUpIcon /> : <ThumbUpAltOutlined />}
+            startIcon={
+              likeStatus === 1 ? <ThumbUpIcon /> : <ThumbUpAltOutlined />
+            }
             size="small"
-            disabled={!isLogin || (userProfile?.id === comment.user?.id)}
+            disabled={!isLogin || userProfile?.id === comment.user?.id}
             disableElevation
           >
             赞同 {likeCount}
@@ -321,14 +329,16 @@ export default function CommentCard({
             onClick={() => {
               handleLike(2);
             }}
-            startIcon={likeStatus === 2 ? <ThumbDown /> : <ThumbDownAltOutlined />}
+            startIcon={
+              likeStatus === 2 ? <ThumbDown /> : <ThumbDownAltOutlined />
+            }
             size="small"
-            disabled={!isLogin || (userProfile?.id === comment.user?.id)}
+            disabled={!isLogin || userProfile?.id === comment.user?.id}
             disableElevation
           >
             反对
           </Button>
-          
+
           {/* Reply button + count */}
           <Button
             variant="text"
@@ -344,9 +354,12 @@ export default function CommentCard({
         </Box>
 
         {/* Reply preview: button + featured replies */}
-        <ReplyPreview 
-          commentId={comment.id} data={commentData} isLoading={isCommentLoading}
-          dialogOpen={commentOpen} setDialogOpen={setCommentOpen}
+        <ReplyPreview
+          commentId={comment.id}
+          data={commentData}
+          isLoading={isCommentLoading}
+          dialogOpen={commentOpen}
+          setDialogOpen={setCommentOpen}
         />
       </CardContent>
     </Card>

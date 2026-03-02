@@ -28,7 +28,9 @@ export default function InstituteFilter({
   // Count courses per institute
   const instituteCounts: Record<string, number> = {};
   courses.forEach((c) => {
-    const inst = instituteNames.includes(c.institute) ? c.institute : "其他学院";
+    const inst = instituteNames.includes(c.institute)
+      ? c.institute
+      : "其他学院";
     instituteCounts[inst] = (instituteCounts[inst] ?? 0) + 1;
   });
 
@@ -43,9 +45,29 @@ export default function InstituteFilter({
   return (
     <>
       <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-        <Button onClick={() => { onSelectedChange(instituteNames) }}>全选</Button>
-        <Button onClick={() => { onSelectedChange([]) }}>全不选</Button>
-        <Button onClick={() => { onSelectedChange(instituteNames.filter((s) => !selected.includes(s))) }}>反选</Button>
+        <Button
+          onClick={() => {
+            onSelectedChange(instituteNames);
+          }}
+        >
+          全选
+        </Button>
+        <Button
+          onClick={() => {
+            onSelectedChange([]);
+          }}
+        >
+          全不选
+        </Button>
+        <Button
+          onClick={() => {
+            onSelectedChange(
+              instituteNames.filter((s) => !selected.includes(s)),
+            );
+          }}
+        >
+          反选
+        </Button>
         {/* <Chip
           label={
             <Typography variant="body2">全选</Typography>
@@ -71,14 +93,16 @@ export default function InstituteFilter({
             key={inst}
             icon={
               <Collapse in={selected.includes(inst)} orientation="horizontal">
-                <CheckOutlined sx={{ backgroundColor: getInstituteColor(inst), color: "white", borderRadius: "50%" }}/>
+                <CheckOutlined
+                  sx={{
+                    backgroundColor: getInstituteColor(inst),
+                    color: "white",
+                    borderRadius: "50%",
+                  }}
+                />
               </Collapse>
             }
-            label={
-              <Typography variant="body2">
-                {inst}
-              </Typography>
-            }
+            label={<Typography variant="body2">{inst}</Typography>}
             variant={selected.includes(inst) ? "filled" : "outlined"}
             onClick={() => handleToggle(inst)}
             sx={{ width: "min-content" }}

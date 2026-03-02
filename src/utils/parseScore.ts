@@ -26,7 +26,7 @@ export function parseScore(score: number, commentCount: number): number {
  */
 export function calculateStarDistribution(comments: Comment[]): number[] {
   const distribution = [0, 0, 0, 0, 0]; // [1★, 2★, 3★, 4★, 5★]
-  
+
   for (const comment of comments) {
     if (!comment.score || comment.score.length < 4) continue;
     const avg = averageScore(comment.score);
@@ -35,7 +35,7 @@ export function calculateStarDistribution(comments: Comment[]): number[] {
       distribution[starRating - 1]++;
     }
   }
-  
+
   return distribution;
 }
 
@@ -43,7 +43,9 @@ export function calculateStarDistribution(comments: Comment[]): number[] {
  * Convert star distribution counts to percentages.
  * Returns an array [1★ %, 2★ %, 3★ %, 4★ %, 5★ %].
  */
-export function starDistributionToPercentages(distribution: number[]): number[] {
+export function starDistributionToPercentages(
+  distribution: number[],
+): number[] {
   const total = distribution.reduce((sum, count) => sum + count, 0);
   if (total === 0) return [0, 0, 0, 0, 0];
   return distribution.map((count) => (count / total) * 100);

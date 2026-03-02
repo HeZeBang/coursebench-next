@@ -44,10 +44,7 @@ function ReplyCard({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-        <UserAvatar
-          userProfile={reply.user}
-          size={28}
-        />
+        <UserAvatar userProfile={reply.user} size={28} />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="caption" fontWeight="bold">
             {getDisplayName(reply.user)}
@@ -87,7 +84,13 @@ export default function ReplyChainDialog({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         查看对话
         <IconButton size="small" onClick={onClose}>
           <CloseIcon />

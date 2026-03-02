@@ -46,7 +46,11 @@ export function useRecentComments() {
   return useSWR<ApiResponse<Comment[]>>("/v1/comment/recent");
 }
 
-export function useReplies(commentId: number | string | null, sort = "latest", showAll = false) {
+export function useReplies(
+  commentId: number | string | null,
+  sort = "latest",
+  showAll = false,
+) {
   return useSWR<ApiResponse<ReplyListData>>(
     commentId
       ? `/v1/comment/${commentId}/replies?sort=${sort}&all=${showAll ? 1 : 0}`

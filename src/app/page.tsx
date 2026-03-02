@@ -67,7 +67,11 @@ export default function HomePage() {
     let result = [...courses];
 
     // Institute filter
-    result = result.filter((c) => selected.includes(instituteNames.includes(c.institute) ? c.institute : "其他学院"));
+    result = result.filter((c) =>
+      selected.includes(
+        instituteNames.includes(c.institute) ? c.institute : "其他学院",
+      ),
+    );
 
     // Search filter
     if (keys.trim()) {
@@ -151,14 +155,19 @@ export default function HomePage() {
                   onSortKeyChange={(k) =>
                     dispatch({ type: "SET_SORT_KEY", payload: k })
                   }
-                  onOrderChange={(o) => dispatch({ type: "SET_ORDER", payload: o })}
+                  onOrderChange={(o) =>
+                    dispatch({ type: "SET_ORDER", payload: o })
+                  }
                   includeDataInsufficient={includeDataInsufficient}
                   onIncludeDataInsufficientChange={(v) =>
-                    dispatch({ type: "SET_INCLUDE_DATA_INSUFFICIENT", payload: v })
+                    dispatch({
+                      type: "SET_INCLUDE_DATA_INSUFFICIENT",
+                      payload: v,
+                    })
                   }
                 />
 
-                <Divider variant="fullWidth" sx={{ my: 2 }}/>
+                <Divider variant="fullWidth" sx={{ my: 2 }} />
 
                 <InstituteFilter
                   courses={courses}

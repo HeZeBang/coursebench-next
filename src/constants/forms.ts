@@ -3,9 +3,7 @@ import { gradeEnum, termEnum } from "./info";
 
 export const gradeItems: SelectOption<string>[] = Object.entries(gradeEnum)
   .filter(([key]) => isNaN(Number(key)))
-  .map(
-    ([key, value]) => ({ label: key, value: String(value) }),
-);
+  .map(([key, value]) => ({ label: key, value: String(value) }));
 
 export const visibleItems: SelectOption[] = [
   { label: "匿名", value: "anonymous" },
@@ -27,6 +25,7 @@ export const yearItems: SelectOption<number | string>[] = [
 
 export const termItems: SelectOption<string>[] = Object.entries(termEnum)
   .filter(([key]) => isNaN(Number(key)))
-  .map(
-    ([key, value]) => ({ label: key, value: String(value).padStart(2, '0') }),
-);
+  .map(([key, value]) => ({
+    label: key,
+    value: String(value).padStart(2, "0"),
+  }));

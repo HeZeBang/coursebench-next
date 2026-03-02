@@ -9,7 +9,14 @@ import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
 
 import type { Course } from "@/types";
-import { getScoreInfo, getInstituteColor, getInstituteAbbr, ENOUGH_DATA_THRESHOLD, judgeItems, getJudgeInfo } from "@/constants";
+import {
+  getScoreInfo,
+  getInstituteColor,
+  getInstituteAbbr,
+  ENOUGH_DATA_THRESHOLD,
+  judgeItems,
+  getJudgeInfo,
+} from "@/constants";
 import { parseScore } from "@/utils";
 import { averageScore } from "@/utils/parseScore";
 import { Rating } from "@mui/material";
@@ -30,7 +37,13 @@ export default function TeacherCourseCard({ course }: TeacherCourseCardProps) {
     <Card variant="outlined">
       <CardActionArea component={Link} href={`/course/${course.id}`}>
         <CardContent>
-          <Box sx={{ maxWidth: "100%", display: "flex", justifyContent: "space-between" }}>
+          <Box
+            sx={{
+              maxWidth: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
             <Box>
               <Typography variant="subtitle1" fontWeight={600}>
                 {course.name}
@@ -39,12 +52,7 @@ export default function TeacherCourseCard({ course }: TeacherCourseCardProps) {
                 <Typography variant="caption" color="text.secondary">
                   {course.code}
                 </Typography>
-                <Rating
-                  value={score}
-                  precision={0.1}
-                  size="small"
-                  readOnly
-                />
+                <Rating value={score} precision={0.1} size="small" readOnly />
               </Box>
             </Box>
           </Box>
@@ -63,9 +71,19 @@ export default function TeacherCourseCard({ course }: TeacherCourseCardProps) {
               {course.score.map((_, i) => (
                 <Box
                   key={i}
-                  sx={{ display: "flex", flexWrap: "wrap", alignItems: "first baseline", gap: 1, rowGap: 0 }}
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "first baseline",
+                    gap: 1,
+                    rowGap: 0,
+                  }}
                 >
-                  <Typography variant="caption" fontWeight={600} color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
                     {judgeItems[i]}
                   </Typography>
                   <Chip
@@ -98,7 +116,7 @@ export default function TeacherCourseCard({ course }: TeacherCourseCardProps) {
               ))}
             </Box>
           </Box>
-          
+
           <Box sx={{ display: "flex", gap: 0.5, mt: 2 }}>
             <Chip
               label={getInstituteAbbr(course.institute)}

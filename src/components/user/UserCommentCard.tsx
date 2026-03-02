@@ -13,7 +13,15 @@ import { getInstituteColor, getScoreInfo } from "@/constants";
 import { unixToReadable, getUserDisplayName } from "@/utils";
 import { Badge, Button, CardActions, CardMedia, Stack } from "@mui/material";
 import { semesterToReadable, timeAgo } from "@/utils/formatTime";
-import { AccessTime, InfoOutline, RateReviewOutlined, SchoolOutlined, SubtitlesOutlined, ThumbUp, Update } from "@mui/icons-material";
+import {
+  AccessTime,
+  InfoOutline,
+  RateReviewOutlined,
+  SchoolOutlined,
+  SubtitlesOutlined,
+  ThumbUp,
+  Update,
+} from "@mui/icons-material";
 import { gradeEnum } from "@/constants/info";
 import UserAvatar from "./UserAvatar";
 import SmartMarkdown from "../mdx/SmartMarkdown";
@@ -85,7 +93,7 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
                       px: 0.5,
                     },
                     mb: 0.3,
-                    ml: 0.5
+                    ml: 0.5,
                   }}
                 />
               </Typography>
@@ -166,17 +174,29 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
           </Box>
         </Box>
 
-
         {/* Content */}
-        {comment.content && <SmartMarkdown content={comment.content} noExpand />}
+        {comment.content && (
+          <SmartMarkdown content={comment.content} noExpand />
+        )}
       </CardContent>
-      <CardActions sx={{ mt: -5 }} >
-        <Button onClick={() => router.push(`/course/${comment.course.id}?answer=${comment.id}`)}>阅读更多</Button>
-        <Box sx={{ flex: "1" }}/>
+      <CardActions sx={{ mt: -5 }}>
+        <Button
+          onClick={() =>
+            router.push(`/course/${comment.course.id}?answer=${comment.id}`)
+          }
+        >
+          阅读更多
+        </Button>
+        <Box sx={{ flex: "1" }} />
         <Stack direction="row" sx={{ pr: 1 }} spacing={2}>
           <Box>
-            <ThumbUp fontSize="small" sx={{ height: 16, width: 16, color: "text.secondary", mr: 1 }} />
-            <Typography variant="caption">{Math.max(comment.like - comment.dislike, 0)}</Typography>
+            <ThumbUp
+              fontSize="small"
+              sx={{ height: 16, width: 16, color: "text.secondary", mr: 1 }}
+            />
+            <Typography variant="caption">
+              {Math.max(comment.like - comment.dislike, 0)}
+            </Typography>
           </Box>
         </Stack>
       </CardActions>

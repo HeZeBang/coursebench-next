@@ -18,20 +18,19 @@ import { semesterToReadable } from "@/utils/formatTime";
 import CommentEditor from "./CommentEditor";
 import type { CommentDialogState } from "./useCommentDialog";
 
-interface CommentDialogProps
-  extends Pick<
-    CommentDialogState,
-    | "dialogOpen"
-    | "step"
-    | "editingComment"
-    | "userComments"
-    | "hasComments"
-    | "handleClose"
-    | "handleEditComment"
-    | "handleNewComment"
-    | "handleBack"
-    | "handleSuccess"
-  > {
+interface CommentDialogProps extends Pick<
+  CommentDialogState,
+  | "dialogOpen"
+  | "step"
+  | "editingComment"
+  | "userComments"
+  | "hasComments"
+  | "handleClose"
+  | "handleEditComment"
+  | "handleNewComment"
+  | "handleBack"
+  | "handleSuccess"
+> {
   courseId: number;
   groups: CourseGroup[];
 }
@@ -88,9 +87,8 @@ export default function CommentDialog({
                   >
                     <SchoolOutlinedIcon sx={{ fontSize: 16 }} />
                     <Typography variant="body2" color="text.secondary">
-                      {comment.group?.teachers
-                        .map((t) => t.name)
-                        .join(", ") || "未知教师"}
+                      {comment.group?.teachers.map((t) => t.name).join(", ") ||
+                        "未知教师"}
                     </Typography>
                   </Box>
 

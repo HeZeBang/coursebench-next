@@ -185,10 +185,10 @@ export default function Header() {
             <Box sx={{ flexGrow: 1 }} />
 
             {/* <Collapse in={!isMobile} orientation="horizontal"> */}
-              <Box sx={{ display: "flex", gap: 1, marginX: 1 }}>
-                {/* Theme toggle */}
-                <ThemeToggle />
-              </Box>
+            <Box sx={{ display: "flex", gap: 1, marginX: 1 }}>
+              {/* Theme toggle */}
+              <ThemeToggle />
+            </Box>
             {/* </Collapse> */}
 
             {/* Auth buttons / User menu */}
@@ -207,33 +207,51 @@ export default function Header() {
                     paper: {
                       elevation: 0,
                       sx: {
-                        overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        overflow: "visible",
+                        filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                         mt: 1.5,
-                        '& .MuiAvatar-root': {
+                        "& .MuiAvatar-root": {
                           width: 32,
                           height: 32,
                           ml: -0.5,
                           mr: 1,
                         },
-                        '&::before': {
+                        "&::before": {
                           content: '""',
-                          display: 'block',
-                          position: 'absolute',
+                          display: "block",
+                          position: "absolute",
                           top: 0,
                           right: 14,
                           width: 10,
                           height: 10,
-                          bgcolor: 'background.paper',
-                          transform: 'translateY(-50%) rotate(45deg)',
+                          bgcolor: "background.paper",
+                          transform: "translateY(-50%) rotate(45deg)",
                           zIndex: 0,
                         },
                       },
                     },
                   }}
                 >
-                  <Box sx={{ px: 5, width: "100%", height: "5rem", display: "flex", justifyContent: "center", alignItems: "center", gap: 1 }}>
-                    <UserAvatar userProfile={userProfile} size={48} sx={{ width: "48px !important", height: "48px !important", mr: "0 !important"}}/>
+                  <Box
+                    sx={{
+                      px: 5,
+                      width: "100%",
+                      height: "5rem",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <UserAvatar
+                      userProfile={userProfile}
+                      size={48}
+                      sx={{
+                        width: "48px !important",
+                        height: "48px !important",
+                        mr: "0 !important",
+                      }}
+                    />
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <Typography>
                         <b>{userProfile.nickname}</b>
@@ -264,15 +282,21 @@ export default function Header() {
                     退出登录
                   </MenuItem>
                   <Divider sx={{ my: 0.5 }} />
-                  <Box sx={{ px: 5, width: "100%", height: "2rem", display: "flex", justifyContent: "center", alignItems: "center", gap: 1 }}>
+                  <Box
+                    sx={{
+                      px: 5,
+                      width: "100%",
+                      height: "2rem",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
                     <Typography variant="caption">
-                      <Link href="/terms-of-service">
-                        用户协议
-                      </Link>
+                      <Link href="/terms-of-service">用户协议</Link>
                       <b>{" · "}</b>
-                      <Link href="/privacy-policy">
-                        隐私政策
-                      </Link>
+                      <Link href="/privacy-policy">隐私政策</Link>
                     </Typography>
                   </Box>
                 </Menu>

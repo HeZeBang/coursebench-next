@@ -28,7 +28,7 @@ export default function TeacherProfile({ teacher }: TeacherProfileProps) {
             mb: 2,
             bgcolor: instColor,
             fontSize: "2rem",
-            color: "white"
+            color: "white",
           }}
           src={teacher.photo}
         >

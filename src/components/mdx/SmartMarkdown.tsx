@@ -3,11 +3,20 @@
 import { useState, useMemo } from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
 import { Button, Box } from "@mui/material";
-import { KeyboardDoubleArrowDownOutlined, KeyboardDoubleArrowUpOutlined } from "@mui/icons-material";
+import {
+  KeyboardDoubleArrowDownOutlined,
+  KeyboardDoubleArrowUpOutlined,
+} from "@mui/icons-material";
 
 const COLLAPSE_LINES = 5;
 
-export default function SmartMarkdown({ content, noExpand }: { content: string, noExpand?: boolean }) {
+export default function SmartMarkdown({
+  content,
+  noExpand,
+}: {
+  content: string;
+  noExpand?: boolean;
+}) {
   const [expanded, setExpanded] = useState(false);
 
   const { lines, shouldCollapse, preview } = useMemo(() => {
@@ -29,9 +38,18 @@ export default function SmartMarkdown({ content, noExpand }: { content: string, 
 
   if (!expanded) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-        <MarkdownRenderer content={preview} className="markdown-body [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]" />
-        {!noExpand &&
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
+        <MarkdownRenderer
+          content={preview}
+          className="markdown-body [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]"
+        />
+        {!noExpand && (
           <Button
             onClick={() => setExpanded(true)}
             size="small"
@@ -41,13 +59,19 @@ export default function SmartMarkdown({ content, noExpand }: { content: string, 
           >
             展开全文
           </Button>
-        }
+        )}
       </Box>
     );
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+      }}
+    >
       <MarkdownRenderer content={content} />
       <Button
         onClick={() => setExpanded(false)}

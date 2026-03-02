@@ -34,7 +34,13 @@ function getDisplayName(user: Reply["user"]): string {
  * Displays reply count + a few featured replies.
  * Clicking opens the full ReplyDialog.
  */
-export default function ReplyPreview({ data, isLoading, commentId, dialogOpen, setDialogOpen }: ReplyPreviewProps) {
+export default function ReplyPreview({
+  data,
+  isLoading,
+  commentId,
+  dialogOpen,
+  setDialogOpen,
+}: ReplyPreviewProps) {
   // Fetch only featured (filtered) replies for the preview
   const replyData = data?.data;
   const featured = replyData?.replies ?? [];
@@ -117,9 +123,7 @@ export default function ReplyPreview({ data, isLoading, commentId, dialogOpen, s
                   </Typography>
                 </Box>
               </Box>
-              {idx < previewReplies.length - 1 && (
-                <Divider sx={{ my: 0.75 }} />
-              )}
+              {idx < previewReplies.length - 1 && <Divider sx={{ my: 0.75 }} />}
             </Box>
           ))}
 

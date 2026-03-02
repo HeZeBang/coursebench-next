@@ -4,7 +4,7 @@ import { useReplies } from "./useApi";
 /**
  * Lazy-loading wrapper around useReplies that only fetches data
  * when the element is near the viewport (using Intersection Observer).
- * 
+ *
  * @param commentId - The comment ID to fetch replies for
  * @param sort - Sort order ("latest" or "hottest")
  * @param showAll - Whether to fetch all replies (true) or filtered (false)
@@ -17,7 +17,7 @@ export function useLazyReplies(
   sort: "latest" | "hottest" = "latest",
   showAll = false,
   enabled = true,
-  threshold = 200
+  threshold = 200,
 ) {
   const [shouldFetch, setShouldFetch] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
@@ -46,7 +46,7 @@ export function useLazyReplies(
       {
         // Extend the viewport by threshold pixels in all directions
         rootMargin: `${threshold}px`,
-      }
+      },
     );
 
     observer.observe(element);
@@ -60,7 +60,7 @@ export function useLazyReplies(
   const { data, isLoading, mutate } = useReplies(
     shouldFetch ? commentId : null,
     sort,
-    showAll
+    showAll,
   );
 
   return {

@@ -35,7 +35,12 @@ import ReplyChainDialog from "./ReplyChainDialog";
 
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
 import UserAvatar from "../user/UserAvatar";
@@ -102,7 +107,10 @@ export default function ReplyDialog({
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(replies.length / PAGE_SIZE));
-  const paginatedReplies = replies.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  const paginatedReplies = replies.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   // ── Handlers ──
 
@@ -160,16 +168,24 @@ export default function ReplyDialog({
     } catch (err: unknown) {
       const msg =
         err &&
-          typeof err === "object" &&
-          "response" in err &&
-          (err as { response?: { data?: { msg?: string } } }).response?.data?.msg
+        typeof err === "object" &&
+        "response" in err &&
+        (err as { response?: { data?: { msg?: string } } }).response?.data?.msg
           ? (err as { response: { data: { msg: string } } }).response.data.msg
           : "回复发布失败";
       showSnackbar(msg, "error");
     } finally {
       setSubmitting(false);
     }
-  }, [commentId, replyContent, replyTarget, isAnonymous, isLogin, showSnackbar, mutate]);
+  }, [
+    commentId,
+    replyContent,
+    replyTarget,
+    isAnonymous,
+    isLogin,
+    showSnackbar,
+    mutate,
+  ]);
 
   const handleToggleLike = useCallback(
     async (reply: Reply, desiredStatus: number) => {
@@ -251,15 +267,17 @@ export default function ReplyDialog({
               </Box>
 
               {totalCount == 0 && (
-                <Box sx={{ 
-                  height: "80%", width: "100%", 
-                  display: "flex", flexDirection: "column",
-                  justifyContent: "center", alignItems: "center"
-                }}>
-                  <Typography
-                    variant="h5"
-                    color="textSecondary"
-                  >
+                <Box
+                  sx={{
+                    height: "80%",
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography variant="h5" color="textSecondary">
                     暂无评论
                   </Typography>
                 </Box>
@@ -272,11 +290,10 @@ export default function ReplyDialog({
                   variant="outlined"
                   sx={{ mb: 1, p: 1.5, bgcolor: "transparent" }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-                    <UserAvatar
-                      userProfile={reply.user}
-                      size={30}
-                    />
+                  <Box
+                    sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
+                  >
+                    <UserAvatar userProfile={reply.user} size={30} />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       {/* Name + reply target */}
                       <Typography variant="caption" fontWeight="bold">
@@ -305,7 +322,11 @@ export default function ReplyDialog({
                       </Typography>
 
                       {/* Timestamp */}
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ mt: 0.5, display: "block" }}
+                      >
                         {unixToReadable(reply.post_time)}
                       </Typography>
 
@@ -321,7 +342,9 @@ export default function ReplyDialog({
                       >
                         <Button
                           size="small"
-                          color={reply.like_status === 1 ? "primary" : "inherit"}
+                          color={
+                            reply.like_status === 1 ? "primary" : "inherit"
+                          }
                           startIcon={
                             reply.like_status === 1 ? (
                               <ThumbUpIcon fontSize="small" />
@@ -336,7 +359,9 @@ export default function ReplyDialog({
                         </Button>
                         <Button
                           size="small"
-                          color={reply.like_status === 2 ? "primary" : "inherit"}
+                          color={
+                            reply.like_status === 2 ? "primary" : "inherit"
+                          }
                           startIcon={
                             reply.like_status === 2 ? (
                               <ThumbDownIcon fontSize="small" />
@@ -405,7 +430,13 @@ export default function ReplyDialog({
             {/* Reply target preview */}
             {replyTarget && (
               <Box sx={{ mb: 1, display: "flex", flexDirection: "column" }}>
-                <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
                   <Typography variant="body2" sx={{ display: "block" }}>
                     正在回复 {getDisplayName(replyTarget.user)}
                   </Typography>
@@ -428,7 +459,7 @@ export default function ReplyDialog({
                     borderRadius: 1,
                     fontStyle: "italic",
                     flexGrow: "1",
-                    flex: "1"
+                    flex: "1",
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">

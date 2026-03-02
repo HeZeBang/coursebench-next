@@ -48,8 +48,6 @@ function collectTeachers(course: CourseDetail): GroupTeacher[] {
   return result;
 }
 
-
-
 /* ── component ───────────────────────────────────────────── */
 
 interface CourseDetailCardProps {
@@ -57,15 +55,18 @@ interface CourseDetailCardProps {
   comments?: Comment[];
 }
 
-export default function CourseDetailCard({ course, comments = [] }: CourseDetailCardProps) {
+export default function CourseDetailCard({
+  course,
+  comments = [],
+}: CourseDetailCardProps) {
   const teachers = useMemo(() => collectTeachers(course), [course]);
-  
+
   // Calculate dynamic scores based on filtered comments
   const dynamicScores = useMemo(() => {
     // Calculate average scores from filtered comments
     const dimensionSums = [0, 0, 0, 0];
     let validCommentCount = 0;
-    
+
     for (const comment of comments) {
       if (comment.score && comment.score.length >= 4) {
         validCommentCount++;
@@ -74,13 +75,14 @@ export default function CourseDetailCard({ course, comments = [] }: CourseDetail
         }
       }
     }
-    
-    const dimensionScores = validCommentCount > 0
-      ? dimensionSums.map(sum => sum / validCommentCount)
-      : [0, 0, 0, 0];
-    
+
+    const dimensionScores =
+      validCommentCount > 0
+        ? dimensionSums.map((sum) => sum / validCommentCount)
+        : [0, 0, 0, 0];
+
     const avg = averageScore(dimensionScores);
-    
+
     return {
       avg,
       score: parseScore(avg, validCommentCount),
@@ -89,18 +91,22 @@ export default function CourseDetailCard({ course, comments = [] }: CourseDetail
       commentCount: validCommentCount,
     };
   }, [comments, course.score, course.comment_num]);
-  
-  const { avg, score, hasEnoughData, dimensionScores, commentCount } = dynamicScores;
-  const { label: scoreLabel, color: scoreColor } = getScoreInfo(avg, commentCount);
-  
+
+  const { avg, score, hasEnoughData, dimensionScores, commentCount } =
+    dynamicScores;
+  const { label: scoreLabel, color: scoreColor } = getScoreInfo(
+    avg,
+    commentCount,
+  );
+
   // Calculate star distribution from comments
   const starDistribution = useMemo(
     () => calculateStarDistribution(comments),
-    [comments]
+    [comments],
   );
   const starPercentages = useMemo(
     () => starDistributionToPercentages(starDistribution),
-    [starDistribution]
+    [starDistribution],
   );
 
   return (
@@ -251,19 +257,24 @@ export default function CourseDetailCard({ course, comments = [] }: CourseDetail
                   const barColor = hasEnoughData
                     ? (scoreInfo[star + 1]?.color ?? "#B0B0B0")
                     : "#B0B0B0";
-                  const percentage = hasEnoughData && comments.length > 0
-                    ? starPercentages[star - 1]
-                    : 0;
-                  const count = hasEnoughData && comments.length > 0
-                    ? starDistribution[star - 1]
-                    : 0;
+                  const percentage =
+                    hasEnoughData && comments.length > 0
+                      ? starPercentages[star - 1]
+                      : 0;
+                  const count =
+                    hasEnoughData && comments.length > 0
+                      ? starDistribution[star - 1]
+                      : 0;
                   return (
                     <Box
                       key={star}
                       sx={{ display: "flex", alignItems: "center", mb: 0.25 }}
                       title={`${count} 人评为 ${star} 星`}
                     >
-                      <Typography variant="body2" sx={{ mr: 0.5, minWidth: 12 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ mr: 0.5, minWidth: 12 }}
+                      >
                         {star}
                       </Typography>
                       <Rating
@@ -284,9 +295,14 @@ export default function CourseDetailCard({ course, comments = [] }: CourseDetail
                           "& .MuiLinearProgress-bar": { bgcolor: barColor },
                         }}
                       />
-                      <Typography 
-                        variant="caption" 
-                        sx={{ ml: 1, minWidth: 28, fontSize: 10, color: "text.secondary" }}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          ml: 1,
+                          minWidth: 28,
+                          fontSize: 10,
+                          color: "text.secondary",
+                        }}
                       >
                         {count > 0 ? count : ""}
                       </Typography>
@@ -300,10 +316,7 @@ export default function CourseDetailCard({ course, comments = [] }: CourseDetail
             {dimensionScores && dimensionScores.length >= 4 && (
               <Grid container spacing={1} sx={{ mt: 2 }}>
                 {judgeItems.map((label, i) => {
-                  const dimScore = parseScore(
-                    dimensionScores[i],
-                    commentCount,
-                  );
+                  const dimScore = parseScore(dimensionScores[i], commentCount);
                   const info =
                     dimScore > 0
                       ? getJudgeInfo(i, dimensionScores[i])

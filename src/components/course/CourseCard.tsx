@@ -59,7 +59,13 @@ export default function CourseCard({ course }: CourseCardProps) {
           </Box>
         </CardMedia>
         <CardContent>
-          <Typography variant="h6" fontWeight={800} component="div" sx={{ mb: 1.2 }} noWrap>
+          <Typography
+            variant="h6"
+            fontWeight={800}
+            component="div"
+            sx={{ mb: 1.2 }}
+            noWrap
+          >
             {course.name}
           </Typography>
 
@@ -79,7 +85,11 @@ export default function CourseCard({ course }: CourseCardProps) {
                   key={i}
                   sx={{ display: "flex", alignItems: "first baseline", gap: 1 }}
                 >
-                  <Typography variant="caption" fontWeight={600} color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
                     {judgeItems[i]}
                   </Typography>
                   <Chip

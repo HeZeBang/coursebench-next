@@ -30,10 +30,7 @@ export default function ReplyChainTree({
         <Box key={node.reply.id} sx={{ mb: 1 }}>
           <Card variant="outlined" sx={{ p: 1.5 }}>
             <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-              <UserAvatar
-                userProfile={node.reply.user}
-                size={28}
-              />
+              <UserAvatar userProfile={node.reply.user} size={28} />
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="caption" fontWeight="bold">
                   {getDisplayName(node.reply.user)}

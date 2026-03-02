@@ -23,7 +23,18 @@ import {
 import { EmptyState } from "@/components/layout";
 import { sortCmp } from "@/utils";
 import type { Comment, CommentSortKey, SortOrder } from "@/types";
-import { Card, CardContent, CardHeader, Divider, Slider, SpeedDial, SpeedDialAction, SpeedDialIcon, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Slider,
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material";
 import { ArrowUpward, Edit } from "@mui/icons-material";
 import { nowYear, startYear } from "@/constants/forms";
 
@@ -39,7 +50,11 @@ const sortOptions: { label: string; value: CommentSortKey }[] = [
 
 export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const { id } = use(params);
-  const { data: courseData, isLoading: courseLoading, mutate: mutateCourse } = useCourse(id);
+  const {
+    data: courseData,
+    isLoading: courseLoading,
+    mutate: mutateCourse,
+  } = useCourse(id);
   const {
     data: commentsData,
     isLoading: commentsLoading,
@@ -57,7 +72,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
   // Initialize selectedGroupIds with all groups (default all selected)
   if (course && !isInitialized) {
-    setSelectedGroupIds(course.groups.map(g => g.id));
+    setSelectedGroupIds(course.groups.map((g) => g.id));
     setIsInitialized(true);
   }
 
@@ -79,25 +94,34 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const displayedComments = useMemo(() => {
     let result = [...comments];
     const totalGroups = course?.groups.length ?? 0;
-    
+
     // If none selected, return empty
     if (selectedGroupIds.length === 0) {
       return [];
     }
-    
+
     // If not all selected, filter by selected groups
     if (selectedGroupIds.length < totalGroups) {
       result = result.filter((c) =>
         selectedGroupIds.includes(c.group?.id ?? 0),
       );
     }
-    
+
     result.sort(sortCmp<Comment>(commentSort, order));
 
-    return result.filter((i) => 
-        (i.semester / 100 >= (yearRange.at(0) || startYear) && 
-         i.semester / 100 <= (yearRange.at(1) || nowYear)));
-  }, [comments, selectedGroupIds, commentSort, course?.groups.length, order, yearRange]);
+    return result.filter(
+      (i) =>
+        i.semester / 100 >= (yearRange.at(0) || startYear) &&
+        i.semester / 100 <= (yearRange.at(1) || nowYear),
+    );
+  }, [
+    comments,
+    selectedGroupIds,
+    commentSort,
+    course?.groups.length,
+    order,
+    yearRange,
+  ]);
 
   if (courseLoading) {
     return (
@@ -134,13 +158,14 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
       <SpeedDial
         ariaLabel="More Actions"
-        sx={{ position: 'fixed', 
-            bottom: { xs: 16, md: 32 }, 
-            right: { xs: 16, md: 32 },
-            "& .MuiSpeedDialIcon-icon": {
-              mb: "4px !important"
-            }
-         }}
+        sx={{
+          position: "fixed",
+          bottom: { xs: 16, md: 32 },
+          right: { xs: 16, md: 32 },
+          "& .MuiSpeedDialIcon-icon": {
+            mb: "4px !important",
+          },
+        }}
         icon={<SpeedDialIcon />}
       >
         <SpeedDialAction
@@ -163,7 +188,9 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               title: "返回顶部",
             },
           }}
-          onClick={() => { window?.scrollTo({ top: 0, behavior: "smooth" }) }}
+          onClick={() => {
+            window?.scrollTo({ top: 0, behavior: "smooth" });
+          }}
         />
       </SpeedDial>
       <Grid container spacing={3}>
@@ -207,8 +234,10 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               </Box>
 
               <Divider variant="fullWidth" sx={{ my: 2 }} />
-              
-              <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
+
+              <Box
+                sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}
+              >
                 <Typography variant="caption" color="textSecondary">
                   {startYear}
                 </Typography>

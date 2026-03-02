@@ -75,12 +75,18 @@ export default function CommentEditor({
   const [scores, setScores] = useState<number[]>(
     existingComment?.score ?? [3, 3, 3, 3],
   );
-  const [groupId, setGroupId] = useState(existingComment?.group?.id ?? undefined);
+  const [groupId, setGroupId] = useState(
+    existingComment?.group?.id ?? undefined,
+  );
   const [year, setYear] = useState(
-    existingComment?.semester ? String(Math.floor(existingComment.semester / 100)) : "",
+    existingComment?.semester
+      ? String(Math.floor(existingComment.semester / 100))
+      : "",
   );
   const [semester, setSemester] = useState(
-    existingComment?.semester ? String(existingComment.semester % 100).padStart(2, "0") : "",
+    existingComment?.semester
+      ? String(existingComment.semester % 100).padStart(2, "0")
+      : "",
   );
   const [isAnonymous, setIsAnonymous] = useState(
     existingComment?.is_anonymous ?? true,
@@ -95,17 +101,19 @@ export default function CommentEditor({
     setScores(existingComment?.score ?? [3, 3, 3, 3]);
     setGroupId(existingComment?.group?.id ?? undefined);
     setYear(
-      existingComment?.semester ? String(Math.floor(existingComment.semester / 100)) : "",
+      existingComment?.semester
+        ? String(Math.floor(existingComment.semester / 100))
+        : "",
     );
     setSemester(
-      existingComment?.semester ? String(existingComment.semester % 100).padStart(2, "0") : "",
+      existingComment?.semester
+        ? String(existingComment.semester % 100).padStart(2, "0")
+        : "",
     );
     setIsAnonymous(existingComment?.is_anonymous ?? true);
     setError("");
     setTab(0);
   }, [existingComment]);
-
-
 
   const handleScoreChange = useCallback(
     (index: number, value: number) => {
@@ -131,8 +139,9 @@ export default function CommentEditor({
       const endpoint = existingComment
         ? "/v1/comment/update"
         : "/v1/comment/post";
-      const semesterValue = year && semester ? Number(year) * 100 + Number(semester) : 0;
-      
+      const semesterValue =
+        year && semester ? Number(year) * 100 + Number(semester) : 0;
+
       // Match backend API signature
       const payload = existingComment
         ? {
@@ -153,7 +162,7 @@ export default function CommentEditor({
             scores: scores,
             student_score_ranking: 2, // Default value, not yet supported
           };
-      
+
       await api.post(endpoint, payload);
       showSnackbar(existingComment ? "评价已更新" : "评价发布成功", "success");
       onSuccess();
@@ -217,7 +226,10 @@ export default function CommentEditor({
         )}
 
         <Box sx={{ display: "flex", gap: 2, alignItems: "baseline" }}>
-          <UserAvatar userProfile={isAnonymous? null : userProfile} size={40} />
+          <UserAvatar
+            userProfile={isAnonymous ? null : userProfile}
+            size={40}
+          />
 
           {/* Title */}
           <TextField
@@ -236,14 +248,17 @@ export default function CommentEditor({
         {/* Teacher select + Year + Semester */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel variant="standard" required error={!groupId}>教师</InputLabel>
+            <InputLabel variant="standard" required error={!groupId}>
+              教师
+            </InputLabel>
             <Select
               variant="standard"
               value={groupId}
               label="教师"
               onChange={(e) => setGroupId(Number(e.target.value))}
               disabled={!!existingComment}
-              required error={!groupId}
+              required
+              error={!groupId}
             >
               {groups.map((g) => (
                 <MenuItem key={g.id} value={g.id}>
@@ -253,9 +268,12 @@ export default function CommentEditor({
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 100 }}>
-            <InputLabel variant="standard" required error={year == ""}>修读年份</InputLabel>
+            <InputLabel variant="standard" required error={year == ""}>
+              修读年份
+            </InputLabel>
             <Select
-              required error={year == ""}
+              required
+              error={year == ""}
               variant="standard"
               value={year}
               label="修读年份"
@@ -269,9 +287,12 @@ export default function CommentEditor({
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 100 }}>
-            <InputLabel variant="standard" required error={semester == ""}>修读学期</InputLabel>
+            <InputLabel variant="standard" required error={semester == ""}>
+              修读学期
+            </InputLabel>
             <Select
-              required error={semester == ""}
+              required
+              error={semester == ""}
               variant="standard"
               value={semester}
               label="修读学期"
@@ -284,7 +305,7 @@ export default function CommentEditor({
               ))}
             </Select>
           </FormControl>
-          
+
           {/* Anonymous toggle */}
           <FormControlLabel
             control={
@@ -335,10 +356,14 @@ export default function CommentEditor({
             )}
           </Box>
         )}
-        
 
         {/* Score sliders */}
-        <Grid container columns={{ xs: 1, sm: 2, md: 4 }} spacing={2} sx={{ mt: 2 }}>
+        <Grid
+          container
+          columns={{ xs: 1, sm: 2, md: 4 }}
+          spacing={2}
+          sx={{ mt: 2 }}
+        >
           {judgeItems.map((label, i) => (
             <Grid key={label} size={1}>
               <Box
