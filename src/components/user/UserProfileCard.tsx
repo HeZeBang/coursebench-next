@@ -14,6 +14,7 @@ import type { UserProfile } from "@/types";
 import { getUserDisplayName } from "@/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { startCasdoorBind } from "@/lib/casdoor";
+import { Stack } from "@mui/material";
 
 const gradeLabels: Record<number, string> = {
   1: "本科",
