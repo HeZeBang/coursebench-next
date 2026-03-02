@@ -222,7 +222,7 @@ export default function ReplyDialog({
         </IconButton>
       </DialogTitle>
       <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 } }}>
-        <Box sx={{ pt: 1, pb: 2 }}>
+        <Box sx={{ pt: 1, pb: 2, height: "100%", width: "100%" }}>
           {isLoading ? (
             <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
               <CircularProgress size={20} />
@@ -249,11 +249,19 @@ export default function ReplyDialog({
                 </ToggleButtonGroup>
               </Box>
 
-              {/* Paginated info */}
-              {totalPages > 1 && (
-                <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
-                  第 {currentPage} 页，共 {totalPages} 页
-                </Typography>
+              {totalCount == 0 && (
+                <Box sx={{ 
+                  height: "80%", width: "100%", 
+                  display: "flex", flexDirection: "column",
+                  justifyContent: "center", alignItems: "center"
+                }}>
+                  <Typography
+                    variant="h5"
+                    color="textSecondary"
+                  >
+                    暂无评论
+                  </Typography>
+                </Box>
               )}
 
               {/* Reply cards */}
@@ -368,7 +376,7 @@ export default function ReplyDialog({
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
                   <Pagination
                     count={totalPages}
                     page={currentPage}

@@ -49,7 +49,7 @@ import { ArrowUpward } from "@mui/icons-material";
 const navLinks = [
   { label: "全部课程", href: "/" },
   { label: "最近评价", href: "/recent" },
-  { label: "赏金排名", href: "/ranking" },
+  // { label: "赏金排名", href: "/ranking" },
   { label: "关于我们", href: "/about" },
 ] as const;
 
