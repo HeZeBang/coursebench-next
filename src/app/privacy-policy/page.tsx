@@ -2,8 +2,7 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import remarkGfm from "remark-gfm";
+import MarkdownRenderer from "@/components/mdx/MarkdownRenderer";
 
 export default async function PrivacyPolicyPage() {
   const filePath = join(process.cwd(), "src/assets/privacy_policy.md");
@@ -14,11 +13,8 @@ export default async function PrivacyPolicyPage() {
       <Typography variant="h4" fontWeight={700} gutterBottom>
         隐私政策
       </Typography>
-      <article className="prose prose-sm max-w-none">
-        <MDXRemote
-          source={source}
-          options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
-        />
+      <article>
+        <MarkdownRenderer content={source} />
       </article>
     </Container>
   );
