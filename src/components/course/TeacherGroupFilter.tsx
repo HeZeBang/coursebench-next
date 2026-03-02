@@ -51,9 +51,9 @@ export default function TeacherGroupFilter({
               },
             }}
             label={
-              <Stack direction="row" alignItems="center" spacing={1} sx={{ my: 1 }}>
+              <Stack direction="row" alignItems="center" sx={{ my: 1 }}>
                 <Collapse in={selectedGroupIds.includes(group.id)} orientation="horizontal">
-                  <CheckOutlined />
+                  <CheckOutlined sx={{ mr: 1 }}/>
                 </Collapse>
                 <Typography variant="body2">
                   {teacherName} ({group.comment_num})
