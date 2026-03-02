@@ -194,6 +194,7 @@ export default function CourseDetailCard({
                   gap: 0.5,
                   flexDirection: "column",
                   alignItems: "center",
+                  minWidth: "7rem",
                 }}
               >
                 {/* Overall score */}
@@ -229,9 +230,19 @@ export default function CourseDetailCard({
                   </Typography>
                 </Box>
 
-                {hasEnoughData && (
+                {hasEnoughData ? (
                   <Chip
                     label={scoreLabel}
+                    size="small"
+                    sx={{
+                      bgcolor: scoreColor,
+                      color: "#fff",
+                      fontWeight: 600,
+                    }}
+                  />
+                ) : (
+                  <Chip
+                    label="数据不足"
                     size="small"
                     sx={{
                       bgcolor: scoreColor,
