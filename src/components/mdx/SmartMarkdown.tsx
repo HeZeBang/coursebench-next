@@ -7,7 +7,7 @@ import { KeyboardDoubleArrowDownOutlined, KeyboardDoubleArrowUpOutlined } from "
 
 const COLLAPSE_LINES = 5;
 
-export default function SmartMarkdown({ content }: { content: string }) {
+export default function SmartMarkdown({ content, noExpand }: { content: string, noExpand?: boolean }) {
   const [expanded, setExpanded] = useState(false);
 
   const { lines, shouldCollapse, preview } = useMemo(() => {
@@ -30,16 +30,18 @@ export default function SmartMarkdown({ content }: { content: string }) {
   if (!expanded) {
     return (
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-        <MarkdownRenderer content={preview} className="markdown-body [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]"/>
-        <Button
-          onClick={() => setExpanded(true)}
-          size="small"
-          sx={{ mt: -1, mb: 1, alignSelf: "center" }}
-          startIcon={<KeyboardDoubleArrowDownOutlined />}
-          variant="outlined"
-        >
-          展开全文
-        </Button>
+        <MarkdownRenderer content={preview} className="markdown-body [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]" />
+        {!noExpand &&
+          <Button
+            onClick={() => setExpanded(true)}
+            size="small"
+            sx={{ mt: -1, mb: 1, alignSelf: "center" }}
+            startIcon={<KeyboardDoubleArrowDownOutlined />}
+            variant="outlined"
+          >
+            展开全文
+          </Button>
+        }
       </Box>
     );
   }
