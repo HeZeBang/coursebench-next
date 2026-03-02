@@ -182,6 +182,7 @@ export default function CommentCard({
                 {displayName}
               </Typography>
               <Typography variant="caption" color="textSecondary">
+                {(comment.user?.year || 0 !== 0) && `${comment.user?.year} 级`}
                 {(comment.user?.grade || 0 !== 0) &&
                   gradeEnum[comment.user?.grade || 0]}
               </Typography>
@@ -330,14 +331,15 @@ export default function CommentCard({
           
           {/* Reply button + count */}
           <Button
-            variant="outlined"
+            variant="text"
             size="small"
             startIcon={<ChatBubbleOutline />}
             onClick={() => setCommentOpen(true)}
             disableElevation
             sx={{ textTransform: "none" }}
+            loading={isCommentLoading}
           >
-            回复 {commentData?.data.total_count ?? ""}
+            {commentData?.data.total_count ?? ""} 条回复
           </Button>
         </Box>
 

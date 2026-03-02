@@ -1,3 +1,5 @@
+import { UserProfile } from "./user";
+
 /** User object embedded in a comment (null when anonymous and not own) */
 export interface CommentUser {
   id: number;
@@ -55,12 +57,7 @@ export interface Comment {
 }
 
 /** User attached to a reply */
-export interface ReplyUser {
-  id: number;
-  nickname: string;
-  avatar: string;
-  is_anonymous: boolean;
-}
+export type ReplyUser = UserProfile;
 
 /** The "reply_to" target (parent reply info) */
 export interface ReplyTarget {

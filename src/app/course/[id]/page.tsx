@@ -133,7 +133,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       />
 
       <SpeedDial
-        ariaLabel="SpeedDial basic example"
+        ariaLabel="More Actions"
         sx={{ position: 'fixed', 
             bottom: { xs: 16, md: 32 }, 
             right: { xs: 16, md: 32 },

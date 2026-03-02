@@ -7,6 +7,7 @@ import Avatar from "@mui/material/Avatar";
 
 import type { ReplyTreeNode } from "@/types";
 import { unixToReadable } from "@/utils";
+import UserAvatar from "../user/UserAvatar";
 
 interface ReplyChainTreeProps {
   nodes: ReplyTreeNode[];
@@ -24,17 +25,15 @@ export default function ReplyChainTree({
   if (!nodes || nodes.length === 0) return null;
 
   return (
-    <Box sx={{ pl: depth > 0 ? 2 : 0 }}>
+    <Box sx={{ mt: 1 }}>
       {nodes.map((node) => (
         <Box key={node.reply.id} sx={{ mb: 1 }}>
           <Card variant="outlined" sx={{ p: 1.5 }}>
             <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-              <Avatar
-                src={node.reply.user?.avatar || undefined}
-                sx={{ width: 28, height: 28, fontSize: 14, borderRadius: 1 }}
-              >
-                {getDisplayName(node.reply.user).charAt(0)}
-              </Avatar>
+              <UserAvatar
+                userProfile={node.reply.user}
+                size={28}
+              />
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="caption" fontWeight="bold">
                   {getDisplayName(node.reply.user)}

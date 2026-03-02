@@ -12,7 +12,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import type { ApiResponse, Reply, ReplyListData } from "@/types";
 import { useReplies } from "@/hooks";
 import { unixToReadable } from "@/utils";
-import ReplyDialog from "./ReplyDialog";
+import ReplyDialog from "./ReplySection";
 
 interface ReplyPreviewProps {
   commentId: number;

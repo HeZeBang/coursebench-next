@@ -15,6 +15,7 @@ import type { ReplyChainData } from "@/types";
 import { useReplyChain } from "@/hooks";
 import { unixToReadable } from "@/utils";
 import ReplyChainTree from "./ReplyChainTree";
+import UserAvatar from "../user/UserAvatar";
 
 interface ReplyChainDialogProps {
   open: boolean;
@@ -43,12 +44,10 @@ function ReplyCard({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-        <Avatar
-          src={reply.user?.avatar || undefined}
-          sx={{ width: 28, height: 28, fontSize: 14, borderRadius: 1 }}
-        >
-          {getDisplayName(reply.user).charAt(0)}
-        </Avatar>
+        <UserAvatar
+          userProfile={reply.user}
+          size={28}
+        />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="caption" fontWeight="bold">
             {getDisplayName(reply.user)}

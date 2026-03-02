@@ -33,7 +33,16 @@ import { unixToReadable } from "@/utils";
 import api from "@/lib/api";
 import ReplyChainDialog from "./ReplyChainDialog";
 
-interface ReplySectionProps {
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+
+import CloseIcon from "@mui/icons-material/Close";
+import UserAvatar from "../user/UserAvatar";
+
+interface ReplyDialogProps {
+  open: boolean;
+  onClose: () => void;
   commentId: number;
 }
 
@@ -53,7 +62,14 @@ function truncateContent(content: string, max = 100): string {
   return first.length > max ? first.substring(0, max) + "..." : first + "...";
 }
 
-export default function ReplySection({ commentId }: ReplySectionProps) {
+export default function ReplyDialog({
+  open,
+  onClose,
+  commentId,
+}: ReplyDialogProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   const { isLogin } = useAuth();
   const showSnackbar = useSnackbar();
 
@@ -180,263 +196,293 @@ export default function ReplySection({ commentId }: ReplySectionProps) {
   // ── Render ──
 
   return (
-    <Box sx={{ pt: 1, pb: 2 }}>
-      {isLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-          <CircularProgress size={20} />
-        </Box>
-      ) : (
-        <>
-          {/* Sort controls */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 1,
-            }}
-          >
-            <ToggleButtonGroup
-              value={sortBy}
-              exclusive
-              onChange={handleSortChange}
-              size="small"
-            >
-              <ToggleButton value="latest">最新</ToggleButton>
-              <ToggleButton value="hottest">最热</ToggleButton>
-            </ToggleButtonGroup>
-          </Box>
-
-          {/* Paginated info */}
-          {totalPages > 1 && (
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
-              第 {currentPage} 页，共 {totalPages} 页
-            </Typography>
-          )}
-
-          {/* Reply cards */}
-          {paginatedReplies.map((reply) => (
-            <Card
-              key={reply.id}
-              variant="outlined"
-              sx={{ mb: 1, p: 1.5, bgcolor: "transparent" }}
-            >
-              <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-                <Avatar
-                  src={reply.user?.avatar || undefined}
-                  sx={{ width: 30, height: 30, fontSize: 14, borderRadius: 1 }}
-                >
-                  {getDisplayName(reply.user).charAt(0)}
-                </Avatar>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  {/* Name + reply target */}
-                  <Typography variant="caption" fontWeight="bold">
-                    {getDisplayName(reply.user)}
-                    {reply.reply_to && (
-                      <Typography
-                        component="span"
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ ml: 0.5 }}
-                      >
-                        回复{" "}
-                        {reply.reply_to.user
-                          ? getDisplayName(reply.reply_to.user)
-                          : "匿名用户"}
-                      </Typography>
-                    )}
-                  </Typography>
-
-                  {/* Content */}
-                  <Typography
-                    variant="body2"
-                    sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-                  >
-                    {reply.content}
-                  </Typography>
-
-                  {/* Timestamp */}
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
-                    {unixToReadable(reply.post_time)}
-                  </Typography>
-
-                  {/* Action buttons */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexWrap: "wrap",
-                      gap: 0.5,
-                      mt: 0.5,
-                    }}
-                  >
-                    <Button
-                      size="small"
-                      color={reply.like_status === 1 ? "primary" : "inherit"}
-                      startIcon={
-                        reply.like_status === 1 ? (
-                          <ThumbUpIcon fontSize="small" />
-                        ) : (
-                          <ThumbUpOutlinedIcon fontSize="small" />
-                        )
-                      }
-                      onClick={() => handleToggleLike(reply, 1)}
-                      sx={{ minWidth: 0, textTransform: "none" }}
-                    >
-                      {reply.like > 0 && reply.like}
-                    </Button>
-                    <Button
-                      size="small"
-                      color={reply.like_status === 2 ? "primary" : "inherit"}
-                      startIcon={
-                        reply.like_status === 2 ? (
-                          <ThumbDownIcon fontSize="small" />
-                        ) : (
-                          <ThumbDownOutlinedIcon fontSize="small" />
-                        )
-                      }
-                      onClick={() => handleToggleLike(reply, 2)}
-                      sx={{ minWidth: 0, textTransform: "none" }}
-                    >
-                      {reply.dislike > 0 && reply.dislike}
-                    </Button>
-                    <Button
-                      size="small"
-                      startIcon={<ReplyIcon fontSize="small" />}
-                      onClick={() => handleSetReplyTarget(reply)}
-                      sx={{ minWidth: 0, textTransform: "none" }}
-                    >
-                      回复
-                    </Button>
-                    {(reply.has_sub_replies || reply.reply_to) && (
-                      <Button
-                        size="small"
-                        startIcon={<ForumOutlinedIcon fontSize="small" />}
-                        onClick={() => handleOpenChain(reply.id)}
-                        sx={{ minWidth: 0, textTransform: "none" }}
-                      >
-                        查看对话
-                      </Button>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-            </Card>
-          ))}
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(_, page) => setCurrentPage(page)}
-                size="small"
-              />
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      fullScreen={fullScreen}
+      slotProps={{
+        paper: {
+          sx: { height: fullScreen ? "100%" : "80vh" },
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pb: 1,
+        }}
+      >
+        全部回复 {!isLoading && `(${totalCount})`}
+        <IconButton size="small" onClick={onClose} edge="end">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 } }}>
+        <Box sx={{ pt: 1, pb: 2 }}>
+          {isLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+              <CircularProgress size={20} />
             </Box>
-          )}
-
-          {/* Reply input */}
-          {isLogin ? (
-            <Box ref={replyInputRef} sx={{ mt: 2 }}>
-              {/* Reply target preview */}
-              {replyTarget && (
-                <Box sx={{ mb: 1, display: "flex", flexDirection: "column" }}>
-                  <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                    <Typography variant="body2" sx={{ display: "block" }}>
-                      正在回复 {getDisplayName(replyTarget.user)}
-                    </Typography>
-                    <Button
-                      size="small"
-                      color="error"
-                      onClick={handleClearReplyTarget}
-                      sx={{ ml: 1, minWidth: 0, textTransform: "none" }}
-                    >
-                      取消
-                    </Button>
-                  </Box>
-                  
-                  <Box
-                    sx={{
-                      p: 1,
-                      borderLeft: 3,
-                      borderColor: "divider",
-                      bgcolor: "action.hover",
-                      borderRadius: 1,
-                      fontStyle: "italic",
-                      flexGrow: "1",
-                      flex: "1"
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      {truncateContent(replyTarget.content)}
-                    </Typography>
-                  </Box>
-                </Box>
-              )}
-
-              <TextField
-                value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
-                placeholder="写下你的回复..."
-                multiline
-                minRows={2}
-                maxRows={6}
-                fullWidth
-                size="small"
-                variant="outlined"
-              />
-
+          ) : (
+            <>
+              {/* Sort controls */}
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "flex-end",
-                  gap: 1,
+                  justifyContent: "space-between",
                   alignItems: "center",
-                  mt: 1,
+                  mb: 1,
                 }}
               >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={isAnonymous}
-                      onChange={(e) => setIsAnonymous(e.target.checked)}
-                      size="small"
-                    />
-                  }
-                  label="匿名"
-                  slotProps={{ typography: { variant: "body2" } }}
-                />
-                <Button
-                  variant="contained"
+                <ToggleButtonGroup
+                  value={sortBy}
+                  exclusive
+                  onChange={handleSortChange}
                   size="small"
-                  onClick={handleSubmitReply}
-                  disabled={submitting}
-                  disableElevation
                 >
-                  {submitting ? <CircularProgress size={16} /> : "发布回复"}
-                </Button>
+                  <ToggleButton value="latest">最新</ToggleButton>
+                  <ToggleButton value="hottest">最热</ToggleButton>
+                </ToggleButtonGroup>
               </Box>
-            </Box>
-          ) : (
-            <Alert
-              severity="info"
-              variant="outlined"
-              sx={{ mt: 1, cursor: "pointer" }}
-              onClick={() => showSnackbar("请先登录", "warning")}
-            >
-              登录后发布回复
-            </Alert>
-          )}
-        </>
-      )}
 
-      {/* Reply chain dialog */}
-      <ReplyChainDialog
-        open={chainDialogOpen}
-        onClose={() => setChainDialogOpen(false)}
-        replyId={chainReplyId}
-      />
-    </Box>
+              {/* Paginated info */}
+              {totalPages > 1 && (
+                <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
+                  第 {currentPage} 页，共 {totalPages} 页
+                </Typography>
+              )}
+
+              {/* Reply cards */}
+              {paginatedReplies.map((reply) => (
+                <Card
+                  key={reply.id}
+                  variant="outlined"
+                  sx={{ mb: 1, p: 1.5, bgcolor: "transparent" }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+                    <UserAvatar
+                      userProfile={reply.user}
+                      size={30}
+                    />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      {/* Name + reply target */}
+                      <Typography variant="caption" fontWeight="bold">
+                        {getDisplayName(reply.user)}
+                        {reply.reply_to && (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ ml: 0.5 }}
+                          >
+                            回复{" "}
+                            {reply.reply_to.user
+                              ? getDisplayName(reply.reply_to.user)
+                              : "匿名用户"}
+                          </Typography>
+                        )}
+                      </Typography>
+
+                      {/* Content */}
+                      <Typography
+                        variant="body2"
+                        sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                      >
+                        {reply.content}
+                      </Typography>
+
+                      {/* Timestamp */}
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                        {unixToReadable(reply.post_time)}
+                      </Typography>
+
+                      {/* Action buttons */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                          gap: 0.5,
+                          mt: 0.5,
+                        }}
+                      >
+                        <Button
+                          size="small"
+                          color={reply.like_status === 1 ? "primary" : "inherit"}
+                          startIcon={
+                            reply.like_status === 1 ? (
+                              <ThumbUpIcon fontSize="small" />
+                            ) : (
+                              <ThumbUpOutlinedIcon fontSize="small" />
+                            )
+                          }
+                          onClick={() => handleToggleLike(reply, 1)}
+                          sx={{ minWidth: 0, textTransform: "none" }}
+                        >
+                          {reply.like > 0 && reply.like}
+                        </Button>
+                        <Button
+                          size="small"
+                          color={reply.like_status === 2 ? "primary" : "inherit"}
+                          startIcon={
+                            reply.like_status === 2 ? (
+                              <ThumbDownIcon fontSize="small" />
+                            ) : (
+                              <ThumbDownOutlinedIcon fontSize="small" />
+                            )
+                          }
+                          onClick={() => handleToggleLike(reply, 2)}
+                          sx={{ minWidth: 0, textTransform: "none" }}
+                        >
+                          {reply.dislike > 0 && reply.dislike}
+                        </Button>
+                        <Button
+                          size="small"
+                          color="inherit"
+                          startIcon={<ReplyIcon fontSize="small" />}
+                          onClick={() => handleSetReplyTarget(reply)}
+                          sx={{ minWidth: 0, textTransform: "none" }}
+                        >
+                          回复
+                        </Button>
+                        {(reply.has_sub_replies || reply.reply_to) && (
+                          <Button
+                            size="small"
+                            color="inherit"
+                            startIcon={<ForumOutlinedIcon fontSize="small" />}
+                            onClick={() => handleOpenChain(reply.id)}
+                            sx={{ minWidth: 0, textTransform: "none" }}
+                          >
+                            查看对话
+                          </Button>
+                        )}
+                      </Box>
+                    </Box>
+                  </Box>
+                </Card>
+              ))}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                  <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={(_, page) => setCurrentPage(page)}
+                    size="small"
+                  />
+                </Box>
+              )}
+            </>
+          )}
+
+          {/* Reply chain dialog */}
+          <ReplyChainDialog
+            open={chainDialogOpen}
+            onClose={() => setChainDialogOpen(false)}
+            replyId={chainReplyId}
+          />
+        </Box>
+      </DialogContent>
+
+      <DialogActions>
+        {/* Reply input */}
+        {isLogin ? (
+          <Box ref={replyInputRef} sx={{ flex: "1", mx: 1 }}>
+            {/* Reply target preview */}
+            {replyTarget && (
+              <Box sx={{ mb: 1, display: "flex", flexDirection: "column" }}>
+                <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                  <Typography variant="body2" sx={{ display: "block" }}>
+                    正在回复 {getDisplayName(replyTarget.user)}
+                  </Typography>
+                  <Button
+                    size="small"
+                    color="error"
+                    onClick={handleClearReplyTarget}
+                    sx={{ ml: 1, minWidth: 0, textTransform: "none" }}
+                  >
+                    取消
+                  </Button>
+                </Box>
+
+                <Box
+                  sx={{
+                    p: 1,
+                    borderLeft: 3,
+                    borderColor: "divider",
+                    bgcolor: "action.hover",
+                    borderRadius: 1,
+                    fontStyle: "italic",
+                    flexGrow: "1",
+                    flex: "1"
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {truncateContent(replyTarget.content)}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
+            <TextField
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              placeholder="写下你的回复..."
+              multiline
+              minRows={2}
+              maxRows={6}
+              fullWidth
+              size="small"
+              variant="outlined"
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 1,
+                alignItems: "center",
+                mt: 1,
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isAnonymous}
+                    onChange={(e) => setIsAnonymous(e.target.checked)}
+                    size="small"
+                  />
+                }
+                label="匿名"
+                slotProps={{ typography: { variant: "body2" } }}
+              />
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleSubmitReply}
+                disabled={submitting}
+                disableElevation
+              >
+                {submitting ? <CircularProgress size={16} /> : "发布回复"}
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Alert
+            severity="info"
+            variant="outlined"
+            sx={{ mt: 1, cursor: "pointer" }}
+            onClick={() => showSnackbar("请先登录", "warning")}
+          >
+            登录后发布回复
+          </Alert>
+        )}
+      </DialogActions>
+    </Dialog>
   );
 }
