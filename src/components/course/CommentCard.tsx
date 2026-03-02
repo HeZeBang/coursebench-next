@@ -43,7 +43,7 @@ import { gradeEnum, termEnum } from "@/constants/info";
 import { semesterToReadable } from "@/utils/formatTime";
 import { useRouter } from "next/navigation";
 import ReplyPreview from "./ReplyPreview";
-import { useReplies } from "@/hooks";
+import { useLazyReplies } from "@/hooks";
 
 interface CommentCardProps {
   comment: Comment;
@@ -58,7 +58,7 @@ export default function CommentCard({
   const [likeCount, setLikeCount] = useState(comment.like);
   const [expanded, setExpanded] = useState(!comment.is_fold);
   const [commentOpen, setCommentOpen] = useState(false);
-  const { data: commentData, isLoading: isCommentLoading } = useReplies(comment.id, "hottest", false);
+  const { ref: cardRef, data: commentData, isLoading: isCommentLoading } = useLazyReplies(comment.id, "hottest", false);
 
   const router = useRouter();
 
@@ -147,7 +147,7 @@ export default function CommentCard({
   }
 
   return (
-    <Card variant="outlined" sx={{ mb: 2 }}>
+    <Card ref={cardRef} variant="outlined" sx={{ mb: 2 }}>
       <CardContent>
         {/* Header */}
         <Box

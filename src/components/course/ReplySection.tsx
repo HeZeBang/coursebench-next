@@ -89,9 +89,9 @@ export default function ReplyDialog({
 
   const replyInputRef = useRef<HTMLDivElement>(null);
 
-  // Fetch replies
+  // Fetch replies - only when dialog is open
   const { data, isLoading, mutate } = useReplies(
-    commentId,
+    open ? commentId : null,
     sortBy,
     true,
   );
@@ -242,6 +242,7 @@ export default function ReplyDialog({
                   value={sortBy}
                   exclusive
                   onChange={handleSortChange}
+                  disabled={totalCount <= 1}
                   size="small"
                 >
                   <ToggleButton value="latest">最新</ToggleButton>

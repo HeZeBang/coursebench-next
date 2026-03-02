@@ -10,3 +10,5 @@ export {
   useUserProfile,
   useRanklist,
 } from "./useApi";
+
+export { useLazyReplies } from "./useLazyReplies";
