@@ -26,7 +26,7 @@ import { unixToReadable, getUserDisplayName, timeAgo } from "@/utils";
 import api from "@/lib/api";
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import MarkdownRenderer from "@/components/mdx/MarkdownRenderer";
+import SmartMarkdown from "@/components/mdx/SmartMarkdown";
 import {
   AccessTime,
   RateReviewOutlined,
@@ -259,7 +259,7 @@ export default function CommentCard({
 
         {/* Content */}
         <Collapse in={expanded} sx={{ mt: 2 }}>
-          {comment.content && <MarkdownRenderer content={comment.content} />}
+          {comment.content && <SmartMarkdown content={comment.content} />}
         </Collapse>
 
         {comment.is_fold && !expanded && (

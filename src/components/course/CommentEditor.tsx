@@ -33,10 +33,10 @@ import {
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import api from "@/lib/api";
 import type { CourseGroup, Comment } from "@/types";
-import MdxRenderer from "@/components/mdx/MdxRenderer";
-import { serializeMdx } from "@/lib/mdx";
-import type { MDXRemoteSerializeResult } from "next-mdx-remote";
+import MarkdownRenderer from "@/components/mdx/MarkdownRenderer";
 import { Grid } from "@mui/material";
+import UserAvatar from "../user/UserAvatar";
+import { useAuth } from "@/contexts/AuthContext";
 
 /**
  * Pure editor form — renders DialogTitle + DialogContent + DialogActions.
@@ -75,7 +75,7 @@ export default function CommentEditor({
   const [scores, setScores] = useState<number[]>(
     existingComment?.score ?? [3, 3, 3, 3],
   );
-  const [groupId, setGroupId] = useState(existingComment?.group?.id ?? null);
+  const [groupId, setGroupId] = useState(existingComment?.group?.id ?? undefined);
   const [year, setYear] = useState(
     existingComment?.semester ? String(Math.floor(existingComment.semester / 100)) : "",
   );
@@ -85,15 +85,15 @@ export default function CommentEditor({
   const [isAnonymous, setIsAnonymous] = useState(
     existingComment?.is_anonymous ?? true,
   );
-  const [previewContent, setPreviewContent] =
-    useState<MDXRemoteSerializeResult | null>(null);
+
+  const { userProfile } = useAuth();
 
   // Reset form when switching between edit targets
   useEffect(() => {
     setTitle(existingComment?.title ?? "");
     setContent(existingComment?.content ?? "");
     setScores(existingComment?.score ?? [3, 3, 3, 3]);
-    setGroupId(existingComment?.group?.id ?? null);
+    setGroupId(existingComment?.group?.id ?? undefined);
     setYear(
       existingComment?.semester ? String(Math.floor(existingComment.semester / 100)) : "",
     );
@@ -105,14 +105,7 @@ export default function CommentEditor({
     setTab(0);
   }, [existingComment]);
 
-  // Serialize markdown for preview when content or tab changes
-  useEffect(() => {
-    if (tab === 1 && content) {
-      serializeMdx(content)
-        .then(setPreviewContent)
-        .catch(() => setPreviewContent(null));
-    }
-  }, [content, tab]);
+
 
   const handleScoreChange = useCallback(
     (index: number, value: number) => {
@@ -223,8 +216,25 @@ export default function CommentEditor({
           </Alert>
         )}
 
+        <Box sx={{ display: "flex", gap: 2, alignItems: "baseline" }}>
+          <UserAvatar userProfile={isAnonymous? null : userProfile} size={40} />
+
+          {/* Title */}
+          <TextField
+            fullWidth
+            variant="standard"
+            size="small"
+            label="标题"
+            required
+            error={title == ""}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+        </Box>
+
         {/* Teacher select + Year + Semester */}
-        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel variant="standard" required error={!groupId}>教师</InputLabel>
             <Select
@@ -274,56 +284,19 @@ export default function CommentEditor({
               ))}
             </Select>
           </FormControl>
-        </Box>
-
-        {/* Title */}
-        <TextField
-          fullWidth
-          variant="standard"
-          size="small"
-          label="标题"
-          required
-          error={title == ""}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-
-        {/* Score sliders */}
-        <Grid sx={{ mb: 2 }}>
-          {judgeItems.map((label, i) => (
-            <Grid key={label} sx={{ mb: 1 }} size={{ sm: 6, md: 6 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="body2">{label}</Typography>
-                <Typography variant="body2">
-                  {gradingEmojis[scores[i] - 1]}{" "}
-                  {gradingInfo[
-                    ["quality", "workload", "difficulty", "distribution"][
-                      i
-                    ] as keyof typeof gradingInfo
-                  ]?.[scores[i] - 1] ?? ""}
-                </Typography>
-              </Box>
-              <Slider
-                value={scores[i]}
-                min={1}
-                max={5}
-                step={1}
-                onChange={(_, val) => handleScoreChange(i, val as number)}
-                marks
-                sx={{
-                  color: gradingInfo.color[scores[i] - 1] ?? "#B0B0B0",
-                }}
+          
+          {/* Anonymous toggle */}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
               />
-            </Grid>
-          ))}
-        </Grid>
+            }
+            label="匿名发布"
+            sx={{ mt: 1 }}
+          />
+        </Box>
 
         {/* Content: Edit / Preview tabs */}
         <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 1 }}>
@@ -354,13 +327,7 @@ export default function CommentEditor({
             }}
           >
             {content ? (
-              previewContent ? (
-                <MdxRenderer source={previewContent} />
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  渲染中...
-                </Typography>
-              )
+              <MarkdownRenderer content={content} />
             ) : (
               <Typography variant="body2" color="text.secondary">
                 预览区域（无内容）
@@ -368,18 +335,44 @@ export default function CommentEditor({
             )}
           </Box>
         )}
+        
 
-        {/* Anonymous toggle */}
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-            />
-          }
-          label="匿名发布"
-          sx={{ mt: 1 }}
-        />
+        {/* Score sliders */}
+        <Grid container columns={{ xs: 1, sm: 2, md: 4 }} spacing={2} sx={{ mt: 2 }}>
+          {judgeItems.map((label, i) => (
+            <Grid key={label} size={1}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="body2">{label}</Typography>
+                <Typography variant="body2">
+                  {gradingEmojis[scores[i] - 1]}{" "}
+                  {gradingInfo[
+                    ["quality", "workload", "difficulty", "distribution"][
+                      i
+                    ] as keyof typeof gradingInfo
+                  ]?.[scores[i] - 1] ?? ""}
+                </Typography>
+              </Box>
+              <Slider
+                value={scores[i]}
+                min={1}
+                max={5}
+                step={1}
+                size="small"
+                onChange={(_, val) => handleScoreChange(i, val as number)}
+                marks
+                sx={{
+                  color: gradingInfo.color[scores[i] - 1] ?? "#B0B0B0",
+                }}
+              />
+            </Grid>
+          ))}
+        </Grid>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>

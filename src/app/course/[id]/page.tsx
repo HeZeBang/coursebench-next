@@ -129,8 +129,8 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       <SpeedDial
         ariaLabel="SpeedDial basic example"
         sx={{ position: 'fixed', 
-            bottom: { sm: 16, md: 32 }, 
-            right: { sm: 16, md: 32 },
+            bottom: { xs: 16, md: 32 }, 
+            right: { xs: 16, md: 32 },
             "& .MuiSpeedDialIcon-icon": {
               mb: "4px !important"
             }
