@@ -23,8 +23,9 @@ import {
 import { EmptyState } from "@/components/layout";
 import { sortCmp } from "@/utils";
 import type { Comment, CommentSortKey, SortOrder } from "@/types";
-import { Card, CardContent, CardHeader, Divider, SpeedDial, SpeedDialAction, SpeedDialIcon, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Card, CardContent, CardHeader, Divider, Slider, SpeedDial, SpeedDialAction, SpeedDialIcon, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { ArrowUpward, Edit } from "@mui/icons-material";
+import { nowYear, startYear } from "@/constants/forms";
 
 interface CourseDetailPageProps {
   params: Promise<{ id: string }>;
@@ -48,6 +49,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const [selectedGroupIds, setSelectedGroupIds] = useState<number[]>([]);
   const [commentSort, setCommentSort] = useState<CommentSortKey>("post_time");
   const [order, setOrder] = useState<SortOrder>("desc");
+  const [yearRange, setYearRange] = useState<number[]>([startYear, nowYear]);
   const [isInitialized, setIsInitialized] = useState(false);
 
   const course = courseData?.data;
@@ -91,8 +93,11 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     }
     
     result.sort(sortCmp<Comment>(commentSort, order));
-    return result;
-  }, [comments, selectedGroupIds, commentSort, course?.groups.length, order]);
+
+    return result.filter((i) => 
+        (i.semester / 100 >= (yearRange.at(0) || startYear) && 
+         i.semester / 100 <= (yearRange.at(1) || nowYear)));
+  }, [comments, selectedGroupIds, commentSort, course?.groups.length, order, yearRange]);
 
   if (courseLoading) {
     return (
@@ -168,6 +173,10 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ position: "sticky", top: "100px" }}>
             <CardContent>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                排序和筛选
+              </Typography>
+
               <Box sx={{ display: "flex", gap: 1 }}>
                 <FormControl size="small" sx={{ minWidth: 120 }}>
                   <InputLabel>排序方式</InputLabel>
@@ -197,7 +206,23 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 </ToggleButtonGroup>
               </Box>
 
-              <Divider variant="middle" sx={{ my: 2 }} />
+              <Divider variant="fullWidth" sx={{ my: 2 }} />
+              
+              <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
+                <Typography variant="caption" color="textSecondary">
+                  {startYear}
+                </Typography>
+                <Slider
+                  value={yearRange}
+                  onChange={(_, v) => setYearRange(v)}
+                  valueLabelDisplay="auto"
+                  min={startYear}
+                  max={nowYear}
+                />
+                <Typography variant="caption" color="textSecondary">
+                  {nowYear}
+                </Typography>
+              </Box>
 
               <TeacherGroupFilter
                 groups={course.groups}

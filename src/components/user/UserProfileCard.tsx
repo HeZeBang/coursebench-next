@@ -54,6 +54,10 @@ export default function UserProfileCard({ user }: UserProfileCardProps) {
             {user.realname}
           </Typography>
         )}
+        
+        <Typography variant="body2" color="text.secondary">
+          {user.email}
+        </Typography>
         <Box
           sx={{
             mt: 1,

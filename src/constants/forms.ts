@@ -12,8 +12,8 @@ export const visibleItems: SelectOption[] = [
   { label: "公开", value: "public" },
 ];
 
-const startYear = 2014;
-const nowYear = new Date().getFullYear();
+export const startYear = 2014;
+export const nowYear = new Date().getFullYear();
 
 export const rawYearItems: number[] = Array.from(
   { length: nowYear - startYear + 1 },
