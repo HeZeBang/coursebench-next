@@ -7,4 +7,7 @@ export { default as CommentCard } from "./CommentCard";
 export { default as CommentEditor } from "./CommentEditor";
 export { default as CommentDialog } from "./CommentDialog";
 export { default as WriteCommentButton } from "./WriteCommentButton";
+export { default as ReplySection } from "./ReplySection";
+export { default as ReplyChainDialog } from "./ReplyChainDialog";
+export { default as ReplyChainTree } from "./ReplyChainTree";
 export { useCommentDialog } from "./useCommentDialog";

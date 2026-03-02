@@ -54,17 +54,53 @@ export interface Comment {
   reward: number;
 }
 
+/** User attached to a reply */
+export interface ReplyUser {
+  id: number;
+  nickname: string;
+  avatar: string;
+  is_anonymous: boolean;
+}
+
+/** The "reply_to" target (parent reply info) */
+export interface ReplyTarget {
+  reply_id: number;
+  user: ReplyUser | null;
+}
+
+/** A single reply from the backend */
 export interface Reply {
   id: number;
   comment_id: number;
-  user_id: number;
-  user_nickname: string;
-  user_is_anonymous: boolean;
+  parent_reply_id: number | null;
   content: string;
-  like_count: number;
-  created_at: number;
-  updated_at: number;
-  is_liked: boolean;
-  parent_id: number;
-  replies?: Reply[];
+  post_time: number;
+  update_time: number;
+  like: number;
+  dislike: number;
+  like_status: number; // 0=none, 1=liked, 2=disliked
+  is_anonymous: boolean;
+  has_sub_replies: boolean;
+  user: ReplyUser | null;
+  reply_to: ReplyTarget | null;
+}
+
+/** Tree node used in reply chain descendants */
+export interface ReplyTreeNode {
+  reply: Reply;
+  children: ReplyTreeNode[];
+}
+
+/** Response from GET /comment/:id/replies */
+export interface ReplyListData {
+  total_count: number;
+  filtered_count: number;
+  replies: Reply[];
+}
+
+/** Response from GET /reply/:id/chain */
+export interface ReplyChainData {
+  ancestors: Reply[];
+  current: Reply;
+  descendants: ReplyTreeNode[];
 }

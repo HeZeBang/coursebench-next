@@ -5,6 +5,7 @@ export {
   useCommentsByUser,
   useRecentComments,
   useReplies,
+  useReplyChain,
   useTeacher,
   useUserProfile,
   useRanklist,

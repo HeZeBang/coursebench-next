@@ -30,6 +30,7 @@ import SmartMarkdown from "@/components/mdx/SmartMarkdown";
 import {
   AccessTime,
   RateReviewOutlined,
+  Reply,
   SchoolOutlined,
   SubtitlesOutlined,
   ThumbDown,
@@ -42,15 +43,14 @@ import { userAgent } from "next/server";
 import { gradeEnum, termEnum } from "@/constants/info";
 import { semesterToReadable } from "@/utils/formatTime";
 import { useRouter } from "next/navigation";
+import ReplySection from "./ReplySection";
 
 interface CommentCardProps {
   comment: Comment;
-  onReplyClick?: (commentId: number) => void;
 }
 
 export default function CommentCard({
   comment,
-  onReplyClick,
 }: CommentCardProps) {
   const { isLogin, userProfile } = useAuth();
   const showSnackbar = useSnackbar();
@@ -302,8 +302,7 @@ export default function CommentCard({
           }}
         >
           <Button
-            variant="contained"
-            color={likeStatus === 1 ? "primary" : "inherit"}
+            variant={likeStatus === 1 ? "contained" : "outlined"}
             onClick={() => {
               handleLike(1);
             }}
@@ -315,8 +314,7 @@ export default function CommentCard({
             赞同 {likeCount}
           </Button>
           <Button
-            variant="contained"
-            color={likeStatus === 2 ? "primary" : "inherit"}
+            variant={likeStatus === 2 ? "contained" : "outlined"}
             onClick={() => {
               handleLike(2);
             }}
@@ -328,12 +326,21 @@ export default function CommentCard({
             反对
           </Button>
 
-          {onReplyClick && (
-            <IconButton size="small" onClick={() => onReplyClick(comment.id)}>
-              <ChatBubbleOutlineIcon fontSize="small" />
-            </IconButton>
-          )}
+          <Button
+            variant="outlined"
+            onClick={() => {
+            }}
+            startIcon={<Reply />}
+            size="small"
+            disabled={!isLogin || (userProfile?.id === comment.user?.id)}
+            disableElevation
+          >
+            回复
+          </Button>
         </Box>
+
+        {/* Nested replies (楼中楼) */}
+        <ReplySection commentId={comment.id} />
       </CardContent>
     </Card>
   );

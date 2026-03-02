@@ -13,6 +13,11 @@ export type {
   CommentCourse,
   CommentGroup,
   Reply,
+  ReplyUser,
+  ReplyTarget,
+  ReplyTreeNode,
+  ReplyListData,
+  ReplyChainData,
 } from "./comment";
 export type {
   UserProfile,

@@ -5,6 +5,8 @@ import type {
   CourseDetail,
   Comment,
   Reply,
+  ReplyListData,
+  ReplyChainData,
   Teacher,
   UserProfile,
 } from "@/types";
@@ -44,9 +46,17 @@ export function useRecentComments() {
   return useSWR<ApiResponse<Comment[]>>("/v1/comment/recent");
 }
 
-export function useReplies(commentId: number | string) {
-  return useSWR<ApiResponse<Reply[]>>(
-    commentId ? `/v1/reply/${commentId}/chain` : null,
+export function useReplies(commentId: number | string | null, sort = "latest", showAll = false) {
+  return useSWR<ApiResponse<ReplyListData>>(
+    commentId
+      ? `/v1/comment/${commentId}/replies?sort=${sort}&all=${showAll ? 1 : 0}`
+      : null,
+  );
+}
+
+export function useReplyChain(replyId: number | string | null) {
+  return useSWR<ApiResponse<ReplyChainData>>(
+    replyId ? `/v1/reply/${replyId}/chain` : null,
   );
 }
 
