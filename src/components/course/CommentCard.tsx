@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Collapse from "@mui/material/Collapse";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import Link from "next/link";
 
 import { useState, useCallback } from "react";
 
@@ -35,7 +36,7 @@ import {
   ThumbUpAltOutlined,
   Update,
 } from "@mui/icons-material";
-import { Alert, Button, ButtonBase, Divider, Link } from "@mui/material";
+import { Alert, Button, ButtonBase, Divider, Link as MuiLink } from "@mui/material";
 import { judgeToKey } from "@/constants/scores";
 import UserAvatar from "../user/UserAvatar";
 import { userAgent } from "next/server";
@@ -44,6 +45,7 @@ import { semesterToReadable } from "@/utils/formatTime";
 import { useRouter } from "next/navigation";
 import ReplyPreview from "./ReplyPreview";
 import { useLazyReplies } from "@/hooks";
+import { default as NextLink } from "next/link";
 
 interface CommentCardProps {
   comment: Comment;
@@ -93,8 +95,11 @@ export default function CommentCard({ comment }: CommentCardProps) {
 
         setLikeStatus(newStatus);
         setLikeCount((c) => c + countChange);
-      } catch {
-        showSnackbar("操作失败", "error");
+      } catch (err: unknown) {
+        const msg =
+        (err as { response?: { data?: { msg?: string } } })?.response?.data
+          ?.msg ?? "操作失败";
+        showSnackbar(msg, "error");
       }
     },
     [comment.id, likeStatus, isLogin, showSnackbar],
@@ -135,14 +140,13 @@ export default function CommentCard({ comment }: CommentCardProps) {
         <CardContent>
           <Alert severity="error">
             由于违反
-            <Link
-              onClick={() => {
-                router.push("/terms-of-service");
-              }}
+            <MuiLink
+              component={NextLink}
+              href="/terms-of-service"
               sx={{ cursor: "pointer" }}
             >
               相关社区规定
-            </Link>
+            </MuiLink>
             ，该评论已被隐藏
           </Alert>
         </CardContent>
@@ -171,9 +175,8 @@ export default function CommentCard({ comment }: CommentCardProps) {
             }}
           >
             <ButtonBase
-              onClick={() => {
-                router.push(comment.user ? `/user/${comment.user.id}` : "#");
-              }}
+              component={Link}
+              href={comment.user ? `/user/${comment.user.id}` : "#"}
             >
               <UserAvatar
                 userProfile={comment.user}
@@ -191,10 +194,9 @@ export default function CommentCard({ comment }: CommentCardProps) {
               <Typography fontWeight={800} color="textSecondary">
                 {comment.user ? (
                   <ButtonBase
+                    component={Link}
+                    href={`/user/${comment.user.id}`}
                     sx={{ mx: -0.5, px: 0.5, borderRadius: 0.5 }}
-                    onClick={() => {
-                      router.push(`/user/${comment.user?.id}`);
-                    }}
                   >
                     {displayName}
                   </ButtonBase>
@@ -299,22 +301,21 @@ export default function CommentCard({ comment }: CommentCardProps) {
         {comment.is_fold && (
           <Alert sx={{ mb: 2 }} severity="warning">
             此评论可能包含违反
-            <Link
-              onClick={() => {
-                router.push("/terms-of-service");
-              }}
+            <MuiLink
+              component={NextLink}
+              href="/terms-of-service"
               sx={{ cursor: "pointer" }}
             >
               相关社区规定
-            </Link>
+            </MuiLink>
             的内容而被折叠，
-            <Link
+            <MuiLink
               variant="body2"
               onClick={() => setExpanded(!expanded)}
               sx={{ cursor: "pointer" }}
             >
               点击{expanded ? "收起" : "展开"}
-            </Link>
+            </MuiLink>
           </Alert>
         )}
 

@@ -42,9 +42,9 @@ export default function RootLayout({
               <SearchProvider>
                 <SnackbarProvider>
                   <CourseFilterProvider>
-                    <Suspense fallback={null}>
-                      <ProgressBar />
-                    </Suspense>
+                    {/* <Suspense fallback={null}> */}
+                    {/* </Suspense> */}
+                    <ProgressBar />
                     <Header />
                     <main className="flex-1">{children}</main>
                     <Footer />

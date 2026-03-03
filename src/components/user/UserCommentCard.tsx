@@ -11,7 +11,7 @@ import Chip from "@mui/material/Chip";
 import type { Comment } from "@/types";
 import { getInstituteColor, getScoreInfo } from "@/constants";
 import { unixToReadable, getUserDisplayName } from "@/utils";
-import { Badge, Button, CardActions, CardMedia, Stack } from "@mui/material";
+import { Badge, Button, ButtonBase, CardActions, CardMedia, Stack } from "@mui/material";
 import { semesterToReadable, timeAgo } from "@/utils/formatTime";
 import {
   AccessTime,
@@ -87,7 +87,13 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
                 }}
               >
                 <Typography fontWeight={800} color="textSecondary">
-                  {comment.course.name}
+                  <ButtonBase
+                    component={Link}
+                    href={`/course/${comment.course.id}`}
+                    sx={{ mx: -0.5, px: 0.5, borderRadius: 0.5 }}
+                  >
+                    {comment.course.name}
+                  </ButtonBase>
                 </Typography>
                 <Chip
                   label={comment.course.code}
@@ -101,7 +107,6 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
                     "& .MuiChip-label": {
                       px: 0.5,
                     },
-                    mb: 0.3,
                   }}
                 />
               </Box>
@@ -191,9 +196,8 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
       </CardContent>
       <CardActions sx={{ mt: -5 }}>
         <Button
-          onClick={() =>
-            router.push(`/course/${comment.course.id}?answer=${comment.id}`)
-          }
+          component={Link}
+          href={`/course/${comment.course.id}?answer=${comment.id}`}
         >
           阅读更多
         </Button>

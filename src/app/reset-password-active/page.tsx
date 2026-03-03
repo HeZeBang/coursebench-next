@@ -19,6 +19,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 import api from "@/lib/api";
+import Link from "next/link";
 
 function ResetPasswordActiveContent() {
   const searchParams = useSearchParams();
@@ -149,7 +150,7 @@ function ResetPasswordActiveContent() {
           )}
           {(status === "success" || (status === "error" && !id)) && (
             <Box sx={{ mt: 3 }}>
-              <Button variant="contained" onClick={() => router.push("/")}>
+              <Button variant="contained" component={Link} href="/">
                 返回首页
               </Button>
             </Box>

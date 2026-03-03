@@ -13,6 +13,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 
 import api from "@/lib/api";
+import Link from "next/link";
 
 function ActiveContent() {
   const searchParams = useSearchParams();
@@ -88,7 +89,7 @@ function ActiveContent() {
             </>
           )}
           <Box sx={{ mt: 3 }}>
-            <Button variant="contained" onClick={() => router.push("/")}>
+            <Button variant="contained" component={Link} href="/">
               返回首页
             </Button>
           </Box>

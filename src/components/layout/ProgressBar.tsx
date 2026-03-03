@@ -1,40 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
-
-NProgress.configure({ showSpinner: false, speed: 300 });
+import { ProgressProvider } from '@bprogress/next/app';
 
 /**
  * NProgress route-change indicator.
  * Placed in root layout to track App Router navigations.
  */
 export default function ProgressBar() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    NProgress.done();
-  }, [pathname, searchParams]);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const anchor = (e.target as HTMLElement).closest("a");
-      if (
-        anchor &&
-        anchor.href &&
-        anchor.target !== "_blank" &&
-        !anchor.href.startsWith("#") &&
-        anchor.origin === window.location.origin
-      ) {
-        NProgress.start();
-      }
-    };
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, []);
-
-  return null;
+  return <ProgressProvider
+    height="2px"
+    color="#1976d2"
+    options={{ showSpinner: false }}
+    shallowRouting
+  />;
 }
