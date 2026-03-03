@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, Suspense, useRef } from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
 import { Button, Box, Collapse } from "@mui/material";
 import {
@@ -18,6 +18,7 @@ export default function SmartMarkdown({
   noExpand?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   const { lines, shouldCollapse, preview } = useMemo(() => {
     const lineArray = content.split("\n");
@@ -44,22 +45,37 @@ export default function SmartMarkdown({
         alignItems: "flex-start",
       }}
     >
-      {/* <Collapse in={expanded} collapsedSize={`${COLLAPSE_LINES * 1.5}em`}> */}
-      {expanded ? (
-        <MarkdownRenderer content={content} />
-      ) : (
-        <MarkdownRenderer
-          content={preview}
-          className="markdown-body [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]"
-        />
-      )}
-      {/* </Collapse> */}
+      <div ref={ref} /> {/* Anchor for scrollIntoView */}
+      <Collapse
+        in={expanded} 
+        collapsedSize={`${COLLAPSE_LINES * 1.5}em`}
+        className={!expanded ? "[mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]" : ""}>
+        <Suspense fallback={
+          <MarkdownRenderer content={preview} />
+        }>
+          <MarkdownRenderer
+            content={content}
+          />
+        </Suspense>
+      </Collapse>
 
       {!noExpand && (
         <Button
-          onClick={() => setExpanded(!expanded)}
+          onClick={() => {
+            if (expanded && ref.current) {
+              const elementPosition = ref.current.getBoundingClientRect().top + window.pageYOffset;
+              const offsetPosition = elementPosition - 300;
+
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+              });
+            }
+
+            setExpanded(!expanded);
+          }}
           size="small"
-          sx={{ mt: expanded ? -1 : 1, mb: 1, alignSelf: "center" }}
+          sx={{ mb: 1, alignSelf: "center" }}
           startIcon={expanded ? <KeyboardDoubleArrowUpOutlined /> : <KeyboardDoubleArrowDownOutlined />}
           variant="outlined"
         >
