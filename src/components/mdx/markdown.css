@@ -115,6 +115,11 @@ ol {
   }
 }
 
+.markdown-body pre {
+  white-space: pre-wrap;
+  line-height: 1.25;
+}
+
 .markdown-body table tbody > :nth-child(2n) {
   background-color: rgba(160, 160, 160, 0.1);
 }
