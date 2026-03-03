@@ -197,7 +197,7 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
       <CardActions sx={{ mt: -5 }}>
         <Button
           component={Link}
-          href={`/course/${comment.course.id}?answer=${comment.id}`}
+          href={`/course/${comment.course.id}#comment-${comment.id}`}
         >
           阅读更多
         </Button>

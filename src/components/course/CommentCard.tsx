@@ -30,13 +30,14 @@ import {
   ChatBubbleOutline,
   RateReviewOutlined,
   SchoolOutlined,
+  Share,
   SubtitlesOutlined,
   ThumbDown,
   ThumbDownAltOutlined,
   ThumbUpAltOutlined,
   Update,
 } from "@mui/icons-material";
-import { Alert, Button, ButtonBase, Divider, Link as MuiLink } from "@mui/material";
+import { Alert, Button, ButtonBase, Divider, IconButton, Link as MuiLink } from "@mui/material";
 import { judgeToKey } from "@/constants/scores";
 import UserAvatar from "../user/UserAvatar";
 import { userAgent } from "next/server";
@@ -155,7 +156,7 @@ export default function CommentCard({ comment }: CommentCardProps) {
   }
 
   return (
-    <Card ref={cardRef} variant="outlined" sx={{ mb: 2 }}>
+    <Card ref={cardRef} id={`comment-${comment.id}`} variant="outlined" sx={{ mb: 2 }}>
       <CardContent>
         {/* Header */}
         <Box
@@ -370,8 +371,25 @@ export default function CommentCard({ comment }: CommentCardProps) {
             sx={{ textTransform: "none" }}
             loading={isCommentLoading}
           >
-            {commentData?.data.total_count ?? ""} 条回复
+            {commentData?.data.total_count ?? ""}
           </Button>
+
+          <IconButton
+            aria-label="share"
+            size="small"
+            onClick={() => {
+              // clipboard copy url
+              navigator.clipboard.
+                writeText(`${window.location.origin}/course/${comment.course.id}#comment-${comment.id}`)
+                .then(() => {
+                  showSnackbar("评论链接已复制到剪贴板", "success");
+                }).catch(() => {
+                  showSnackbar("复制链接失败，请手动复制", "error");
+                });
+            }}
+          >
+            <Share fontSize="small" sx={{ color: "primary.main" }} />
+          </IconButton>
         </Box>
 
         {/* Reply preview: button + featured replies */}

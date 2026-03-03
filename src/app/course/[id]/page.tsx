@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, use } from "react";
+import { useState, useMemo, use, useEffect } from "react";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -66,6 +66,27 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const [order, setOrder] = useState<SortOrder>("desc");
   const [yearRange, setYearRange] = useState<number[]>([startYear, nowYear]);
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Scroll to comment anchored in URL hash after loading
+  useEffect(() => {
+    if (commentsLoading || !isInitialized) return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    const timer = setTimeout(() => {
+      const el = document.getElementById(hash.slice(1));
+      if (el) {
+        // el.scrollIntoView({ behavior: "smooth", block: "start" });
+        const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - 100;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [commentsLoading, isInitialized]);
 
   const course = courseData?.data;
   const comments = commentsData?.data ?? [];

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
-import { Button, Box } from "@mui/material";
+import { Button, Box, Collapse } from "@mui/material";
 import {
   KeyboardDoubleArrowDownOutlined,
   KeyboardDoubleArrowUpOutlined,
@@ -36,34 +36,6 @@ export default function SmartMarkdown({
     return <MarkdownRenderer content={content} />;
   }
 
-  if (!expanded) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        <MarkdownRenderer
-          content={preview}
-          className="markdown-body [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]"
-        />
-        {!noExpand && (
-          <Button
-            onClick={() => setExpanded(true)}
-            size="small"
-            sx={{ mt: -1, mb: 1, alignSelf: "center" }}
-            startIcon={<KeyboardDoubleArrowDownOutlined />}
-            variant="outlined"
-          >
-            展开全文
-          </Button>
-        )}
-      </Box>
-    );
-  }
-
   return (
     <Box
       sx={{
@@ -72,16 +44,28 @@ export default function SmartMarkdown({
         alignItems: "flex-start",
       }}
     >
-      <MarkdownRenderer content={content} />
-      <Button
-        onClick={() => setExpanded(false)}
-        size="small"
-        sx={{ my: 1, alignSelf: "center" }}
-        startIcon={<KeyboardDoubleArrowUpOutlined />}
-        variant="outlined"
-      >
-        收起全文
-      </Button>
+      {/* <Collapse in={expanded} collapsedSize={`${COLLAPSE_LINES * 1.5}em`}> */}
+      {expanded ? (
+        <MarkdownRenderer content={content} />
+      ) : (
+        <MarkdownRenderer
+          content={preview}
+          className="markdown-body [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]"
+        />
+      )}
+      {/* </Collapse> */}
+
+      {!noExpand && (
+        <Button
+          onClick={() => setExpanded(!expanded)}
+          size="small"
+          sx={{ mt: expanded ? -1 : 1, mb: 1, alignSelf: "center" }}
+          startIcon={expanded ? <KeyboardDoubleArrowUpOutlined /> : <KeyboardDoubleArrowDownOutlined />}
+          variant="outlined"
+        >
+          {expanded ? "收起全文" : "展开全文"}
+        </Button>
+      )}
     </Box>
   );
 }
