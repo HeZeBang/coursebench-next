@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Card from "@mui/material/Card";
-import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -78,38 +77,38 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
                 gap: 0.1,
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 0.5,
-                  alignItems: "baseline",
-                  flexWrap: "wrap",
-                }}
+              <ButtonBase
+                component={Link}
+                href={`/course/${comment.course.id}`}
+                sx={{ mx: -0.5, pb: 0.3, px: 0.5, borderRadius: 0.5 }}
               >
-                <Typography fontWeight={800} color="textSecondary">
-                  <ButtonBase
-                    component={Link}
-                    href={`/course/${comment.course.id}`}
-                    sx={{ mx: -0.5, px: 0.5, borderRadius: 0.5 }}
-                  >
-                    {comment.course.name}
-                  </ButtonBase>
-                </Typography>
-                <Chip
-                  label={comment.course.code}
-                  size="small"
+                <Box
                   sx={{
-                    backgroundColor: instColor,
-                    color: "white",
-                    fontSize: "0.65rem",
-                    height: "1rem",
-                    borderRadius: 0.8,
-                    "& .MuiChip-label": {
-                      px: 0.5,
-                    },
+                    display: "flex",
+                    gap: 0.5,
+                    alignItems: "baseline",
+                    flexWrap: "wrap",
                   }}
-                />
-              </Box>
+                >
+                  <Typography fontWeight={800} color="textSecondary">
+                    {comment.course.name}
+                  </Typography>
+                  <Chip
+                    label={comment.course.code}
+                    size="small"
+                    sx={{
+                      backgroundColor: instColor,
+                      color: "white",
+                      fontSize: "0.65rem",
+                      height: "1rem",
+                      borderRadius: 0.8,
+                      "& .MuiChip-label": {
+                        px: 0.5,
+                      },
+                    }}
+                  />
+                </Box>
+              </ButtonBase>
               <Typography variant="caption" color="textSecondary">
                 {displayName}
               </Typography>

@@ -390,40 +390,40 @@ export default function RegisterDialog({
               立即登录
             </Link>
           </Box>
-        </Box>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          {activeStep > 0 ? (
-            <Button onClick={() => setActiveStep((s) => s - 1)}>上一步</Button>
-          ) : (
-            <Button variant="text" onClick={handleClose}>
-              取消
-            </Button>
-          )}
-          {activeStep === 0 && (
-            <Button variant="contained" onClick={handleEmailNext}>
-              下一步
-            </Button>
-          )}
-          {activeStep === 1 && (
-            <Button variant="contained" onClick={handlePasswordNext}>
-              下一步
-            </Button>
-          )}
-          {activeStep === 2 && (
-            <Button variant="contained" onClick={handleInfoNext}>
-              下一步
-            </Button>
-          )}
-          {activeStep === 3 && (
-            <Button
-              variant="contained"
-              onClick={handleRegister}
-              disabled={loading || !captcha || !acceptTerms}
-              startIcon={loading ? <CircularProgress size={16} /> : undefined}
-            >
-              注册
-            </Button>
-          )}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {activeStep > 0 ? (
+              <Button onClick={() => setActiveStep((s) => s - 1)}>上一步</Button>
+            ) : (
+              <Button variant="text" onClick={handleClose}>
+                取消
+              </Button>
+            )}
+            {activeStep === 0 && (
+              <Button variant="contained" onClick={handleEmailNext}>
+                下一步
+              </Button>
+            )}
+            {activeStep === 1 && (
+              <Button variant="contained" onClick={handlePasswordNext}>
+                下一步
+              </Button>
+            )}
+            {activeStep === 2 && (
+              <Button variant="contained" onClick={handleInfoNext}>
+                下一步
+              </Button>
+            )}
+            {activeStep === 3 && (
+              <Button
+                variant="contained"
+                onClick={handleRegister}
+                disabled={loading || !captcha || !acceptTerms}
+                startIcon={loading ? <CircularProgress size={16} /> : undefined}
+              >
+                注册
+              </Button>
+            )}
+          </Box>
         </Box>
       </DialogActions>
     </Dialog>

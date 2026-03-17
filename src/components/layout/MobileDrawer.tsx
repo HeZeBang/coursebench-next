@@ -7,7 +7,6 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import Logo from "../Logo";
@@ -20,13 +19,13 @@ interface NavLink {
 interface MobileDrawerProps {
   open: boolean;
   onClose: () => void;
-  navLinks: NavLink[];
+  children?: React.ReactNode;
 }
 
 export default function MobileDrawer({
   open,
   onClose,
-  navLinks,
+  children,
 }: MobileDrawerProps) {
   const pathname = usePathname();
 
@@ -35,20 +34,7 @@ export default function MobileDrawer({
       <Box sx={{ width: 260, pt: 2 }}>
         <Logo width={120} sx={{ mx: 2 }} />
         <Divider />
-        <List>
-          {navLinks.map((link) => (
-            <ListItem key={link.href} disablePadding>
-              <ListItemButton
-                component={Link}
-                href={link.href}
-                selected={pathname === link.href}
-                onClick={onClose}
-              >
-                <ListItemText primary={link.label} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+        {children}
       </Box>
     </Drawer>
   );

@@ -38,6 +38,10 @@ import {
   Collapse,
   Divider,
   Fab,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   Slide,
   Tab,
   Tabs,
@@ -64,8 +68,8 @@ function ElevationScroll(props: {
 
   return children
     ? React.cloneElement(children, {
-        elevation: trigger ? 4 : 0,
-      })
+      elevation: trigger ? 4 : 0,
+    })
     : null;
 }
 
@@ -309,9 +313,10 @@ export default function Header() {
                 </Menu>
               </>
             ) : (
-              <Box sx={{ display: "flex", gap: 1 }}>
+              <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1 }}>
                 <Button
                   variant="contained"
+                  disableElevation
                   size="small"
                   onClick={() => setLoginOpen(true)}
                 >
@@ -395,8 +400,49 @@ export default function Header() {
       <MobileDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        navLinks={navLinks.map((l) => ({ ...l }))}
-      />
+      >
+        <List>
+          {navLinks.map((link) => (
+            <ListItem key={link.href} disablePadding>
+              <ListItemButton
+                component={Link}
+                href={link.href}
+                selected={pathname === link.href}
+                onClick={() => setDrawerOpen(false)}
+              >
+                <ListItemText primary={link.label} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        {(!isLogin || !userProfile) && (
+          <>
+            <Divider />
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    setLoginOpen(true);
+                  }}
+                >
+                  <ListItemText primary="登录" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    setRegisterOpen(true);
+                  }}
+                >
+                  <ListItemText primary="注册" />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </>
+        )}
+      </MobileDrawer>
     </>
   );
 }
