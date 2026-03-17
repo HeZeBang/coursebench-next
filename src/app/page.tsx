@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -19,10 +19,38 @@ import { EmptyState } from "@/components/layout";
 import { averageScore } from "@/utils/parseScore";
 import type { Course, SortKey, SortOrder } from "@/types";
 import { ENOUGH_DATA_THRESHOLD } from "@/constants/scores";
-import { Card, CardActions, CardContent, Divider } from "@mui/material";
+import { Card, CardActions, CardContent, Collapse, Divider, IconButton, IconButtonProps, styled } from "@mui/material";
 import { instituteNames } from "@/constants";
+import { ExpandMoreSharp } from "@mui/icons-material";
 
 const ITEMS_PER_PAGE = 12;
+
+interface ExpandMoreProps extends IconButtonProps {
+  expand: boolean;
+}
+const ExpandMore = styled((props: ExpandMoreProps) => {
+  const { expand, ...other } = props;
+  return <IconButton {...other} />;
+})(({ theme }) => ({
+  marginLeft: 'auto',
+  transition: theme.transitions.create('transform', {
+    duration: theme.transitions.duration.shortest,
+  }),
+  variants: [
+    {
+      props: ({ expand }) => !expand,
+      style: {
+        transform: 'rotate(0deg)',
+      },
+    },
+    {
+      props: ({ expand }) => !!expand,
+      style: {
+        transform: 'rotate(180deg)',
+      },
+    },
+  ],
+}));
 
 function courseComparator(key: SortKey, order: SortOrder) {
   return (a: Course, b: Course) => {
@@ -54,6 +82,8 @@ export default function HomePage() {
   const { page, selected, sortKey, order, includeDataInsufficient } =
     useCourseFilter();
   const dispatch = useCourseFilterDispatch();
+
+  const [collapsed, setCollapsed] = useState<boolean>(true);
 
   const courses = data?.data ?? [];
 
@@ -166,25 +196,38 @@ export default function HomePage() {
                     })
                   }
                 />
+              </CardContent>
 
-                <Divider variant="fullWidth" sx={{ my: 2 }} />
+              <Divider variant="middle" />
 
-                <InstituteFilter
-                  courses={courses}
-                  selected={selected}
-                  onSelectedChange={(s) =>
-                    dispatch({ type: "SET_SELECTED", payload: s })
-                  }
-                />
-
+              <Collapse in={collapsed} timeout="auto" unmountOnExit>
+                <CardContent>
+                  <InstituteFilter
+                    courses={courses}
+                    selected={selected}
+                    onSelectedChange={(s) =>
+                      dispatch({ type: "SET_SELECTED", payload: s })
+                    }
+                  />
+                </CardContent>
+              </Collapse>
+              <CardActions sx={{ mx: 1 }}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ mt: 1, display: "block", width: "100%" }}
+                  sx={{ display: "block", width: "100%" }}
                 >
                   共 {filteredCourses.length} 门课程
                 </Typography>
-              </CardContent>
+                <ExpandMore
+                  expand={collapsed}
+                  onClick={() => setCollapsed((prev) => !prev)}
+                  aria-expanded={collapsed}
+                  aria-label="show more"
+                >
+                  <ExpandMoreSharp />
+                </ExpandMore>
+              </CardActions>
             </Card>
           )}
         </Grid>
