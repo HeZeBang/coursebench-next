@@ -35,7 +35,34 @@ export default function RankingPage() {
       </Typography>
 
       {isLoading ? (
-        <Skeleton variant="rounded" height={300} />
+        <Card variant="outlined">
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell width={60}><Skeleton variant="text" width={20} height={24} /></TableCell>
+                  <TableCell><Skeleton variant="text" width={60} height={24} /></TableCell>
+                  <TableCell align="right"><Skeleton variant="text" width={40} height={24} sx={{ ml: "auto" }} /></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      {i < 3 ? (
+                        <Skeleton variant="rounded" width={28} height={24} />
+                      ) : (
+                        <Skeleton variant="text" width={16} height={24} />
+                      )}
+                    </TableCell>
+                    <TableCell><Skeleton variant="text" width={`${40 + Math.random() * 30}%`} height={24} /></TableCell>
+                    <TableCell align="right"><Skeleton variant="text" width={50} height={24} sx={{ ml: "auto" }} /></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Card>
       ) : error ? (
         <Alert severity="error">加载失败</Alert>
       ) : rows.length === 0 ? (

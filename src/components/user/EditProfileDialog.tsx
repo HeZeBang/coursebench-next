@@ -20,6 +20,8 @@ import {
   IconButton,
   Grid,
 } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -62,6 +64,8 @@ export default function EditProfileDialog({
   handleBack,
   maxWidth = "sm",
 }: EditProfileDialogProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [captchaImage, setCaptchaImage] = useState("");
@@ -94,6 +98,7 @@ export default function EditProfileDialog({
       onClose={handleClose}
       maxWidth={maxWidth}
       fullWidth
+      fullScreen={fullScreen}
     >
       {step === 0 ? (
         /* ── Step 0: Edit Profile ── */

@@ -171,7 +171,28 @@ export default function HomePage() {
         {/* Sidebar */}
         <Grid size={{ xs: 12, md: 3 }}>
           {isLoading ? (
-            <Skeleton variant="rounded" height={300} />
+            <Card>
+              <CardContent>
+                <Skeleton variant="text" width="40%" height={32} sx={{ mb: 2 }} />
+                {/* SortBar skeleton */}
+                <Skeleton variant="rounded" width="100%" height={40} sx={{ mb: 1.5 }} />
+                <Skeleton variant="rounded" width="100%" height={40} sx={{ mb: 1.5 }} />
+                <Skeleton variant="rounded" width="60%" height={24} />
+              </CardContent>
+              <Divider variant="middle" />
+              <CardContent>
+                {/* InstituteFilter skeleton */}
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Box key={i} sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+                    <Skeleton variant="rounded" width={20} height={20} sx={{ mr: 1 }} />
+                    <Skeleton variant="text" width={`${50 + 10 * (i % 3)}%`} height={24} />
+                  </Box>
+                ))}
+              </CardContent>
+              <CardActions sx={{ mx: 1 }}>
+                <Skeleton variant="text" width="30%" height={20} />
+              </CardActions>
+            </Card>
           ) : (
             <Card sx={{ position: "sticky", top: "130px" }}>
               <CardContent>
@@ -238,7 +259,36 @@ export default function HomePage() {
             <Grid container spacing={2}>
               {Array.from({ length: 6 }).map((_, i) => (
                 <Grid key={i} size={{ xs: 12, sm: 6 }}>
-                  <Skeleton variant="rounded" height={200} />
+                  <Card variant="outlined" sx={{ height: "100%" }}>
+                    {/* Colored header bar */}
+                    <Skeleton variant="rectangular" height={32} />
+                    <CardContent>
+                      {/* Course name */}
+                      <Skeleton variant="text" width="70%" height={32} sx={{ mb: 1.2 }} />
+                      {/* Score grid (2x2) + overall score */}
+                      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                        <Box sx={{ display: "grid", gap: 0.5, gridTemplateColumns: "repeat(2, 1fr)", flex: 1 }}>
+                          {Array.from({ length: 4 }).map((_, j) => (
+                            <Box key={j} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                              <Skeleton variant="text" width={40} height={16} />
+                              <Skeleton variant="rounded" width={36} height={16} />
+                            </Box>
+                          ))}
+                        </Box>
+                        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minWidth: 56 }}>
+                          <Skeleton variant="text" width={36} height={36} />
+                          <Skeleton variant="text" width={28} height={14} />
+                        </Box>
+                      </Box>
+                      <Divider sx={{ my: 1 }} />
+                      {/* Chips */}
+                      <Box sx={{ display: "flex", gap: 0.5 }}>
+                        <Skeleton variant="rounded" width={40} height={22} />
+                        <Skeleton variant="rounded" width={52} height={22} />
+                        <Skeleton variant="rounded" width={52} height={22} />
+                      </Box>
+                    </CardContent>
+                  </Card>
                 </Grid>
               ))}
             </Grid>

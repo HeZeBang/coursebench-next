@@ -66,12 +66,82 @@ export default function UserDetailPage({
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
+          {/* UserProfileCard skeleton */}
           <Grid size={{ xs: 12, md: 3 }}>
-            <Skeleton variant="rounded" height={300} />
+            <Card>
+              <CardContent sx={{ textAlign: "center" }}>
+                <Skeleton variant="circular" width={100} height={100} sx={{ mx: "auto", mb: 2 }} />
+                <Skeleton variant="text" width="60%" height={32} sx={{ mx: "auto" }} />
+                <Skeleton variant="text" width="50%" height={20} sx={{ mx: "auto" }} />
+                <Skeleton variant="text" width="70%" height={20} sx={{ mx: "auto" }} />
+                <Box sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 0.5 }}>
+                  <Skeleton variant="rounded" width={40} height={24} />
+                  <Skeleton variant="rounded" width={52} height={24} />
+                </Box>
+              </CardContent>
+            </Card>
+            {/* Achievements skeleton */}
+            <Card sx={{ mt: 2 }}>
+              <CardContent>
+                <Skeleton variant="text" width="40%" height={32} />
+                <Divider sx={{ my: 1 }} />
+                <Stack sx={{ my: 2 }} spacing={1.5}>
+                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                    <Skeleton variant="rounded" width={20} height={20} />
+                    <Skeleton variant="text" width="60%" height={20} />
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                    <Skeleton variant="rounded" width={20} height={20} />
+                    <Skeleton variant="text" width="50%" height={20} />
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
           </Grid>
+
+          {/* Comments skeleton */}
           <Grid size={{ xs: 12, md: 9 }}>
-            <Skeleton variant="rounded" height={80} sx={{ mb: 2 }} />
-            <Skeleton variant="rounded" height={80} sx={{ mb: 2 }} />
+            {/* Sort bar skeleton */}
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Skeleton variant="text" width={80} height={28} />
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Skeleton variant="rounded" width={120} height={40} />
+                <Skeleton variant="rounded" width={100} height={40} />
+              </Box>
+            </Box>
+            {/* UserCommentCard skeletons */}
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Card key={i} variant="outlined" sx={{ mb: 2 }}>
+                <CardContent>
+                  {/* Header: avatar + course name + time */}
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Skeleton variant="rounded" width={40} height={40} />
+                      <Box>
+                        <Box sx={{ display: "flex", gap: 0.5, alignItems: "baseline" }}>
+                          <Skeleton variant="text" width={100} height={24} />
+                          <Skeleton variant="rounded" width={48} height={16} />
+                        </Box>
+                        <Skeleton variant="text" width={60} height={16} />
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "end" }}>
+                      <Skeleton variant="text" width={60} height={16} />
+                      <Skeleton variant="text" width={60} height={16} />
+                    </Box>
+                  </Box>
+                  {/* Title + meta */}
+                  <Skeleton variant="text" width="40%" height={32} />
+                  <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
+                    <Skeleton variant="text" width={80} height={20} />
+                    <Skeleton variant="text" width={60} height={20} />
+                  </Box>
+                  {/* Content */}
+                  <Skeleton variant="text" width="100%" height={18} />
+                  <Skeleton variant="text" width="80%" height={18} />
+                </CardContent>
+              </Card>
+            ))}
           </Grid>
         </Grid>
       </Container>
@@ -168,8 +238,35 @@ export default function UserDetailPage({
 
           {commentsLoading ? (
             <>
-              <Skeleton variant="rounded" height={80} sx={{ mb: 2 }} />
-              <Skeleton variant="rounded" height={80} sx={{ mb: 2 }} />
+              {Array.from({ length: 2 }).map((_, i) => (
+                <Card key={i} variant="outlined" sx={{ mb: 2 }}>
+                  <CardContent>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                        <Skeleton variant="rounded" width={40} height={40} />
+                        <Box>
+                          <Box sx={{ display: "flex", gap: 0.5, alignItems: "baseline" }}>
+                            <Skeleton variant="text" width={100} height={24} />
+                            <Skeleton variant="rounded" width={48} height={16} />
+                          </Box>
+                          <Skeleton variant="text" width={60} height={16} />
+                        </Box>
+                      </Box>
+                      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "end" }}>
+                        <Skeleton variant="text" width={60} height={16} />
+                        <Skeleton variant="text" width={60} height={16} />
+                      </Box>
+                    </Box>
+                    <Skeleton variant="text" width="40%" height={32} />
+                    <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
+                      <Skeleton variant="text" width={80} height={20} />
+                      <Skeleton variant="text" width={60} height={20} />
+                    </Box>
+                    <Skeleton variant="text" width="100%" height={18} />
+                    <Skeleton variant="text" width="80%" height={18} />
+                  </CardContent>
+                </Card>
+              ))}
             </>
           ) : comments.length === 0 ? (
             <EmptyState message="暂无评价" />

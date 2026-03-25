@@ -57,18 +57,75 @@ export default function TeacherDetailPage({
 
   if (isLoading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Skeleton variant="rounded" height={300} />
+      <>
+        {/* Banner skeleton */}
+        <Box sx={{ height: 120, bgcolor: "grey.300" }} />
+        <Container maxWidth="lg" sx={{ mt: -6, pb: 4 }}>
+          <Grid container spacing={3}>
+            {/* TeacherProfile skeleton */}
+            <Grid size={{ xs: 12, md: 3 }}>
+              <Card>
+                <CardContent sx={{ textAlign: "center" }}>
+                  <Skeleton variant="circular" width={80} height={80} sx={{ mx: "auto", mb: 2 }} />
+                  <Skeleton variant="text" width="60%" height={32} sx={{ mx: "auto" }} />
+                  <Skeleton variant="text" width="40%" height={20} sx={{ mx: "auto", mt: 0.5 }} />
+                  <Box sx={{ mt: 1, display: "flex", justifyContent: "center" }}>
+                    <Skeleton variant="rounded" width={80} height={24} />
+                  </Box>
+                  <Skeleton variant="text" width="90%" height={18} sx={{ mt: 2 }} />
+                  <Skeleton variant="text" width="70%" height={18} />
+                </CardContent>
+              </Card>
+              {/* Statistics skeleton */}
+              <Card sx={{ mt: 2 }}>
+                <CardContent>
+                  <Skeleton variant="text" width="50%" height={24} sx={{ mb: 1 }} />
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Box key={i} sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+                      <Skeleton variant="rounded" width={20} height={20} sx={{ mr: 1 }} />
+                      <Skeleton variant="text" width={`${50 + i * 10}%`} height={24} />
+                    </Box>
+                  ))}
+                </CardContent>
+              </Card>
+            </Grid>
+            {/* TeacherCourseCard skeletons */}
+            <Grid size={{ xs: 12, md: 9 }}>
+              <Grid container spacing={2}>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
+                    <Card variant="outlined">
+                      <CardContent>
+                        {/* Name + code + rating */}
+                        <Skeleton variant="text" width="70%" height={24} />
+                        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                          <Skeleton variant="text" width={60} height={16} />
+                          <Skeleton variant="rounded" width={80} height={16} />
+                        </Box>
+                        {/* Score grid 2x2 */}
+                        <Box sx={{ display: "grid", gap: 0.5, gridTemplateColumns: "repeat(2, 1fr)", my: 1 }}>
+                          {Array.from({ length: 4 }).map((_, j) => (
+                            <Box key={j} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                              <Skeleton variant="text" width={36} height={14} />
+                              <Skeleton variant="rounded" width={32} height={16} />
+                            </Box>
+                          ))}
+                        </Box>
+                        {/* Chips */}
+                        <Box sx={{ display: "flex", gap: 0.5, mt: 2 }}>
+                          <Skeleton variant="rounded" width={36} height={20} />
+                          <Skeleton variant="rounded" width={48} height={20} />
+                          <Skeleton variant="rounded" width={48} height={20} />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid size={{ xs: 12, md: 9 }}>
-            <Skeleton variant="rounded" height={120} sx={{ mb: 2 }} />
-            <Skeleton variant="rounded" height={120} sx={{ mb: 2 }} />
-            <Skeleton variant="rounded" height={120} />
-          </Grid>
-        </Grid>
-      </Container>
+        </Container>
+      </>
     );
   }
 

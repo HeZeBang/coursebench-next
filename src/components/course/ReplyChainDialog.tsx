@@ -9,6 +9,8 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Avatar from "@mui/material/Avatar";
 import CircularProgress from "@mui/material/CircularProgress";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 
 import type { ReplyChainData } from "@/types";
@@ -79,11 +81,13 @@ export default function ReplyChainDialog({
   onClose,
   replyId,
 }: ReplyChainDialogProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const { data, isLoading } = useReplyChain(open ? replyId : null);
   const chain = data?.data;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
       <DialogTitle
         sx={{
           display: "flex",

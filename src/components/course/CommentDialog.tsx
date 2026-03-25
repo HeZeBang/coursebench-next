@@ -8,6 +8,8 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -56,8 +58,11 @@ export default function CommentDialog({
   handleBack,
   handleSuccess,
 }: CommentDialogProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
-    <Dialog open={dialogOpen} onClose={handleClose} maxWidth="md" fullWidth>
+    <Dialog open={dialogOpen} onClose={handleClose} maxWidth="md" fullWidth fullScreen={fullScreen}>
       {step === 0 ? (
         /* ── Step 0: My comments list ── */
         <>
