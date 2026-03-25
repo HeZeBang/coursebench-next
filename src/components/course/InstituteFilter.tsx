@@ -10,7 +10,7 @@ import Badge from "@mui/material/Badge";
 
 import { instituteNames, getInstituteColor } from "@/constants";
 import type { Course } from "@/types";
-import { Box, Button, Chip, Collapse, Stack } from "@mui/material";
+import { Avatar, Box, Button, Chip, Collapse, Stack } from "@mui/material";
 import { CheckCircle, CheckOutlined } from "@mui/icons-material";
 import { group } from "console";
 
@@ -93,13 +93,22 @@ export default function InstituteFilter({
             key={inst}
             icon={
               <Collapse in={selected.includes(inst)} orientation="horizontal">
-                <CheckOutlined
+                <Avatar style={{
+                  backgroundColor: getInstituteColor(inst),
+                  borderRadius: "50%",
+                }}
                   sx={{
-                    backgroundColor: getInstituteColor(inst),
-                    color: "white",
-                    borderRadius: "50%",
+                    width: 24, 
+                    height: 24,
                   }}
-                />
+                >
+                  <CheckOutlined
+                    sx={{
+                      color: "white",
+                    }}
+                    fontSize="small"
+                  />
+                </Avatar>
               </Collapse>
             }
             label={<Typography variant="body2">{inst}</Typography>}
