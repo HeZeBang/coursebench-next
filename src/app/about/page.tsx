@@ -16,22 +16,22 @@ const features = [
   {
     icon: <SchoolIcon color="primary" sx={{ fontSize: 40 }} />,
     title: "真实评价",
-    desc: "来自真实学生的课程评价，帮助你选择适合的课程",
+    desc: "Real Comments",
   },
   {
     icon: <ForumIcon color="primary" sx={{ fontSize: 40 }} />,
     title: "畅所欲言",
-    desc: "自由发表你的课程体验，支持匿名评价",
+    desc: "Free Discussion",
   },
   {
     icon: <BarChartIcon color="primary" sx={{ fontSize: 40 }} />,
     title: "多维评分",
-    desc: "质量、工作量、难度、给分四个维度全面评估",
+    desc: "Comprehensive Grading",
   },
   {
     icon: <TouchAppIcon color="primary" sx={{ fontSize: 40 }} />,
     title: "简明易用",
-    desc: "简洁直观的界面设计，快速找到你需要的信息",
+    desc: "User Friendly",
   },
 ];
 
@@ -48,7 +48,7 @@ export default function AboutPage() {
           To be the best bench.
         </Typography>
         <Typography variant="h6" color="text.secondary">
-          ShanghaiTech 课程评价平台
+          一个真实可靠、不断完善的多维课程评价信息库
         </Typography>
       </Box>
 
@@ -56,20 +56,17 @@ export default function AboutPage() {
       <Grid container spacing={3} sx={{ mb: 6 }}>
         {features.map((f) => (
           <Grid size={{ xs: 6, md: 3 }} key={f.title}>
-            <Card
-              variant="outlined"
+            <Box
               sx={{ textAlign: "center", height: "100%" }}
             >
-              <CardContent>
-                {f.icon}
-                <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 1 }}>
-                  {f.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {f.desc}
-                </Typography>
-              </CardContent>
-            </Card>
+              {f.icon}
+              <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 1 }}>
+                {f.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {f.desc}
+              </Typography>
+            </Box>
           </Grid>
         ))}
       </Grid>
