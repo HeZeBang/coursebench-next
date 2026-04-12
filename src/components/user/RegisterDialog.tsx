@@ -60,6 +60,7 @@ export default function RegisterDialog({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [invitationCode, setInvitationCode] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileKey, setTurnstileKey] = useState(0);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   // Errors
@@ -156,6 +157,7 @@ export default function RegisterDialog({
     setConfirmPassword("");
     setInvitationCode("");
     setTurnstileToken("");
+    setTurnstileKey((k) => k + 1);
     setAcceptTerms(false);
     setError("");
     setEmailError("");
@@ -303,6 +305,7 @@ export default function RegisterDialog({
         {activeStep === 3 && (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Turnstile
+              key={turnstileKey}
               onVerify={setTurnstileToken}
               onExpire={() => setTurnstileToken("")}
             />

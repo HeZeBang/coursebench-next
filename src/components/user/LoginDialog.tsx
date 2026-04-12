@@ -41,6 +41,7 @@ export default function LoginDialog({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileKey, setTurnstileKey] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -84,6 +85,7 @@ export default function LoginDialog({
           ?.msg ?? "登录失败";
       setError(msg);
       setTurnstileToken("");
+      setTurnstileKey((k) => k + 1);
     } finally {
       setLoading(false);
     }
@@ -108,6 +110,7 @@ export default function LoginDialog({
     setEmail("");
     setPassword("");
     setTurnstileToken("");
+    setTurnstileKey((k) => k + 1);
     setError("");
     setEmailError("");
     setPasswordError("");
@@ -171,6 +174,7 @@ export default function LoginDialog({
 
           {open && (
             <Turnstile
+              key={turnstileKey}
               onVerify={setTurnstileToken}
               onExpire={() => setTurnstileToken("")}
             />
