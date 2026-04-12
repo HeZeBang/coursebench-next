@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -95,9 +95,14 @@ export default function HomeClient({ initialCourses }: HomeClientProps) {
 
   const courses = data?.data ?? [];
 
-  // Reset page to 1 when search input changes
+  // Reset page to 1 when search input changes (skip initial mount)
+  const prevSearchRef = useRef({ keys, isRegexp });
   useEffect(() => {
-    dispatch({ type: "SET_PAGE", payload: 1 });
+    const prev = prevSearchRef.current;
+    if (prev.keys !== keys || prev.isRegexp !== isRegexp) {
+      dispatch({ type: "SET_PAGE", payload: 1 });
+      prevSearchRef.current = { keys, isRegexp };
+    }
   }, [keys, isRegexp, dispatch]);
 
   // Filter, search, sort
