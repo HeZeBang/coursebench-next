@@ -501,12 +501,17 @@ interface ReplyUserBrief {
   is_anonymous: boolean;
 }
 
-function buildReplyUserBrief(user: typeof users.$inferSelect): ReplyUserBrief {
+/**
+ * Build reply user brief. `replyIsAnonymous` is the reply's anonymous flag,
+ * NOT the user's profile anonymous setting. This matches the Go backend's
+ * buildReplyUserResponse which passes the reply's isAnonymous directly.
+ */
+function buildReplyUserBrief(user: typeof users.$inferSelect, replyIsAnonymous: boolean): ReplyUserBrief {
   return {
     id: user.id,
     nickname: user.nickName || "",
     avatar: resolveAvatarUrl(user.avatar),
-    is_anonymous: user.isAnonymous ?? false,
+    is_anonymous: replyIsAnonymous,
   };
 }
 
@@ -517,7 +522,7 @@ export async function buildReplyResponse(reply: typeof replies.$inferSelect, vie
   let replyUser: ReplyUserBrief | null = null;
   if (!isAnonymous || isSelf) {
     const [user] = await db.select().from(users).where(eq(users.id, reply.userId!));
-    replyUser = user ? buildReplyUserBrief(user) : null;
+    replyUser = user ? buildReplyUserBrief(user, isAnonymous) : null;
   }
 
   let likeStatus = 0;
@@ -550,7 +555,7 @@ export async function buildReplyResponse(reply: typeof replies.$inferSelect, vie
       let parentUserBrief: ReplyUserBrief | null = null;
       if (!parentAnonymous || parentIsSelf) {
         const [parentUser] = await db.select().from(users).where(eq(users.id, parentReply.userId!));
-        parentUserBrief = parentUser ? buildReplyUserBrief(parentUser) : null;
+        parentUserBrief = parentUser ? buildReplyUserBrief(parentUser, parentAnonymous) : null;
       }
       replyTo = {
         reply_id: parentReply.id,

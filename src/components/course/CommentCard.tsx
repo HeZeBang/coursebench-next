@@ -108,7 +108,7 @@ export default function CommentCard({ comment }: CommentCardProps) {
 
   // Display name
   const displayName = getUserDisplayName(
-    { nickname: comment.user?.nickname, id: comment.user?.id },
+    comment.user,
     comment.is_anonymous,
   );
 

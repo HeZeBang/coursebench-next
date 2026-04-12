@@ -15,7 +15,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import type { ReplyChainData } from "@/types";
 import { useReplyChain } from "@/hooks";
-import { unixToReadable } from "@/utils";
+import { unixToReadable, getUserDisplayName } from "@/utils";
 import ReplyChainTree from "./ReplyChainTree";
 import UserAvatar from "../user/UserAvatar";
 
@@ -23,10 +23,6 @@ interface ReplyChainDialogProps {
   open: boolean;
   onClose: () => void;
   replyId: number | null;
-}
-
-function getDisplayName(user: { nickname: string } | null): string {
-  return user ? user.nickname : "匿名用户";
 }
 
 function ReplyCard({
@@ -46,10 +42,10 @@ function ReplyCard({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-        <UserAvatar userProfile={reply.user} size={28} />
+        <UserAvatar userProfile={reply.is_anonymous ? null : reply.user} size={28} />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="caption" fontWeight="bold">
-            {getDisplayName(reply.user)}
+            {getUserDisplayName(reply.user, reply.is_anonymous)}
             {reply.reply_to && (
               <Typography
                 component="span"
@@ -57,7 +53,7 @@ function ReplyCard({
                 color="text.secondary"
                 sx={{ ml: 0.5 }}
               >
-                回复 {getDisplayName(reply.reply_to.user)}
+                回复 {getUserDisplayName(reply.reply_to.user, reply.reply_to.user?.is_anonymous)}
               </Typography>
             )}
           </Typography>

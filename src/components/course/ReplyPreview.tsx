@@ -11,7 +11,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 import type { ApiResponse, Reply, ReplyListData } from "@/types";
 import { useReplies } from "@/hooks";
-import { unixToReadable } from "@/utils";
+import { unixToReadable, getUserDisplayName } from "@/utils";
 import ReplyDialog from "./ReplySection";
 
 interface ReplyPreviewProps {
@@ -24,10 +24,6 @@ interface ReplyPreviewProps {
 
 /** Max number of featured replies to show inline */
 const PREVIEW_COUNT = 3;
-
-function getDisplayName(user: Reply["user"]): string {
-  return user ? user.nickname : "匿名用户";
-}
 
 /**
  * Lightweight inline preview shown inside CommentCard.
@@ -68,7 +64,7 @@ export default function ReplyPreview({
             <Box key={reply.id}>
               <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
                 <Avatar
-                  src={reply.user?.avatar || undefined}
+                  src={reply.is_anonymous ? undefined : reply.user?.avatar || undefined}
                   sx={{
                     width: 22,
                     height: 22,
@@ -78,7 +74,7 @@ export default function ReplyPreview({
                     flexShrink: 0,
                   }}
                 >
-                  {getDisplayName(reply.user).charAt(0)}
+                  {getUserDisplayName(reply.user, reply.is_anonymous).charAt(0)}
                 </Avatar>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography
@@ -87,7 +83,7 @@ export default function ReplyPreview({
                     fontWeight="bold"
                     color="text.primary"
                   >
-                    {getDisplayName(reply.user)}
+                    {getUserDisplayName(reply.user, reply.is_anonymous)}
                   </Typography>
                   {reply.reply_to && (
                     <Typography
@@ -96,7 +92,7 @@ export default function ReplyPreview({
                       color="text.secondary"
                       sx={{ ml: 0.5 }}
                     >
-                      回复 {getDisplayName(reply.reply_to.user)}
+                      回复 {getUserDisplayName(reply.reply_to.user, reply.reply_to.user?.is_anonymous)}
                     </Typography>
                   )}
                   <Typography
@@ -139,11 +135,11 @@ export default function ReplyPreview({
         </Box>
       )}
 
-      {isLoading && totalCount === 0 && (
+      {/* {isLoading && totalCount === 0 && (
         <Box sx={{ mt: 1 }}>
           <CircularProgress size={14} />
         </Box>
-      )}
+      )} */}
 
       {/* Full reply dialog */}
       <ReplyDialog
