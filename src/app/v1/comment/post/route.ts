@@ -22,9 +22,9 @@ export async function POST(req: Request) {
     }
     if (student_score_ranking < 1 || student_score_ranking > 11) throw errors.InvalidArgument();
 
-    // Validate semester: YYYYS format
-    const semYear = Math.floor(semester / 10);
-    const semNum = semester % 10;
+    // Validate semester: YYYYSS format (e.g. 202601 = 2026 semester 1)
+    const semYear = Math.floor(semester / 100);
+    const semNum = semester % 100;
     if (semYear < 2014 || semNum < 1 || semNum > 3) throw errors.InvalidArgument();
 
     // Get course group

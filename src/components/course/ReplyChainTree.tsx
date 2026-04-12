@@ -6,16 +6,12 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 
 import type { ReplyTreeNode } from "@/types";
-import { unixToReadable } from "@/utils";
+import { unixToReadable, getUserDisplayName } from "@/utils";
 import UserAvatar from "../user/UserAvatar";
 
 interface ReplyChainTreeProps {
   nodes: ReplyTreeNode[];
   depth?: number;
-}
-
-function getDisplayName(user: { nickname: string } | null): string {
-  return user ? user.nickname : "匿名用户";
 }
 
 export default function ReplyChainTree({
@@ -30,10 +26,10 @@ export default function ReplyChainTree({
         <Box key={node.reply.id} sx={{ mb: 1 }}>
           <Card variant="outlined" sx={{ p: 1.5 }}>
             <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-              <UserAvatar userProfile={node.reply.user} size={28} />
+              <UserAvatar userProfile={node.reply.is_anonymous ? null : node.reply.user} size={28} />
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="caption" fontWeight="bold">
-                  {getDisplayName(node.reply.user)}
+                  {getUserDisplayName(node.reply.user, node.reply.is_anonymous)}
                   {node.reply.reply_to && (
                     <Typography
                       component="span"
@@ -41,7 +37,7 @@ export default function ReplyChainTree({
                       color="text.secondary"
                       sx={{ ml: 0.5 }}
                     >
-                      回复 {getDisplayName(node.reply.reply_to.user)}
+                      回复 {getUserDisplayName(node.reply.reply_to.user, node.reply.reply_to.user?.is_anonymous)}
                     </Typography>
                   )}
                 </Typography>

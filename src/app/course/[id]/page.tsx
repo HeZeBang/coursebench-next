@@ -131,9 +131,11 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     result.sort(sortCmp<Comment>(commentSort, order));
 
     return result.filter(
-      (i) =>
-        i.semester / 100 >= (yearRange.at(0) || startYear) &&
-        i.semester / 100 <= (yearRange.at(1) || nowYear),
+      (i) => {
+        const year = Math.floor(i.semester / 100);
+        return year >= (yearRange.at(0) || startYear) &&
+               year <= (yearRange.at(1) || nowYear);
+      },
     );
   }, [
     comments,

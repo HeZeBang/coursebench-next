@@ -29,7 +29,7 @@ import type { Reply } from "@/types";
 import { useReplies } from "@/hooks";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSnackbar } from "@/contexts/SnackbarContext";
-import { unixToReadable } from "@/utils";
+import { unixToReadable, getUserDisplayName } from "@/utils";
 import api from "@/lib/api";
 import ReplyChainDialog from "./ReplyChainDialog";
 
@@ -52,10 +52,6 @@ interface ReplyDialogProps {
 }
 
 const PAGE_SIZE = 10;
-
-function getDisplayName(user: Reply["user"]): string {
-  return user ? user.nickname : "匿名用户";
-}
 
 function truncateContent(content: string, max = 100): string {
   if (!content) return "";
@@ -293,11 +289,11 @@ export default function ReplyDialog({
                   <Box
                     sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
                   >
-                    <UserAvatar userProfile={reply.user} size={30} />
+                    <UserAvatar userProfile={reply.is_anonymous ? null : reply.user} size={30} />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       {/* Name + reply target */}
                       <Typography variant="caption" fontWeight="bold">
-                        {getDisplayName(reply.user)}
+                        {getUserDisplayName(reply.user, reply.is_anonymous)}
                         {reply.reply_to && (
                           <Typography
                             component="span"
@@ -306,9 +302,7 @@ export default function ReplyDialog({
                             sx={{ ml: 0.5 }}
                           >
                             回复{" "}
-                            {reply.reply_to.user
-                              ? getDisplayName(reply.reply_to.user)
-                              : "匿名用户"}
+                            {getUserDisplayName(reply.reply_to.user, reply.reply_to.user?.is_anonymous)}
                           </Typography>
                         )}
                       </Typography>
@@ -438,7 +432,7 @@ export default function ReplyDialog({
                   }}
                 >
                   <Typography variant="body2" sx={{ display: "block" }}>
-                    正在回复 {getDisplayName(replyTarget.user)}
+                    正在回复 {getUserDisplayName(replyTarget.user, replyTarget.is_anonymous)}
                   </Typography>
                   <Button
                     size="small"
