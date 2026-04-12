@@ -39,7 +39,7 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
 
   // Display name
   const displayName = getUserDisplayName(
-    { nickname: comment.user?.nickname, id: comment.user?.id },
+    comment.user,
     comment.is_anonymous,
   );
 
