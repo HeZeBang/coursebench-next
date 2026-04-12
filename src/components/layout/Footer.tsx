@@ -29,7 +29,7 @@ export default function Footer() {
           display="block"
           sx={{ mt: 0.5 }}
         >
-          To be the best bench.
+          CourseBench NEXT by Project Course
         </Typography>
       </Container>
     </Box>
