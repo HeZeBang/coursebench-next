@@ -52,6 +52,7 @@ export default function EditProfileDialog({
   step,
   formData,
   passwordData,
+  turnstileKey,
   isLoading,
   handleClose,
   updateFormData,
@@ -247,6 +248,7 @@ export default function EditProfileDialog({
 
               {step === 1 && (
                 <Turnstile
+                  key={turnstileKey}
                   onVerify={(token) => updatePasswordData({ captcha: token })}
                   onExpire={() => updatePasswordData({ captcha: "" })}
                 />

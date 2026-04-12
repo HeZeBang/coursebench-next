@@ -27,6 +27,8 @@ export interface EditProfileDialogState {
     newPassword: string;
     captcha: string;
   };
+  /** Key to force Turnstile re-mount */
+  turnstileKey: number;
   /** Loading state */
   isLoading: boolean;
   /** Open the dialog */
@@ -63,6 +65,7 @@ export function useEditProfileDialog(): EditProfileDialogState {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [step, setStep] = useState<0 | 1>(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileKey, setTurnstileKey] = useState(0);
 
   // Initialize form data from current profile
   const initialFormData: EditProfileFormData = {
@@ -170,6 +173,8 @@ export function useEditProfileDialog(): EditProfileDialogState {
     } catch (error: any) {
       const errorMsg = error?.response?.data?.msg || "修改密码失败，请重试";
       showSnackbar(errorMsg, "error");
+      setPasswordData((prev) => ({ ...prev, captcha: "" }));
+      setTurnstileKey((k) => k + 1);
     } finally {
       setIsLoading(false);
     }
@@ -182,6 +187,7 @@ export function useEditProfileDialog(): EditProfileDialogState {
   const handleBack = useCallback(() => {
     setStep(0);
     setPasswordData({ oldPassword: "", newPassword: "", captcha: "" });
+    setTurnstileKey((k) => k + 1);
   }, []);
 
   const resetForm = useCallback(() => {
@@ -194,6 +200,7 @@ export function useEditProfileDialog(): EditProfileDialogState {
     step,
     formData,
     passwordData,
+    turnstileKey,
     isLoading,
     handleOpen,
     handleClose,
