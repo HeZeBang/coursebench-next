@@ -15,6 +15,7 @@
  *   rm_duplicate_group                     Merge duplicate course groups
  *   clear_userdata Yes_Confirm             Delete ALL user data (dangerous!)
  *   stats                                  Show database statistics
+ *   test_mail <to> [options]                Send a test email
  */
 
 const args = process.argv.slice(2);
@@ -36,6 +37,10 @@ Commands:
   rm_duplicate_group                  Merge duplicate course groups
   clear_userdata Yes_Confirm          Delete ALL user data (dangerous!)
   stats                               Show database statistics
+  test_mail <to> [options]            Send a test email
+    --subject <text>                    Custom subject
+    --template register|reset           Use built-in template
+    --raw <html>                        Custom HTML body
 `);
   process.exit(0);
 }
@@ -104,6 +109,19 @@ try {
     case "stats": {
       const { showStats } = await import("./commands/stats.mjs");
       await showStats();
+      break;
+    }
+    case "test_mail": {
+      if (!args[1]) { console.error("Missing <to>. e.g. test_mail user@example.com"); process.exit(1); }
+      const to = args[1];
+      const opts = {};
+      for (let i = 2; i < args.length; i++) {
+        if (args[i] === "--subject" && args[i + 1]) opts.subject = args[++i];
+        else if (args[i] === "--template" && args[i + 1]) opts.template = args[++i];
+        else if (args[i] === "--raw" && args[i + 1]) opts.raw = args[++i];
+      }
+      const { testMail } = await import("./commands/test-mail.mjs");
+      await testMail(to, opts);
       break;
     }
     default:
