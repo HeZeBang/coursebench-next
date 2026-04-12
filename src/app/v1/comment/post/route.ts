@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { handleRoute, okResponse } from "@/server/response";
 import { requireUserId } from "@/server/auth/session";
 import { db } from "@/server/db";
@@ -123,6 +124,9 @@ export async function POST(req: Request) {
     } else if (user && !user.hasPostedComments) {
       await db.update(users).set({ hasPostedComments: true }).where(eq(users.id, userId));
     }
+
+    revalidateTag("courses", "minutes");
+    revalidateTag(`course-${cg.courseId}`, "minutes");
 
     return okResponse({ comment_id: newComment.id });
   });

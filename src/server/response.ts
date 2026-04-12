@@ -26,6 +26,10 @@ export function handleRoute(handler: () => Promise<NextResponse>): Promise<NextR
     if (err instanceof AppError) {
       return errorResponse(err);
     }
+    // Re-throw Next.js internal errors (prerender interrupts, bailouts, etc.)
+    if (typeof err === "object" && err !== null && "digest" in err) {
+      throw err;
+    }
     console.error("Unhandled error:", err);
     return NextResponse.json(
       {
