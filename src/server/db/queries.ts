@@ -303,6 +303,8 @@ interface UserBrief {
   grade: number;
   realname: string;
   reward: number;
+  invitation_code: string;
+  has_casdoor_bound: boolean;
 }
 
 function buildUserBrief(user: typeof users.$inferSelect, viewerId: number): UserBrief {
@@ -319,12 +321,16 @@ function buildUserBrief(user: typeof users.$inferSelect, viewerId: number): User
     grade: 0,
     realname: "",
     reward: -1,
+    invitation_code: "",
+    has_casdoor_bound: false,
   };
   if (!user.isAnonymous || isSelf) {
     brief.email = user.email || "";
     brief.year = user.year ?? 0;
     brief.grade = user.grade ?? 0;
     brief.realname = user.realName || "";
+    brief.invitation_code = user.invitationCode || "";
+    brief.has_casdoor_bound = !!user.casdoorSub;
   }
   return brief;
 }
@@ -580,4 +586,25 @@ export async function buildReplyResponse(reply: typeof replies.$inferSelect, vie
     reply_to: replyTo,
     is_fold: reply.isFold ?? false,
   };
+}
+
+// ---------- ranklist helpers ----------
+
+export async function getRanklist() {
+  const rows = await db
+    .select({
+      nickName: users.nickName,
+      reward: users.reward,
+      isAnonymous: users.isAnonymous,
+    })
+    .from(users)
+    .where(isNull(users.deletedAt))
+    .orderBy(desc(users.reward))
+    .limit(30);
+
+  return rows.map((r) => ({
+    nick_name: r.isAnonymous ? "" : (r.nickName || ""),
+    reward: r.reward ?? 0,
+    is_anonymous: r.isAnonymous ?? false,
+  }));
 }

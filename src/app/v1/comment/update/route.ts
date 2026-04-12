@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { handleRoute, okResponse } from "@/server/response";
 import { requireUserId } from "@/server/auth/session";
 import { db } from "@/server/db";
@@ -44,6 +45,9 @@ export async function POST(req: Request) {
 
     // Recalculate course group and course scores
     await recalculateScores(comment.courseGroupId!, comment.courseId!);
+
+    revalidateTag("courses", "minutes");
+    revalidateTag(`course-${comment.courseId}`, "minutes");
 
     return okResponse(null);
   });

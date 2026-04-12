@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { handleRoute, okResponse } from "@/server/response";
 import { requireUserId } from "@/server/auth/session";
 import { getUserById } from "@/server/db/queries";
@@ -63,6 +64,9 @@ export async function POST(req: Request) {
       .update(courses)
       .set({ scores: courseScoreSum, commentCount: totalComments, updatedAt: new Date() })
       .where(eq(courses.id, comment.courseId!));
+
+    revalidateTag("courses", "minutes");
+    revalidateTag(`course-${comment.courseId}`, "minutes");
 
     return okResponse(null);
   });
