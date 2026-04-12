@@ -43,9 +43,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       })
       .returning({ id: replies.id });
 
-    // Update comment's update time
-    await db.update(comments).set({ updateTime: now, updatedAt: new Date() }).where(eq(comments.id, commentId));
-
     return okResponse({ reply_id: newReply.id });
   });
 }
