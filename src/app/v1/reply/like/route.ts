@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     if (likeDelta !== 0 || dislikeDelta !== 0) {
       await db
         .update(replies)
-        .set({ like: (reply.like ?? 0) + likeDelta, dislike: (reply.dislike ?? 0) + dislikeDelta, updatedAt: new Date() })
+        .set({ like: (reply.like ?? 0) + likeDelta, dislike: (reply.dislike ?? 0) + dislikeDelta })
         .where(eq(replies.id, replyId));
     }
 

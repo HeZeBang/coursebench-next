@@ -64,7 +64,6 @@ export async function POST(req: Request) {
         .set({
           like: (comment.like ?? 0) + likeDelta,
           dislike: (comment.dislike ?? 0) + dislikeDelta,
-          updatedAt: new Date(),
         })
         .where(eq(comments.id, commentId));
     }
