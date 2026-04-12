@@ -255,6 +255,7 @@ node cli/index.mjs <command> [args...]
 | `update_teacher_institute [--dry-run]` | 从 ELRC 搜索 API 更新教师所属学院 |
 | `import_teacher_uniid <json_path>` | 从 JSON 更新教师工号 |
 | `rm_duplicate_group` | 合并重复授课组 |
+| `test_mail <to> [options]` | 发送测试邮件（验证 SMTP 配置） |
 | `clear_userdata Yes_Confirm` | 删除所有用户数据（危险！） |
 
 ### ELRC 课程导入
@@ -328,6 +329,33 @@ pnpm cli set_admin 123
 pnpm cli set_community_admin 456
 ```
 
+### 邮件测试
+
+验证 SMTP 配置是否正确，支持发送到任意地址，输出完整 SMTP 会话日志。
+
+```bash
+# 发送默认测试邮件（包含 SMTP 配置摘要）
+pnpm cli test_mail user@example.com
+
+# 使用注册邮件模板
+pnpm cli test_mail user@example.com --template register
+
+# 使用密码重置邮件模板
+pnpm cli test_mail user@example.com --template reset
+
+# 自定义主题
+pnpm cli test_mail user@example.com --subject "自定义主题"
+
+# 自定义 HTML 内容
+pnpm cli test_mail user@example.com --raw "<h1>Hello</h1>"
+```
+
+输出内容：
+- SMTP 配置详情（密码脱敏）
+- SMTP 连接验证结果及耗时
+- 完整的 SMTP 会话 debug 日志
+- 发送结果：Message-ID、服务器响应、accepted/rejected 地址
+
 ### 数据维护
 
 ```bash
@@ -356,7 +384,8 @@ frontend-next/
 │       ├── update-teacher-institute.mjs # ELRC 教师学院更新
 │       ├── rm-duplicate-group.mjs    # 合并重复组
 │       ├── clear-userdata.mjs        # 清除用户数据
-│       └── stats.mjs                 # 数据库统计
+│       ├── stats.mjs                 # 数据库统计
+│       └── test-mail.mjs            # 测试邮件发送
 ├── src/
 │   ├── app/
 │   │   ├── v1/                        # API Route Handlers (后端)

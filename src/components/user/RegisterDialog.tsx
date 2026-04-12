@@ -348,7 +348,7 @@ export default function RegisterDialog({
             alignItems: "center",
           }}
         >
-          <Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5}}>
             <Typography variant="caption" color="text.secondary">
               已有账号？
             </Typography>

@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
+import EmailIcon from "@mui/icons-material/EmailOutlined";
 
 import { useAuthDispatch } from "@/contexts/AuthContext";
 import Divider from "@mui/material/Divider";
@@ -23,6 +24,8 @@ import { startCasdoorLogin } from "@/lib/casdoor";
 import { useMediaQuery, useTheme } from "@mui/material";
 import Logo from "../Logo";
 import Turnstile from "@/components/Turnstile";
+
+type DialogMode = "login" | "forgot" | "forgot-sent";
 
 interface LoginDialogProps {
   open: boolean;
@@ -38,6 +41,7 @@ export default function LoginDialog({
   const authDispatch = useAuthDispatch();
   const showSnackbar = useSnackbar();
 
+  const [mode, setMode] = useState<DialogMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -98,15 +102,48 @@ export default function LoginDialog({
     onClose,
   ]);
 
+  const handleResetPassword = useCallback(async () => {
+    const emailErr = validate(email, validators.email);
+    setEmailError(emailErr || "");
+
+    if (emailErr || !turnstileToken) {
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    try {
+      await api.post("/v1/user/reset_password", {
+        email,
+        captcha: turnstileToken,
+      });
+      setMode("forgot-sent");
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { msg?: string } } })?.response?.data
+          ?.msg ?? "发送重置邮件失败";
+      setError(msg);
+      setTurnstileToken("");
+      setTurnstileKey((k) => k + 1);
+    } finally {
+      setLoading(false);
+    }
+  }, [email, turnstileToken]);
+
   const handleSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      handleLogin();
+      if (mode === "forgot") {
+        handleResetPassword();
+      } else {
+        handleLogin();
+      }
     },
-    [handleLogin],
+    [mode, handleLogin, handleResetPassword],
   );
 
   const handleReset = useCallback(() => {
+    setMode("login");
     setEmail("");
     setPassword("");
     setTurnstileToken("");
@@ -121,6 +158,22 @@ export default function LoginDialog({
     onClose();
   }, [handleReset, onClose]);
 
+  const switchToForgot = useCallback(() => {
+    setMode("forgot");
+    setError("");
+    setPassword("");
+    setPasswordError("");
+    setTurnstileToken("");
+    setTurnstileKey((k) => k + 1);
+  }, []);
+
+  const switchToLogin = useCallback(() => {
+    setMode("login");
+    setError("");
+    setTurnstileToken("");
+    setTurnstileKey((k) => k + 1);
+  }, []);
+
   return (
     <Dialog
       open={open}
@@ -130,7 +183,7 @@ export default function LoginDialog({
     >
       <DialogTitle sx={{ display: "flex", flexDirection: "column" }}>
         <Logo width={100} />
-        登录
+        {mode === "login" ? "登录" : "重置密码"}
       </DialogTitle>
       <DialogContent>
         {error && (
@@ -139,62 +192,83 @@ export default function LoginDialog({
           </Alert>
         )}
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          autoComplete="on"
-          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-        >
-          <TextField
-            fullWidth
-            label="邮箱"
-            name="email"
-            type="email"
-            variant="standard"
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={!!emailError}
-            helperText={emailError || "请使用上海科技大学邮箱"}
-            autoFocus
-          />
-
-          <TextField
-            fullWidth
-            label="密码"
-            name="password"
-            type="password"
-            variant="standard"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!!passwordError}
-            helperText={passwordError}
-          />
-
-          {open && (
-            <Turnstile
-              key={turnstileKey}
-              onVerify={setTurnstileToken}
-              onExpire={() => setTurnstileToken("")}
+        {mode === "forgot-sent" ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+              py: 2,
+            }}
+          >
+            <EmailIcon sx={{ fontSize: 64 }} color="info" />
+            <Typography variant="body1" textAlign="center">
+              重置密码的邮件已发送至您的邮箱，请点击其中的链接以重置您的密码
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            autoComplete="on"
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <TextField
+              fullWidth
+              label="邮箱"
+              name="email"
+              type="email"
+              variant="standard"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={!!emailError}
+              helperText={emailError || "请使用上海科技大学邮箱"}
+              autoFocus
             />
-          )}
 
-          <button
-            type="submit"
-            style={{ display: "none" }}
-            aria-hidden="true"
-          />
-        </Box>
+            {mode === "login" && (
+              <TextField
+                fullWidth
+                label="密码"
+                name="password"
+                type="password"
+                variant="standard"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={!!passwordError}
+                helperText={passwordError}
+              />
+            )}
+
+            {open && (
+              <Turnstile
+                key={turnstileKey}
+                onVerify={setTurnstileToken}
+                onExpire={() => setTurnstileToken("")}
+              />
+            )}
+
+            <button
+              type="submit"
+              style={{ display: "none" }}
+              aria-hidden="true"
+            />
+          </Box>
+        )}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2, flexDirection: "column", gap: 1 }}>
-        <Box sx={{ width: "100%" }}>
-          <Divider sx={{ mb: 1 }}>或</Divider>
-          <Button fullWidth variant="outlined" onClick={startCasdoorLogin}>
-            使用 GeekPie 账户登录
-          </Button>
-        </Box>
+        {mode === "login" && (
+          <Box sx={{ width: "100%" }}>
+            <Divider sx={{ mb: 1 }}>或</Divider>
+            <Button fullWidth variant="outlined" onClick={startCasdoorLogin}>
+              使用 GeekPie 账户登录
+            </Button>
+          </Box>
+        )}
         <Box
           sx={{
             width: "100%",
@@ -203,31 +277,73 @@ export default function LoginDialog({
             alignItems: "center",
           }}
         >
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              没有账号？
-            </Typography>
-            <Link
-              component="button"
-              variant="caption"
-              onClick={onSwitchToRegister}
-              sx={{ ml: 0.5 }}
-            >
-              立即注册
-            </Link>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5}}>
+            {mode === "login" ? (
+              <>
+                <Typography variant="caption" color="text.secondary">
+                  没有账号？
+                </Typography>
+                <Link
+                  component="button"
+                  variant="caption"
+                  onClick={onSwitchToRegister}
+                  sx={{ ml: 0.5 }}
+                >
+                  立即注册
+                </Link>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mx: 0.5 }}
+                >
+                  ·
+                </Typography>
+                <Link
+                  component="button"
+                  variant="caption"
+                  onClick={switchToForgot}
+                >
+                  忘记密码？
+                </Link>
+              </>
+            ) : (
+              <Link
+                component="button"
+                variant="caption"
+                onClick={switchToLogin}
+              >
+                返回登录
+              </Link>
+            )}
           </Box>
           <Box sx={{ display: "flex", gap: 1 }}>
             <Button variant="text" onClick={handleClose}>
-              取消
+              {mode === "forgot-sent" ? "关闭" : "取消"}
             </Button>
-            <Button
-              variant="contained"
-              onClick={handleLogin}
-              disabled={loading || !turnstileToken}
-              startIcon={loading ? <CircularProgress size={16} /> : undefined}
-            >
-              登录
-            </Button>
+            {mode === "login" && (
+              <Button
+                variant="contained"
+                onClick={handleLogin}
+                disabled={loading || !turnstileToken}
+                startIcon={
+                  loading ? <CircularProgress size={16} /> : undefined
+                }
+              >
+                登录
+              </Button>
+            )}
+            {mode === "forgot" && (
+              <Button
+                variant="contained"
+                onClick={handleResetPassword}
+                disabled={loading || !turnstileToken}
+                startIcon={
+                  loading ? <CircularProgress size={16} /> : undefined
+                }
+              >
+                发送重置邮件
+              </Button>
+            )}
           </Box>
         </Box>
       </DialogActions>
