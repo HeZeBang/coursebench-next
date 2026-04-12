@@ -1,4 +1,5 @@
 import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import type {
   ApiResponse,
   Course,
@@ -44,6 +45,35 @@ export function useCommentsByUser(userId: number | string) {
 
 export function useRecentComments() {
   return useSWR<ApiResponse<Comment[]>>("/v1/comment/recent");
+}
+
+interface RecentCommentsPage {
+  page_count: number;
+  has_more: boolean;
+  comments: Comment[];
+}
+
+export function useRecentCommentsInfinite() {
+  const result = useSWRInfinite<ApiResponse<RecentCommentsPage>>(
+    (pageIndex, previousPageData) => {
+      if (pageIndex === 0) return `/v1/comment/recent/1`;
+      if (previousPageData && !previousPageData.data?.has_more) return null;
+      return `/v1/comment/recent/${pageIndex + 1}`;
+    },
+    { revalidateFirstPage: false },
+  );
+
+  const comments = result.data?.flatMap((page) => page.data?.comments ?? []) ?? [];
+  const isLoadingMore = result.isLoading || (result.size > 0 && result.data && typeof result.data[result.size - 1] === "undefined");
+  const hasMore = result.data ? (result.data[result.data.length - 1]?.data?.has_more ?? false) : true;
+
+  return {
+    ...result,
+    comments,
+    isLoadingMore: !!isLoadingMore,
+    hasMore,
+    loadMore: () => result.setSize(result.size + 1),
+  };
 }
 
 export function useReplies(

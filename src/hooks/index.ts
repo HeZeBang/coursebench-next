@@ -4,6 +4,7 @@ export {
   useCommentsByCourse,
   useCommentsByUser,
   useRecentComments,
+  useRecentCommentsInfinite,
   useReplies,
   useReplyChain,
   useTeacher,
