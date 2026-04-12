@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -20,10 +20,9 @@ import { useSnackbar } from "@/contexts/SnackbarContext";
 import { validators, validate } from "@/constants";
 import api from "@/lib/api";
 import { startCasdoorLogin } from "@/lib/casdoor";
-import type { CaptchaResponse } from "@/types";
-import { Grid, useMediaQuery, useTheme } from "@mui/material";
-import Image from "next/image";
+import { useMediaQuery, useTheme } from "@mui/material";
 import Logo from "../Logo";
+import Turnstile from "@/components/Turnstile";
 
 interface LoginDialogProps {
   open: boolean;
@@ -41,52 +40,24 @@ export default function LoginDialog({
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [captcha, setCaptcha] = useState("");
-  const [captchaImage, setCaptchaImage] = useState("");
-  const [captchaLoading, setCaptchaLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [captchaError, setCaptchaError] = useState("");
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const fetchCaptcha = useCallback(async () => {
-    setCaptchaLoading(true);
-    try {
-      const res = await api.post<{ data: CaptchaResponse }>(
-        "/v1/user/get_captcha",
-      );
-      const data = (res.data as { error: boolean; data: CaptchaResponse }).data;
-      setCaptchaImage(`data:image/png;base64,${data.img}`);
-      setCaptcha("");
-      setCaptchaError("");
-    } catch {
-      showSnackbar("获取验证码失败", "error");
-    } finally {
-      setCaptchaLoading(false);
-    }
-  }, [showSnackbar]);
-
-  useEffect(() => {
-    if (open) {
-      fetchCaptcha();
-    }
-  }, [open, fetchCaptcha]);
-
   const handleLogin = useCallback(async () => {
     const emailErr = validate(email, validators.email);
     const passwordErr = validate(password, validators.password);
-    const captchaErr = captcha.trim() ? "" : "请输入验证码";
 
     setEmailError(emailErr || "");
     setPasswordError(passwordErr || "");
-    setCaptchaError(captchaErr);
 
-    if (emailErr || passwordErr || captchaErr) {
+    if (emailErr || passwordErr || !turnstileToken) {
       return;
     }
 
@@ -96,7 +67,7 @@ export default function LoginDialog({
       await api.post("/v1/user/login", {
         email,
         password,
-        captcha,
+        captcha: turnstileToken,
       });
       // Get user profile
       const myIdRes = await api.get("/v1/user/my_id");
@@ -112,18 +83,17 @@ export default function LoginDialog({
         (err as { response?: { data?: { msg?: string } } })?.response?.data
           ?.msg ?? "登录失败";
       setError(msg);
-      fetchCaptcha();
+      setTurnstileToken("");
     } finally {
       setLoading(false);
     }
   }, [
     email,
     password,
-    captcha,
+    turnstileToken,
     authDispatch,
     showSnackbar,
     onClose,
-    fetchCaptcha,
   ]);
 
   const handleSubmit = useCallback(
@@ -137,12 +107,10 @@ export default function LoginDialog({
   const handleReset = useCallback(() => {
     setEmail("");
     setPassword("");
-    setCaptcha("");
-    setCaptchaImage("");
+    setTurnstileToken("");
     setError("");
     setEmailError("");
     setPasswordError("");
-    setCaptchaError("");
   }, []);
 
   const handleClose = useCallback(() => {
@@ -201,44 +169,12 @@ export default function LoginDialog({
             helperText={passwordError}
           />
 
-          <Grid container spacing={1}>
-            <Grid size={8}>
-              <TextField
-                fullWidth
-                label="验证码"
-                name="captcha"
-                variant="standard"
-                value={captcha}
-                onChange={(e) => setCaptcha(e.target.value)}
-                error={!!captchaError}
-                helperText={captchaError || "点击图片刷新验证码"}
-              />
-            </Grid>
-            <Grid size={4} alignContent="center" overflow="hidden">
-              {captchaLoading ? (
-                <Box
-                  sx={{
-                    width: 150,
-                    alignContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <CircularProgress size={20} />
-                </Box>
-              ) : captchaImage ? (
-                <img
-                  src={captchaImage}
-                  alt="captcha"
-                  style={{ width: 150, borderRadius: 4, cursor: "pointer" }}
-                  onClick={fetchCaptcha}
-                />
-              ) : (
-                <Button variant="text" sx={{ width: 150 }}>
-                  加载验证码
-                </Button>
-              )}
-            </Grid>
-          </Grid>
+          {open && (
+            <Turnstile
+              onVerify={setTurnstileToken}
+              onExpire={() => setTurnstileToken("")}
+            />
+          )}
 
           <button
             type="submit"
@@ -283,7 +219,7 @@ export default function LoginDialog({
             <Button
               variant="contained"
               onClick={handleLogin}
-              disabled={loading || captchaLoading || !captcha}
+              disabled={loading || !turnstileToken}
               startIcon={loading ? <CircularProgress size={16} /> : undefined}
             >
               登录

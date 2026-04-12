@@ -23,5 +23,4 @@ export type {
   UserProfile,
   LoginRequest,
   RegisterRequest,
-  CaptchaResponse,
 } from "./user";

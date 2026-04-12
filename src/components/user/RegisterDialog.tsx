@@ -28,11 +28,11 @@ import { useSnackbar } from "@/contexts/SnackbarContext";
 import { validators, validate, gradeItems, yearItems } from "@/constants";
 import api from "@/lib/api";
 import { startCasdoorLogin } from "@/lib/casdoor";
-import type { CaptchaResponse } from "@/types";
 import Logo from "../Logo";
+import Turnstile from "@/components/Turnstile";
 import { useMediaQuery, useTheme } from "@mui/material";
 
-const steps = ["邮箱", "密码", "个人信息", "验证码"];
+const steps = ["邮箱", "密码", "个人信息", "确认"];
 
 interface RegisterDialogProps {
   open: boolean;
@@ -59,8 +59,7 @@ export default function RegisterDialog({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [invitationCode, setInvitationCode] = useState("");
-  const [captcha, setCaptcha] = useState("");
-  const [captchaImage, setCaptchaImage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   // Errors
@@ -98,28 +97,19 @@ export default function RegisterDialog({
   }, [password, confirmPassword, showSnackbar]);
 
   // Step 2 → personal info
-  const handleInfoNext = useCallback(async () => {
+  const handleInfoNext = useCallback(() => {
     const err = validate(nickname, validators.nickname);
     if (err) {
       setNicknameError(err);
       return;
     }
     setNicknameError("");
-    // Fetch captcha
-    try {
-      const res = await api.post("/v1/user/get_captcha");
-      const data = (res.data as { data: CaptchaResponse }).data;
-      setCaptchaImage(`data:image/png;base64,${data.img}`);
-      setCaptcha("");
-      setActiveStep(3);
-    } catch {
-      showSnackbar("获取验证码失败", "error");
-    }
+    setActiveStep(3);
   }, [nickname]);
 
   // Step 3 → register
   const handleRegister = useCallback(async () => {
-    if (!captcha || !acceptTerms) return;
+    if (!turnstileToken || !acceptTerms) return;
     setLoading(true);
     setError("");
     try {
@@ -129,7 +119,7 @@ export default function RegisterDialog({
         nickname,
         grade,
         year,
-        captcha,
+        captcha: turnstileToken,
         invitation_code: invitationCode || undefined,
       });
       showSnackbar("注册成功！请查收激活邮件", "success");
@@ -149,7 +139,7 @@ export default function RegisterDialog({
     nickname,
     grade,
     year,
-    captcha,
+    turnstileToken,
     invitationCode,
     acceptTerms,
     showSnackbar,
@@ -165,8 +155,7 @@ export default function RegisterDialog({
     setPassword("");
     setConfirmPassword("");
     setInvitationCode("");
-    setCaptcha("");
-    setCaptchaImage("");
+    setTurnstileToken("");
     setAcceptTerms(false);
     setError("");
     setEmailError("");
@@ -310,33 +299,12 @@ export default function RegisterDialog({
           </Box>
         )}
 
-        {/* Step 3: Captcha + terms */}
+        {/* Step 3: Turnstile + terms */}
         {activeStep === 3 && (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {captchaImage && (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
-                onClick={handlePasswordNext}
-              >
-                <img
-                  src={captchaImage}
-                  alt="captcha"
-                  style={{ height: 50, borderRadius: 4 }}
-                />
-              </Box>
-            )}
-            <TextField
-              fullWidth
-              label="验证码"
-              value={captcha}
-              onChange={(e) => setCaptcha(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleRegister()}
-              autoFocus
-              helperText="点击图片刷新验证码"
+            <Turnstile
+              onVerify={setTurnstileToken}
+              onExpire={() => setTurnstileToken("")}
             />
             <FormControlLabel
               control={
@@ -417,7 +385,7 @@ export default function RegisterDialog({
               <Button
                 variant="contained"
                 onClick={handleRegister}
-                disabled={loading || !captcha || !acceptTerms}
+                disabled={loading || !turnstileToken || !acceptTerms}
                 startIcon={loading ? <CircularProgress size={16} /> : undefined}
               >
                 注册
