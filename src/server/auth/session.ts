@@ -9,8 +9,19 @@ export interface SessionData {
   casdoorReturnUrl?: string;
 }
 
+function getSessionSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("SESSION_SECRET environment variable is required in production");
+    }
+    return "dev-only-fallback-secret-at-least-32-chars!!";
+  }
+  return secret;
+}
+
 const SESSION_OPTIONS = {
-  password: process.env.SESSION_SECRET || "a-very-long-secret-that-must-be-at-least-32-chars-long",
+  password: getSessionSecret(),
   cookieName: "session_id",
   cookieOptions: {
     httpOnly: process.env.NODE_ENV === "production",
