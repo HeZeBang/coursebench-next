@@ -18,17 +18,15 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
-  Grid,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import type { EditProfileDialogState } from "./useEditProfileDialog";
-import api from "@/lib/api";
-import { CaptchaResponse } from "@/types";
+import Turnstile from "@/components/Turnstile";
 
 interface EditProfileDialogProps extends EditProfileDialogState {
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
@@ -68,29 +66,6 @@ export default function EditProfileDialog({
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [captchaImage, setCaptchaImage] = useState("");
-  const [captchaLoading, setCaptchaLoading] = useState(false);
-  const [captchaError, setCaptchaError] = useState("");
-
-  const fetchCaptcha = useCallback(async () => {
-    setCaptchaLoading(true);
-    try {
-      const res = await api.post<{ data: CaptchaResponse }>(
-        "/v1/user/get_captcha",
-      );
-      const data = (res.data as { error: boolean; data: CaptchaResponse }).data;
-      setCaptchaImage(`data:image/png;base64,${data.img}`);
-      setCaptchaError("");
-    } catch {
-      setCaptchaError("获取验证码失败");
-    } finally {
-      setCaptchaLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (step === 1) fetchCaptcha();
-  }, [step]);
 
   return (
     <Dialog
@@ -270,46 +245,12 @@ export default function EditProfileDialog({
                 }}
               />
 
-              <Grid container spacing={1}>
-                <Grid size={8}>
-                  <TextField
-                    fullWidth
-                    label="验证码"
-                    name="captcha"
-                    variant="standard"
-                    value={passwordData.captcha}
-                    onChange={(e) =>
-                      updatePasswordData({ captcha: e.target.value })
-                    }
-                    error={!!captchaError}
-                    helperText={captchaError || "点击图片刷新验证码"}
-                  />
-                </Grid>
-                <Grid size={4} alignContent="center" overflow="hidden">
-                  {captchaLoading ? (
-                    <Box
-                      sx={{
-                        width: 150,
-                        alignContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <CircularProgress size={20} />
-                    </Box>
-                  ) : captchaImage ? (
-                    <img
-                      src={captchaImage}
-                      alt="captcha"
-                      style={{ width: 150, borderRadius: 4, cursor: "pointer" }}
-                      onClick={fetchCaptcha}
-                    />
-                  ) : (
-                    <Button variant="text" sx={{ width: 150 }}>
-                      加载验证码
-                    </Button>
-                  )}
-                </Grid>
-              </Grid>
+              {step === 1 && (
+                <Turnstile
+                  onVerify={(token) => updatePasswordData({ captcha: token })}
+                  onExpire={() => updatePasswordData({ captcha: "" })}
+                />
+              )}
             </Box>
           </DialogContent>
           <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
@@ -326,10 +267,7 @@ export default function EditProfileDialog({
             </Button>
             <Button
               variant="contained"
-              onClick={() => {
-                handleSubmitPassword();
-                fetchCaptcha();
-              }}
+              onClick={handleSubmitPassword}
               disabled={isLoading}
             >
               {isLoading ? <CircularProgress size={20} /> : "确认修改"}

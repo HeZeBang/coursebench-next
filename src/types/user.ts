@@ -18,8 +18,7 @@ export interface UserProfile {
 export interface LoginRequest {
   email: string;
   password: string;
-  captcha: string;
-  captcha_id: string;
+  captcha: string; // Turnstile token
 }
 
 export interface RegisterRequest {
@@ -29,11 +28,6 @@ export interface RegisterRequest {
   realname?: string;
   grade: string;
   year: number;
-  captcha: string;
-  captcha_id: string;
+  captcha: string; // Turnstile token
   invitation_code?: string;
-}
-
-export interface CaptchaResponse {
-  img: string;
 }
