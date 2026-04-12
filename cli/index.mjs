@@ -1,0 +1,116 @@
+#!/usr/bin/env node
+/**
+ * CourseBench CLI Tool
+ * Usage: node cli/index.mjs <command> [args...]
+ *
+ * Commands:
+ *   set_admin <user_id>                    Set user as admin
+ *   unset_admin <user_id>                  Remove admin
+ *   set_community_admin <user_id>          Set user as community admin
+ *   unset_community_admin <user_id>        Remove community admin
+ *   import_elrc <semester>                 Import courses from ELRC API (e.g. 2024-2025-3)
+ *   import_teacher <csv_path>              Update teacher info from CSV
+ *   import_course <csv_dir>                Import courses from CSV directory
+ *   import_teacher_uniid <json_path>       Update teacher UniIDs from JSON
+ *   rm_duplicate_group                     Merge duplicate course groups
+ *   clear_userdata Yes_Confirm             Delete ALL user data (dangerous!)
+ *   stats                                  Show database statistics
+ */
+
+const args = process.argv.slice(2);
+const command = args[0];
+
+if (!command) {
+  console.log(`CourseBench CLI Tool
+
+Commands:
+  set_admin <user_id>                 Set user as admin
+  unset_admin <user_id>               Remove admin
+  set_community_admin <user_id>       Set user as community admin
+  unset_community_admin <user_id>     Remove community admin
+  import_elrc <semester> [--dry-run]  Import from ELRC API (e.g. 2024-2025-3)
+  import_teacher <csv_path>           Update teacher info from CSV
+  import_course <csv_dir>             Import courses from CSV directory
+  import_teacher_uniid <json_path>    Update teacher UniIDs from JSON
+  update_teacher_institute [--dry-run] Update teacher institutes from ELRC
+  rm_duplicate_group                  Merge duplicate course groups
+  clear_userdata Yes_Confirm          Delete ALL user data (dangerous!)
+  stats                               Show database statistics
+`);
+  process.exit(0);
+}
+
+try {
+  switch (command) {
+    case "set_admin":
+    case "unset_admin":
+    case "set_community_admin":
+    case "unset_community_admin": {
+      if (!args[1]) { console.error(`Missing <user_id>`); process.exit(1); }
+      const { setAdmin, setCommunityAdmin } = await import("./commands/admin.mjs");
+      if (command.includes("community")) {
+        await setCommunityAdmin(Number(args[1]), !command.startsWith("unset"));
+      } else {
+        await setAdmin(Number(args[1]), !command.startsWith("unset"));
+      }
+      break;
+    }
+    case "import_elrc": {
+      if (!args[1]) { console.error("Missing <semester>. e.g. 2024-2025-3"); process.exit(1); }
+      const dryRun = args.includes("--dry-run");
+      const semester = args.find((a) => a !== "import_elrc" && !a.startsWith("--"));
+      const { importELRC } = await import("./commands/import-elrc.mjs");
+      await importELRC(semester, { dryRun });
+      break;
+    }
+    case "import_teacher": {
+      if (!args[1]) { console.error("Missing <csv_path>"); process.exit(1); }
+      const { importTeacher } = await import("./commands/import-teacher.mjs");
+      await importTeacher(args[1]);
+      break;
+    }
+    case "import_course": {
+      if (!args[1]) { console.error("Missing <csv_dir>"); process.exit(1); }
+      const { importCourse } = await import("./commands/import-course.mjs");
+      await importCourse(args[1]);
+      break;
+    }
+    case "import_teacher_uniid": {
+      if (!args[1]) { console.error("Missing <json_path>"); process.exit(1); }
+      const { importTeacherUniID } = await import("./commands/import-teacher-uniid.mjs");
+      await importTeacherUniID(args[1]);
+      break;
+    }
+    case "update_teacher_institute": {
+      const dryRun = args.includes("--dry-run");
+      const { updateTeacherInstitute } = await import("./commands/update-teacher-institute.mjs");
+      await updateTeacherInstitute({ dryRun });
+      break;
+    }
+    case "rm_duplicate_group": {
+      const { rmDuplicateGroup } = await import("./commands/rm-duplicate-group.mjs");
+      await rmDuplicateGroup();
+      break;
+    }
+    case "clear_userdata": {
+      if (args[1] !== "Yes_Confirm") {
+        console.error("Safety check failed. Usage: clear_userdata Yes_Confirm");
+        process.exit(1);
+      }
+      const { clearUserdata } = await import("./commands/clear-userdata.mjs");
+      await clearUserdata();
+      break;
+    }
+    case "stats": {
+      const { showStats } = await import("./commands/stats.mjs");
+      await showStats();
+      break;
+    }
+    default:
+      console.error(`Unknown command: ${command}`);
+      process.exit(1);
+  }
+} catch (err) {
+  console.error("ERROR:", err.message || err);
+  process.exit(1);
+}

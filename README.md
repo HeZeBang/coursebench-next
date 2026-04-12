@@ -228,10 +228,135 @@ pnpm drizzle-kit push --dry-run
 
 ---
 
+## CLI 管理工具
+
+内置命令行工具，用于数据导入和管理员操作。自动从 `.env.local` 读取 `DATABASE_URL`。
+
+```bash
+# 通过 pnpm 运行
+pnpm cli <command> [args...]
+
+# 或直接运行
+node cli/index.mjs <command> [args...]
+```
+
+### 命令一览
+
+| 命令 | 说明 |
+|------|------|
+| `stats` | 显示数据库统计（用户数、课程数、评论数等） |
+| `set_admin <user_id>` | 设置用户为管理员 |
+| `unset_admin <user_id>` | 取消管理员 |
+| `set_community_admin <user_id>` | 设置用户为社区管理员 |
+| `unset_community_admin <user_id>` | 取消社区管理员 |
+| `import_elrc <semester> [--dry-run]` | 从 ELRC API 导入课程 |
+| `import_teacher <csv_path>` | 从 CSV 更新教师信息 |
+| `import_course <csv_dir>` | 从 CSV 目录导入课程 |
+| `update_teacher_institute [--dry-run]` | 从 ELRC 搜索 API 更新教师所属学院 |
+| `import_teacher_uniid <json_path>` | 从 JSON 更新教师工号 |
+| `rm_duplicate_group` | 合并重复授课组 |
+| `clear_userdata Yes_Confirm` | 删除所有用户数据（危险！） |
+
+### ELRC 课程导入
+
+每学期从上海科技大学 ELRC 系统导入新课程。
+
+```bash
+# Dry run：仅预览，不写入数据库
+pnpm cli import_elrc 2024-2025-2 --dry-run
+
+# 实际导入
+pnpm cli import_elrc 2024-2025-2
+```
+
+学期参数格式为 `<起始年>-<结束年>-<学期号>`，学期号：1=秋季，2=春季，3=夏季。
+
+Dry run 模式会：
+1. 从 ELRC API 拉取所有课程数据
+2. 查询 API 获取学分和开课单位等详情
+3. 与数据库对比，输出预览报告：
+   - 按学院分组的新课程列表（课程号、名称、学分、教师）
+   - 新教师列表
+   - 已存在课程统计
+
+### 教师数据导入
+
+```bash
+# 从 CSV 更新教师资料（照片、职称、邮箱等）
+# CSV 格式: name, photo, job, email, institute, introduction
+pnpm cli import_teacher teachers.csv
+
+# 从 JSON 更新教师工号
+# JSON 格式: { "课程号": { "工号": "教师姓名" } }
+pnpm cli import_teacher_uniid teachers.json
+```
+
+### 更新教师所属学院
+
+通过 ELRC 搜索 API 按姓名查询教师，根据返回的 `userCode` (工号) 匹配数据库中的教师，用 `college` 字段更新 `institute`。
+
+```bash
+# Dry run：仅预览变更，不写入
+pnpm cli update_teacher_institute --dry-run
+
+# 实际执行
+pnpm cli update_teacher_institute
+```
+
+匹配逻辑：
+- 优先按 `userCode == uni_id` 精确匹配
+- 如果搜索结果只有一条，直接使用
+- 多条结果且无法按工号匹配时标记为 "Ambiguous"，需人工核实
+- 同时补充缺失的 `uni_id`
+
+### 课程 CSV 导入
+
+```bash
+# 从目录中的 CSV 文件批量导入课程
+# CSV 列: [2]name, [3]code, [4]credit, [10]institute, [12]teacher_names(JSON), [13]teacher_eams_ids(JSON)
+pnpm cli import_course ./course_data/
+```
+
+### 管理员设置
+
+```bash
+# 查看数据库统计，确认用户 ID
+pnpm cli stats
+
+# 设置管理员（管理员和社区管理员互斥）
+pnpm cli set_admin 123
+pnpm cli set_community_admin 456
+```
+
+### 数据维护
+
+```bash
+# 合并重复授课组（教师集合完全相同的组）
+pnpm cli rm_duplicate_group
+
+# 删除所有用户数据（不可逆！需输入确认码）
+pnpm cli clear_userdata Yes_Confirm
+```
+
+---
+
 ## 项目结构
 
 ```
 frontend-next/
+├── cli/                               # 命令行管理工具
+│   ├── index.mjs                     # CLI 入口
+│   ├── db.mjs                        # 数据库连接
+│   └── commands/                     # 各命令实现
+│       ├── admin.mjs                 # 管理员设置
+│       ├── import-elrc.mjs           # ELRC API 导入
+│       ├── import-teacher.mjs        # 教师 CSV 导入
+│       ├── import-course.mjs         # 课程 CSV 导入
+│       ├── import-teacher-uniid.mjs  # 教师工号导入
+│       ├── update-teacher-institute.mjs # ELRC 教师学院更新
+│       ├── rm-duplicate-group.mjs    # 合并重复组
+│       ├── clear-userdata.mjs        # 清除用户数据
+│       └── stats.mjs                 # 数据库统计
 ├── src/
 │   ├── app/
 │   │   ├── v1/                        # API Route Handlers (后端)
