@@ -1,4 +1,18 @@
 {
-  "cooperations": [],
-  "individuals": []
+"cooperations": [
+  {
+    "name": "GeekPie",
+    "home": "homepage:https://geekpie.club",
+    "avatar": "github:ShanghaitechGeekPie",
+    "role": "邮件服务"
+  },
+  {
+    "name": "Vercel",
+    "home": "homepage:https://vercel.com",
+    "avatar": "github:vercel",
+    "role": "云服务"
+  }
+],
+"individuals": [
+]
 }
