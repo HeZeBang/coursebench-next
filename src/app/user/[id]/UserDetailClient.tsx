@@ -93,10 +93,10 @@ export default function UserDetailClient({
                 <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                   <RateReview fontSize="small" />
                   <Typography variant="body2">
-                    发表{" "}
-                    {comments
-                      .map((i) => i.like)
-                      .reduce((prev, cur) => prev + cur, 0)}{" "}
+                    发表
+                    {" "}
+                    {comments.length}
+                    {" "}
                     篇评价
                   </Typography>
                 </Box>
