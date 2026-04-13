@@ -256,7 +256,7 @@ export default function CommentCard({ comment }: CommentCardProps) {
                 {comment.title || "无标题"}
               </Typography>
 
-              <Box sx={{ display: "flex", gap: 2 }}>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 {comment.semester && (
                   <Box
                     sx={{
@@ -330,6 +330,7 @@ export default function CommentCard({ comment }: CommentCardProps) {
             gap: 1,
             mt: 1.5,
             pt: 1,
+            flexWrap: "wrap",
           }}
         >
           <Button
