@@ -10,6 +10,7 @@ import { SearchProvider } from "@/contexts/SearchContext";
 import { SnackbarProvider } from "@/contexts/SnackbarContext";
 import { CourseFilterProvider } from "@/contexts/CourseFilterContext";
 import { Header, Footer, ProgressBar } from "@/components/layout";
+import NewFeatureBanner from "@/components/layout/NewFeatureBanner";
 import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
@@ -47,6 +48,7 @@ export default function RootLayout({
                     {/* </Suspense> */}
                     <ProgressBar />
                     <Header />
+                    <NewFeatureBanner />
                     <main className="flex-1">{children}</main>
                     <Footer />
                   </CourseFilterProvider>

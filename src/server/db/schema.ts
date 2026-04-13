@@ -201,3 +201,20 @@ export const metadata = pgTable("metadata", {
   ...gormModel(),
   dbVersion: bigintCol("db_version").default(0),
 });
+
+// ---------- feature_feedback ----------
+
+export const featureFeedback = pgTable(
+  "feature_feedback",
+  {
+    ...gormModel(),
+    userId: bigintCol("user_id").notNull(),
+    featureKey: text("feature_key").notNull(),
+    rating: bigintCol("rating").notNull(), // 1-5
+    comment: text("comment"),
+  },
+  (table) => [
+    index("idx_feature_feedback_user").on(table.userId),
+    index("idx_feature_feedback_key").on(table.featureKey),
+  ],
+);
