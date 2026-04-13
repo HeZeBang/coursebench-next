@@ -55,6 +55,7 @@ export default function RootLayout({
             </AuthProvider>
           </SWRProvider>
         </ThemeRegistry>
+        <Analytics />
       </body>
     </html>
   );
