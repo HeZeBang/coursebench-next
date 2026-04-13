@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useSWRConfig } from "swr";
 import { useAuth, useAuthDispatch } from "@/contexts/AuthContext";
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import api from "@/lib/api";
@@ -12,6 +13,7 @@ export interface EditProfileFormData {
   year: number;
   grade: number;
   is_anonymous: boolean;
+  avatar: string;
 }
 
 export interface EditProfileDialogState {
@@ -61,6 +63,7 @@ export function useEditProfileDialog(): EditProfileDialogState {
   const { userProfile } = useAuth();
   const dispatch = useAuthDispatch();
   const showSnackbar = useSnackbar();
+  const { mutate } = useSWRConfig();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [step, setStep] = useState<0 | 1>(0);
@@ -74,6 +77,7 @@ export function useEditProfileDialog(): EditProfileDialogState {
     year: userProfile?.year ?? 0,
     grade: userProfile?.grade ?? 0,
     is_anonymous: userProfile?.is_anonymous ?? false,
+    avatar: "",
   };
 
   const [formData, setFormData] =
@@ -119,19 +123,28 @@ export function useEditProfileDialog(): EditProfileDialogState {
 
     setIsLoading(true);
     try {
-      const response = await api.post("/v1/user/update_profile", {
+      const payload: Record<string, unknown> = {
         nickname: formData.nickname,
         realname: formData.realname,
         year: formData.year,
         grade: formData.grade,
         is_anonymous: formData.is_anonymous,
-      });
+      };
+      if (formData.avatar) {
+        payload.avatar = formData.avatar;
+      }
 
-      // Update auth context
+      await api.post("/v1/user/update_profile", payload);
+
+      // Re-fetch profile to get resolved avatar URL
+      const profileRes = await api.get(`/v1/user/profile/${userProfile!.id}`);
       dispatch({
         type: "UPDATE_PROFILE",
-        payload: formData,
+        payload: profileRes.data.data,
       });
+
+      // Revalidate SWR cache so the profile page updates
+      mutate(`/v1/user/profile/${userProfile!.id}`);
 
       showSnackbar("个人信息已更新", "success");
       handleClose();

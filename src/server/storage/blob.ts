@@ -1,4 +1,5 @@
 import { put, del } from "@vercel/blob";
+import { parseAvatarUrl } from "@/utils/parseContributorLink";
 
 const AVATAR_SIZE_LIMIT = parseInt(process.env.AVATAR_SIZE_LIMIT || "1048576", 10); // 1MB default
 
@@ -25,7 +26,8 @@ export async function uploadAvatar(file: Blob, userId: number): Promise<string> 
 
 /**
  * Resolve an avatar field to a full URL.
- * Handles both old MinIO UUIDs and new Vercel Blob URLs.
+ * Handles protocol-prefixed strings (qq:, github:, gravatar:, cravatar:),
+ * full URLs (Vercel Blob), and old MinIO UUIDs.
  */
 export function resolveAvatarUrl(avatar: string | null): string {
   if (!avatar) return "";
@@ -33,6 +35,16 @@ export function resolveAvatarUrl(avatar: string | null): string {
   // If it's already a full URL (Vercel Blob), return as-is
   if (avatar.startsWith("http://") || avatar.startsWith("https://")) {
     return avatar;
+  }
+
+  // Protocol-prefixed formats
+  if (
+    avatar.startsWith("qq:") ||
+    avatar.startsWith("github:") ||
+    avatar.startsWith("gravatar:") ||
+    avatar.startsWith("cravatar:")
+  ) {
+    return parseAvatarUrl(avatar);
   }
 
   // Legacy MinIO UUID format

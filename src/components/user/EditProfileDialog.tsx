@@ -137,6 +137,20 @@ export default function EditProfileDialog({
                 </Select>
               </FormControl>
 
+              {/* Avatar */}
+              <TextField
+                fullWidth
+                label="头像"
+                placeholder="留空则不修改"
+                value={formData.avatar}
+                onChange={(e) => updateFormData({ avatar: e.target.value })}
+                disabled={isLoading}
+                helperText={
+                  "支持格式：qq:<QQ号>、github:<用户名或ID>、" +
+                  "gravatar:<邮箱>、cravatar:<邮箱>、或直接输入图片链接"
+                }
+              />
+
               {/* Anonymity */}
               <FormControlLabel
                 control={

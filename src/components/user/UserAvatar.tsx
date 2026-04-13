@@ -43,7 +43,6 @@ const UserAvatar = forwardRef<HTMLDivElement, UserAvatarProps>(
           fontSize: size / 2,
           bgcolor: userProfile ? "primary.main" : "grey.500",
           color: "white",
-          pb: "0.1rem",
           ...sx,
         }}
         {...props}
