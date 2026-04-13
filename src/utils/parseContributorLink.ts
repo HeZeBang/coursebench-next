@@ -1,6 +1,8 @@
+import { createHash } from "crypto";
+
 /**
  * Parse a contributor's avatar URL from protocol-prefixed links.
- * Supports: qq:<id>, github:<username>, email:<address>, and direct URLs.
+ * Supports: qq:<id>, github:<username>, gravatar:<email>, cravatar:<email>, email:<address>, and direct URLs.
  */
 export function parseAvatarUrl(url: string): string {
   if (!url) return "";
@@ -14,6 +16,16 @@ export function parseAvatarUrl(url: string): string {
       return `https://avatars.githubusercontent.com/u/${id}`;
     }
     return `https://github.com/${id}.png`;
+  }
+  if (url.startsWith("gravatar:")) {
+    const email = url.slice(9).trim().toLowerCase();
+    const hash = createHash("md5").update(email).digest("hex");
+    return `https://www.gravatar.com/avatar/${hash}?s=640`;
+  }
+  if (url.startsWith("cravatar:")) {
+    const email = url.slice(9).trim().toLowerCase();
+    const hash = createHash("md5").update(email).digest("hex");
+    return `https://cravatar.cn/avatar/${hash}?s=640`;
   }
   if (url.startsWith("email:") || url.startsWith("homepage:")) {
     return "";

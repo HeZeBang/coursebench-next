@@ -86,7 +86,7 @@ export default function UserCommentCard({ comment }: UserCommentCardProps) {
                   sx={{
                     display: "flex",
                     gap: 0.5,
-                    alignItems: "baseline",
+                    alignItems: "center",
                     flexWrap: "wrap",
                   }}
                 >
