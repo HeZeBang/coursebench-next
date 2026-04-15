@@ -162,7 +162,7 @@ export default function EditProfileDialog({
                     disabled={isLoading}
                   />
                 }
-                label="默认评价时匿名"
+                label="隐藏真实信息"
               />
             </Box>
           </DialogContent>

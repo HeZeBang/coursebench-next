@@ -92,7 +92,7 @@ export default function CommentEditor({
   const { userProfile } = useAuth();
 
   const [isAnonymous, setIsAnonymous] = useState(
-    existingComment?.is_anonymous ?? (userProfile?.is_anonymous || false),
+    existingComment?.is_anonymous ?? false,
   );
 
   // Reset form when switching between edit targets
@@ -112,7 +112,7 @@ export default function CommentEditor({
         : "",
     );
     setIsAnonymous(
-      existingComment?.is_anonymous ?? (userProfile?.is_anonymous || false),
+      existingComment?.is_anonymous ?? false,
     );
     setError("");
     setTab(0);
