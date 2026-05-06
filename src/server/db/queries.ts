@@ -422,6 +422,154 @@ export async function buildCommentResponse(
   };
 }
 
+/**
+ * Batched version of buildCommentResponse for lists.
+ * Avoids the 4–5 sequential queries per comment that buildCommentResponse does
+ * by fetching users/courses/groups/group-teachers/likes in bulk and assembling
+ * in JS. Output shape matches buildCommentResponse exactly.
+ */
+export async function buildCommentResponsesBatch(
+  rows: (typeof comments.$inferSelect)[],
+  viewerId: number,
+) {
+  if (rows.length === 0) return [];
+
+  const userIdSet = new Set<number>();
+  const courseIdSet = new Set<number>();
+  const groupIdSet = new Set<number>();
+  const commentIds: number[] = [];
+
+  for (const c of rows) {
+    const isAnonymous = c.isAnonymous ?? false;
+    const isSelf = viewerId !== 0 && viewerId === c.userId;
+    if (c.userId != null && (!isAnonymous || isSelf)) userIdSet.add(c.userId);
+    if (c.courseId != null) courseIdSet.add(c.courseId);
+    if (c.courseGroupId != null) groupIdSet.add(c.courseGroupId);
+    commentIds.push(c.id);
+  }
+
+  const userIds = [...userIdSet];
+  const courseIds = [...courseIdSet];
+  const groupIds = [...groupIdSet];
+
+  const [userRows, courseRows, groupRows, gtRows, likeRows] = await Promise.all([
+    userIds.length
+      ? db.select().from(users).where(inArray(users.id, userIds))
+      : Promise.resolve([] as (typeof users.$inferSelect)[]),
+    courseIds.length
+      ? db
+          .select({
+            id: courses.id,
+            name: courses.name,
+            code: courses.code,
+            institute: courses.institute,
+          })
+          .from(courses)
+          .where(inArray(courses.id, courseIds))
+      : Promise.resolve([] as { id: number; name: string | null; code: string | null; institute: string | null }[]),
+    groupIds.length
+      ? db.select().from(courseGroups).where(inArray(courseGroups.id, groupIds))
+      : Promise.resolve([] as (typeof courseGroups.$inferSelect)[]),
+    groupIds.length
+      ? db
+          .select()
+          .from(coursegroupTeachers)
+          .where(inArray(coursegroupTeachers.courseGroupId, groupIds))
+      : Promise.resolve([] as (typeof coursegroupTeachers.$inferSelect)[]),
+    viewerId && commentIds.length
+      ? db
+          .select()
+          .from(commentLikes)
+          .where(
+            and(
+              eq(commentLikes.userId, viewerId),
+              inArray(commentLikes.commentId, commentIds),
+              isNull(commentLikes.deletedAt),
+            ),
+          )
+      : Promise.resolve([] as (typeof commentLikes.$inferSelect)[]),
+  ]);
+
+  const teacherIdSet = new Set<number>();
+  for (const r of gtRows) teacherIdSet.add(r.teacherId);
+  const teacherIds = [...teacherIdSet];
+  const teacherRows = teacherIds.length
+    ? await db
+        .select({ id: teachers.id, name: teachers.name })
+        .from(teachers)
+        .where(inArray(teachers.id, teacherIds))
+    : [];
+
+  const userMap = new Map(userRows.map((u) => [u.id, u]));
+  const courseMap = new Map(courseRows.map((c) => [c.id, c]));
+  const groupMap = new Map(groupRows.map((g) => [g.id, g]));
+  const teacherMap = new Map(teacherRows.map((t) => [t.id, t]));
+  const groupTeacherMap = new Map<number, { id: number; name: string }[]>();
+  for (const r of gtRows) {
+    const t = teacherMap.get(r.teacherId);
+    if (!t) continue;
+    const arr = groupTeacherMap.get(r.courseGroupId) ?? [];
+    arr.push({ id: t.id, name: t.name || "" });
+    groupTeacherMap.set(r.courseGroupId, arr);
+  }
+  const likeMap = new Map<number, boolean>();
+  for (const l of likeRows) likeMap.set(l.commentId!, l.isLike ?? false);
+
+  return rows.map((comment) => {
+    const isAnonymous = comment.isAnonymous ?? false;
+    const isSelf = viewerId !== 0 && viewerId === comment.userId;
+    let userBrief: UserBrief | null = null;
+    if (!isAnonymous || isSelf) {
+      const user = comment.userId != null ? userMap.get(comment.userId) : undefined;
+      userBrief = user ? buildUserBrief(user, viewerId) : null;
+    }
+    const course = comment.courseId != null ? courseMap.get(comment.courseId) : undefined;
+    const group = comment.courseGroupId != null ? groupMap.get(comment.courseGroupId) : undefined;
+    const groupTeachers = group ? groupTeacherMap.get(group.id) ?? [] : [];
+
+    let likeStatus = 0;
+    if (viewerId && likeMap.has(comment.id)) {
+      likeStatus = likeMap.get(comment.id) ? 1 : 2;
+    }
+
+    return {
+      id: comment.id,
+      title: comment.title || "",
+      content: comment.content || "",
+      post_time: comment.createTime ?? 0,
+      update_time: comment.updateTime ?? 0,
+      semester: comment.semester ?? 0,
+      is_anonymous: comment.isAnonymous ?? false,
+      like: comment.like ?? 0,
+      dislike: comment.dislike ?? 0,
+      like_status: likeStatus,
+      score: comment.scores || [],
+      user: userBrief,
+      course: course
+        ? {
+            id: course.id,
+            name: course.name || "",
+            code: course.code || "",
+            institute: course.institute || "",
+          }
+        : null,
+      group: group
+        ? {
+            id: group.id,
+            code: group.code || "",
+            teachers: groupTeachers,
+          }
+        : null,
+      is_fold: comment.isFold ?? false,
+      is_covered: comment.isCovered ?? false,
+      cover_title: comment.coverTitle || "",
+      cover_content: comment.coverContent || "",
+      cover_reason: comment.coverReason || "",
+      reward: comment.reward ?? 0,
+    };
+  });
+}
+
 export async function getCommentsByCourse(courseId: number, viewerId: number) {
   const rows = await db
     .select()
@@ -429,7 +577,7 @@ export async function getCommentsByCourse(courseId: number, viewerId: number) {
     .where(and(eq(comments.courseId, courseId), isNull(comments.deletedAt)))
     .orderBy(desc(comments.updateTime));
 
-  return Promise.all(rows.map((c) => buildCommentResponse(c, viewerId)));
+  return buildCommentResponsesBatch(rows, viewerId);
 }
 
 export async function getCommentsByCourseGroup(groupId: number, viewerId: number) {
@@ -439,7 +587,7 @@ export async function getCommentsByCourseGroup(groupId: number, viewerId: number
     .where(and(eq(comments.courseGroupId, groupId), isNull(comments.deletedAt)))
     .orderBy(desc(comments.updateTime));
 
-  return Promise.all(rows.map((c) => buildCommentResponse(c, viewerId)));
+  return buildCommentResponsesBatch(rows, viewerId);
 }
 
 export async function getCommentsByUser(userId: number, viewerId: number) {
@@ -455,7 +603,7 @@ export async function getCommentsByUser(userId: number, viewerId: number) {
     return true;
   });
 
-  return Promise.all(filtered.map((c) => buildCommentResponse(c, viewerId)));
+  return buildCommentResponsesBatch(filtered, viewerId);
 }
 
 export async function getRecentComments(viewerId: number, limit = 100) {
@@ -466,7 +614,7 @@ export async function getRecentComments(viewerId: number, limit = 100) {
     .orderBy(desc(comments.updateTime))
     .limit(limit);
 
-  return Promise.all(rows.map((c) => buildCommentResponse(c, viewerId)));
+  return buildCommentResponsesBatch(rows, viewerId);
 }
 
 export async function getRecentCommentsPaginated(viewerId: number, page: number) {
@@ -489,7 +637,7 @@ export async function getRecentCommentsPaginated(viewerId: number, page: number)
     .limit(pageSize)
     .offset(offset);
 
-  const commentData = await Promise.all(rows.map((c) => buildCommentResponse(c, viewerId)));
+  const commentData = await buildCommentResponsesBatch(rows, viewerId);
 
   return {
     page_count: pageCount,
