@@ -16,6 +16,8 @@
  *   clear_userdata Yes_Confirm             Delete ALL user data (dangerous!)
  *   stats                                  Show database statistics
  *   test_mail <to> [options]                Send a test email
+ *   migrate_pg [--dry-run] [--truncate]    Copy Postgres data DATABASE_URL → DATABASE_URL_DEST
+ *   migrate_blob                           (warning-only no-op)
  */
 
 const args = process.argv.slice(2);
@@ -41,6 +43,8 @@ Commands:
     --subject <text>                    Custom subject
     --template register|reset           Use built-in template
     --raw <html>                        Custom HTML body
+  migrate_pg [--dry-run] [--truncate] Copy Postgres data DATABASE_URL → DATABASE_URL_DEST
+  migrate_blob                        (warning-only no-op)
 `);
   process.exit(0);
 }
@@ -122,6 +126,18 @@ try {
       }
       const { testMail } = await import("./commands/test-mail.mjs");
       await testMail(to, opts);
+      break;
+    }
+    case "migrate_pg": {
+      const dryRun = args.includes("--dry-run");
+      const truncate = args.includes("--truncate");
+      const { migratePg } = await import("./commands/migrate-pg.mjs");
+      await migratePg({ dryRun, truncate });
+      break;
+    }
+    case "migrate_blob": {
+      const { migrateBlob } = await import("./commands/migrate-blob.mjs");
+      await migrateBlob();
       break;
     }
     default:
