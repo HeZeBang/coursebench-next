@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { AppError } from "./errors";
+import { PUBLIC_API_CACHE_CONTROL } from "./cache";
 
-export function okResponse(data: unknown = null) {
-  return NextResponse.json({ error: false, data });
+export function okResponse(data: unknown = null, init?: ResponseInit) {
+  return NextResponse.json({ error: false, data }, init);
+}
+
+export function publicOkResponse(data: unknown = null, init?: ResponseInit) {
+  const headers = new Headers(init?.headers);
+  headers.set("Cache-Control", PUBLIC_API_CACHE_CONTROL);
+  return okResponse(data, { ...init, headers });
 }
 
 export function errorResponse(err: AppError) {

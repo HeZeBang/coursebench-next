@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useState, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -20,27 +20,20 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 import api from "@/lib/api";
 import Link from "next/link";
+import { classifyError } from "@/utils/classifyError";
 
 function ResetPasswordActiveContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const [status, setStatus] = useState<
-    "input" | "loading" | "success" | "error"
-  >("input");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
 
   const id = searchParams.get("id");
   const code = searchParams.get("code");
-
-  useEffect(() => {
-    if (!id || !code) {
-      setStatus("error");
-      setErrorMsg("链接参数无效");
-    }
-  }, [id, code]);
+  const hasValidParams = !!id && !!code;
+  const [status, setStatus] = useState<
+    "input" | "loading" | "success" | "error"
+  >(hasValidParams ? "input" : "error");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(hasValidParams ? "" : "链接参数无效");
 
   const handleSubmit = useCallback(async () => {
     // Validate password: 8-16 chars, must contain letter + digit
@@ -57,9 +50,9 @@ function ResetPasswordActiveContent() {
         password,
       });
       setStatus("success");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus("error");
-      setErrorMsg(err.response?.data?.msg || err.message || "重置失败，请重试");
+      setErrorMsg(classifyError(err).message || "重置失败，请重试");
     }
   }, [password, id, code]);
 

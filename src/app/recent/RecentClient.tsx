@@ -40,7 +40,9 @@ export default function RecentClient({ firstPage }: RecentClientProps) {
   const isLoadingMore = result.isLoading || (result.size > 0 && result.data && typeof result.data[result.size - 1] === "undefined");
   const hasMore = result.data ? (result.data[result.data.length - 1]?.data?.has_more ?? false) : true;
 
-  const loadMore = () => result.setSize(result.size + 1);
+  const loadMore = useCallback(() => {
+    result.setSize((size) => size + 1);
+  }, [result]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +53,7 @@ export default function RecentClient({ firstPage }: RecentClientProps) {
         loadMore();
       }
     },
-    [hasMore, isLoadingMore],
+    [hasMore, isLoadingMore, loadMore],
   );
 
   useEffect(() => {

@@ -5,6 +5,7 @@ import { db } from "@/server/db";
 import { comments, users } from "@/server/db/schema";
 import { eq, and, isNull, sql } from "drizzle-orm";
 import * as errors from "@/server/errors";
+import { revalidateCoursePublicData, revalidateRanklistPublicData } from "@/server/cache";
 
 export async function POST(req: Request) {
   return handleRoute(async () => {
@@ -32,7 +33,10 @@ export async function POST(req: Request) {
         .update(users)
         .set({ reward: sql`${users.reward} + ${delta}` })
         .where(eq(users.id, comment.userId!));
+      revalidateRanklistPublicData();
     }
+
+    revalidateCoursePublicData(comment.courseId!);
 
     return okResponse(null);
   });

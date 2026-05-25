@@ -1,10 +1,10 @@
-import { revalidateTag } from "next/cache";
 import { handleRoute, okResponse } from "@/server/response";
 import { requireUserId } from "@/server/auth/session";
 import { db } from "@/server/db";
 import { comments, courseGroups, courses, users } from "@/server/db/schema";
 import { eq, and, isNull, sql } from "drizzle-orm";
 import * as errors from "@/server/errors";
+import { revalidateCoursePublicData, revalidateRanklistPublicData } from "@/server/cache";
 
 const SCORE_LENGTH = 4;
 
@@ -125,8 +125,10 @@ export async function POST(req: Request) {
       await db.update(users).set({ hasPostedComments: true }).where(eq(users.id, userId));
     }
 
-    revalidateTag("courses", "minutes");
-    revalidateTag(`course-${cg.courseId}`, "minutes");
+    revalidateCoursePublicData(cg.courseId!);
+    if (user && !user.hasPostedComments && user.invitedByUserId) {
+      revalidateRanklistPublicData();
+    }
 
     return okResponse({ comment_id: newComment.id });
   });

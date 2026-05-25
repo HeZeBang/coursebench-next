@@ -4,6 +4,7 @@ import { db } from "@/server/db";
 import { comments, commentLikes } from "@/server/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import * as errors from "@/server/errors";
+import { revalidateCoursePublicData } from "@/server/cache";
 
 export async function POST(req: Request) {
   return handleRoute(async () => {
@@ -66,6 +67,7 @@ export async function POST(req: Request) {
           dislike: (comment.dislike ?? 0) + dislikeDelta,
         })
         .where(eq(comments.id, commentId));
+      revalidateCoursePublicData(comment.courseId!);
     }
 
     return okResponse({});

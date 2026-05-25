@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -14,24 +14,20 @@ import ErrorIcon from "@mui/icons-material/Error";
 
 import api from "@/lib/api";
 import Link from "next/link";
+import { classifyError } from "@/utils/classifyError";
 
 function ActiveContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const id = searchParams.get("id");
+  const code = searchParams.get("code");
+  const hasValidParams = !!id && !!code;
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading",
+    hasValidParams ? "loading" : "error",
   );
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState(hasValidParams ? "" : "链接参数无效");
 
   useEffect(() => {
-    const id = searchParams.get("id");
-    const code = searchParams.get("code");
-
-    if (!id || !code) {
-      setStatus("error");
-      setErrorMsg("链接参数无效");
-      return;
-    }
+    if (!id || !code) return;
 
     api
       .post("/v1/user/register_active", {
@@ -41,11 +37,9 @@ function ActiveContent() {
       .then(() => setStatus("success"))
       .catch((err) => {
         setStatus("error");
-        setErrorMsg(
-          err.response?.data?.msg || err.message || "激活失败，请重试",
-        );
+        setErrorMsg(classifyError(err).message || "激活失败，请重试");
       });
-  }, [searchParams]);
+  }, [id, code]);
 
   return (
     <Container

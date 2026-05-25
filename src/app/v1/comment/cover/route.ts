@@ -5,6 +5,7 @@ import { db } from "@/server/db";
 import { comments } from "@/server/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import * as errors from "@/server/errors";
+import { revalidateCoursePublicData } from "@/server/cache";
 
 export async function POST(req: Request) {
   return handleRoute(async () => {
@@ -24,6 +25,8 @@ export async function POST(req: Request) {
       .update(comments)
       .set({ isCovered: !!status, updatedAt: new Date() })
       .where(eq(comments.id, comment.id));
+
+    revalidateCoursePublicData(comment.courseId!);
 
     return okResponse({});
   });

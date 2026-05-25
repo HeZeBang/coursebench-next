@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useSWRConfig } from "swr";
 import { useAuth, useAuthDispatch } from "@/contexts/AuthContext";
 import { useSnackbar } from "@/contexts/SnackbarContext";
 import api from "@/lib/api";
-import type { UserProfile } from "@/types";
+import { classifyError } from "@/utils/classifyError";
 
 export interface EditProfileFormData {
   nickname: string;
@@ -71,14 +71,17 @@ export function useEditProfileDialog(): EditProfileDialogState {
   const [turnstileKey, setTurnstileKey] = useState(0);
 
   // Initialize form data from current profile
-  const initialFormData: EditProfileFormData = {
-    nickname: userProfile?.nickname ?? "",
-    realname: userProfile?.realname ?? "",
-    year: userProfile?.year ?? 0,
-    grade: userProfile?.grade ?? 0,
-    is_anonymous: userProfile?.is_anonymous ?? false,
-    avatar: "",
-  };
+  const initialFormData = useMemo<EditProfileFormData>(
+    () => ({
+      nickname: userProfile?.nickname ?? "",
+      realname: userProfile?.realname ?? "",
+      year: userProfile?.year ?? 0,
+      grade: userProfile?.grade ?? 0,
+      is_anonymous: userProfile?.is_anonymous ?? false,
+      avatar: "",
+    }),
+    [userProfile],
+  );
 
   const [formData, setFormData] =
     useState<EditProfileFormData>(initialFormData);
@@ -148,13 +151,13 @@ export function useEditProfileDialog(): EditProfileDialogState {
 
       showSnackbar("个人信息已更新", "success");
       handleClose();
-    } catch (error: any) {
-      const errorMsg = error?.response?.data?.msg || "更新个人信息失败，请重试";
+    } catch (error: unknown) {
+      const errorMsg = classifyError(error).message || "更新个人信息失败，请重试";
       showSnackbar(errorMsg, "error");
     } finally {
       setIsLoading(false);
     }
-  }, [formData, dispatch, showSnackbar, handleClose]);
+  }, [formData, dispatch, mutate, userProfile, showSnackbar, handleClose]);
 
   const handleSubmitPassword = useCallback(async () => {
     if (!passwordData.oldPassword.trim()) {
@@ -183,8 +186,8 @@ export function useEditProfileDialog(): EditProfileDialogState {
       showSnackbar("密码已修改", "success");
       setPasswordData({ oldPassword: "", newPassword: "", captcha: "" });
       setStep(0);
-    } catch (error: any) {
-      const errorMsg = error?.response?.data?.msg || "修改密码失败，请重试";
+    } catch (error: unknown) {
+      const errorMsg = classifyError(error).message || "修改密码失败，请重试";
       showSnackbar(errorMsg, "error");
       setPasswordData((prev) => ({ ...prev, captcha: "" }));
       setTurnstileKey((k) => k + 1);

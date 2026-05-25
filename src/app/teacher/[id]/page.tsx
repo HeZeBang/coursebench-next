@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { connection } from "next/server";
 
 import { getTeacherDetail } from "@/server/db/queries";
 import { AppError } from "@/server/errors";
@@ -13,7 +12,6 @@ interface TeacherDetailPageProps {
 
 export async function generateMetadata({ params }: TeacherDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  await connection();
   try {
     const teacher = await getTeacherDetail(Number(id));
     return {
@@ -28,7 +26,6 @@ export async function generateMetadata({ params }: TeacherDetailPageProps): Prom
 export default async function TeacherDetailPage({ params }: TeacherDetailPageProps) {
   const { id } = await params;
   const teacherId = Number(id);
-  await connection();
 
   let teacher;
   try {

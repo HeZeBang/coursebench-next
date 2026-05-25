@@ -18,6 +18,7 @@ import {
 } from "./schema";
 import * as errors from "../errors";
 import { resolveAvatarUrl } from "../storage/blob";
+import { cachePublic, cacheTags } from "../cache";
 
 const SCORE_LENGTH = 4;
 
@@ -159,7 +160,7 @@ export interface CourseListItem {
   comment_num: number;
 }
 
-export async function getAllCourses(): Promise<CourseListItem[]> {
+async function getAllCoursesRaw(): Promise<CourseListItem[]> {
   const rows = await db
     .select()
     .from(courses)
@@ -176,7 +177,11 @@ export async function getAllCourses(): Promise<CourseListItem[]> {
   }));
 }
 
-export async function getCourseDetail(courseId: number) {
+export const getAllCourses = cachePublic(getAllCoursesRaw, ["courses:all"], [
+  cacheTags.courses,
+]);
+
+async function getCourseDetailRaw(courseId: number) {
   const [course] = await db
     .select()
     .from(courses)
@@ -236,9 +241,17 @@ export async function getCourseDetail(courseId: number) {
   };
 }
 
+export async function getCourseDetail(courseId: number) {
+  return cachePublic(
+    () => getCourseDetailRaw(courseId),
+    ["course:detail", String(courseId)],
+    [cacheTags.courses, cacheTags.course(courseId)],
+  )();
+}
+
 // ---------- teacher helpers ----------
 
-export async function getAllTeachers() {
+async function getAllTeachersRaw() {
   const rows = await db.select().from(teachers).where(isNull(teachers.deletedAt));
   return rows.map((t) => ({
     id: t.id,
@@ -250,7 +263,11 @@ export async function getAllTeachers() {
   }));
 }
 
-export async function getTeacherDetail(teacherId: number) {
+export const getAllTeachers = cachePublic(getAllTeachersRaw, ["teachers:all"], [
+  cacheTags.teachers,
+]);
+
+async function getTeacherDetailRaw(teacherId: number) {
   const [teacher] = await db
     .select()
     .from(teachers)
@@ -287,6 +304,14 @@ export async function getTeacherDetail(teacherId: number) {
     photo: teacher.photo || "",
     courses: teacherCourses,
   };
+}
+
+export async function getTeacherDetail(teacherId: number) {
+  return cachePublic(
+    () => getTeacherDetailRaw(teacherId),
+    ["teacher:detail", String(teacherId)],
+    [cacheTags.teachers, cacheTags.teacher(teacherId)],
+  )();
 }
 
 // ---------- comment helpers ----------
@@ -570,7 +595,7 @@ export async function buildCommentResponsesBatch(
   });
 }
 
-export async function getCommentsByCourse(courseId: number, viewerId: number) {
+async function getCommentsByCourseRaw(courseId: number, viewerId: number) {
   const rows = await db
     .select()
     .from(comments)
@@ -578,6 +603,18 @@ export async function getCommentsByCourse(courseId: number, viewerId: number) {
     .orderBy(desc(comments.updateTime));
 
   return buildCommentResponsesBatch(rows, viewerId);
+}
+
+export async function getCommentsByCourse(courseId: number, viewerId: number) {
+  if (viewerId !== 0) {
+    return getCommentsByCourseRaw(courseId, viewerId);
+  }
+
+  return cachePublic(
+    () => getCommentsByCourseRaw(courseId, 0),
+    ["comments:course", String(courseId), "anonymous"],
+    [cacheTags.courseComments(courseId)],
+  )();
 }
 
 export async function getCommentsByCourseGroup(groupId: number, viewerId: number) {
@@ -606,7 +643,7 @@ export async function getCommentsByUser(userId: number, viewerId: number) {
   return buildCommentResponsesBatch(filtered, viewerId);
 }
 
-export async function getRecentComments(viewerId: number, limit = 100) {
+async function getRecentCommentsRaw(viewerId: number, limit = 100) {
   const rows = await db
     .select()
     .from(comments)
@@ -617,7 +654,19 @@ export async function getRecentComments(viewerId: number, limit = 100) {
   return buildCommentResponsesBatch(rows, viewerId);
 }
 
-export async function getRecentCommentsPaginated(viewerId: number, page: number) {
+export async function getRecentComments(viewerId: number, limit = 100) {
+  if (viewerId !== 0) {
+    return getRecentCommentsRaw(viewerId, limit);
+  }
+
+  return cachePublic(
+    () => getRecentCommentsRaw(0, limit),
+    ["comments:recent", String(limit), "anonymous"],
+    [cacheTags.recentComments],
+  )();
+}
+
+async function getRecentCommentsPaginatedRaw(viewerId: number, page: number) {
   const pageSize = 30;
   const offset = (page - 1) * pageSize;
 
@@ -644,6 +693,18 @@ export async function getRecentCommentsPaginated(viewerId: number, page: number)
     has_more: page < pageCount,
     comments: commentData,
   };
+}
+
+export async function getRecentCommentsPaginated(viewerId: number, page: number) {
+  if (viewerId !== 0) {
+    return getRecentCommentsPaginatedRaw(viewerId, page);
+  }
+
+  return cachePublic(
+    () => getRecentCommentsPaginatedRaw(0, page),
+    ["comments:recent:page", String(page), "anonymous"],
+    [cacheTags.recentComments],
+  )();
 }
 
 // ---------- reply helpers ----------
@@ -738,7 +799,7 @@ export async function buildReplyResponse(reply: typeof replies.$inferSelect, vie
 
 // ---------- ranklist helpers ----------
 
-export async function getRanklist() {
+async function getRanklistRaw() {
   const rows = await db
     .select({
       nickName: users.nickName,
@@ -756,3 +817,7 @@ export async function getRanklist() {
     is_anonymous: r.isAnonymous ?? false,
   }));
 }
+
+export const getRanklist = cachePublic(getRanklistRaw, ["ranklist"], [
+  cacheTags.ranklist,
+]);

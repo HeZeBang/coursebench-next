@@ -1,10 +1,10 @@
-import { revalidateTag } from "next/cache";
 import { handleRoute, okResponse } from "@/server/response";
 import { requireUserId } from "@/server/auth/session";
 import { db } from "@/server/db";
 import { comments, courseGroups, courses } from "@/server/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import * as errors from "@/server/errors";
+import { revalidateCoursePublicData } from "@/server/cache";
 
 const SCORE_LENGTH = 4;
 
@@ -46,8 +46,7 @@ export async function POST(req: Request) {
     // Recalculate course group and course scores
     await recalculateScores(comment.courseGroupId!, comment.courseId!);
 
-    revalidateTag("courses", "minutes");
-    revalidateTag(`course-${comment.courseId}`, "minutes");
+    revalidateCoursePublicData(comment.courseId!);
 
     return okResponse(null);
   });
